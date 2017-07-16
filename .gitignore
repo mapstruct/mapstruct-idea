@@ -1,0 +1,19 @@
+# Eclipse
+.metadata
+.recommenders
+.classpath
+.project
+.settings
+.factorypath
+.checkstyle
+.externalToolBuilders
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Gradle
+.gradle/
+build/

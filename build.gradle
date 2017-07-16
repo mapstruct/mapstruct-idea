@@ -1,0 +1,35 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.2.14"
+}
+
+
+group pluginGroup
+version pluginVersion
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'org.jetbrains.intellij'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'
+    }
+}
+
+intellij {
+    version System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
+    type ideaType
+    downloadSources Boolean.valueOf(sources)
+    sameSinceUntilBuild Boolean.valueOf(isEAP)
+    alternativeIdePath idePath
+    updateSinceUntilBuild false
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
