@@ -33,6 +33,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
+import org.mapstruct.intellij.util.MapstructUtil;
 
 import static com.intellij.patterns.PsiJavaPatterns.psiElement;
 
@@ -55,7 +56,7 @@ public class MapperCompletionContributor extends CompletionContributor {
             CompletionType.BASIC,
             psiElement()
                 .insideAnnotationParam(
-                    StandardPatterns.string().oneOf( "org.mapstruct.Mapper" ),
+                    StandardPatterns.string().equalTo( MapstructUtil.MAPPER_ANNOTATION_FQN   ),
                     "componentModel"
                 ),
             new MapperCompletionProvider()

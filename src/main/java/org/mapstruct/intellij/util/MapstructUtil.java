@@ -42,6 +42,7 @@ import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
@@ -49,6 +50,7 @@ import org.mapstruct.Mapping;
  */
 public class MapstructUtil {
 
+    public static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
     private static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
 
     /**
