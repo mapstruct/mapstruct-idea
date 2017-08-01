@@ -24,6 +24,7 @@ import java.util.Objects;
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
@@ -37,6 +38,7 @@ import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +66,7 @@ public class MapstructUtil {
 
         String propertyName = getPropertyName( method );
         LookupElementBuilder builder = LookupElementBuilder.create(method, propertyName )
-            .withIcon(method.getIcon( Iconable.ICON_FLAG_VISIBILITY))
+            .withIcon( PlatformIcons.VARIABLE_ICON)
             .withPresentableText(propertyName)
             .withTailText( PsiFormatUtil.formatMethod(method, substitutor,
                 0,

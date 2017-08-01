@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Filip Hrisafov
  */
-public class MapperCompletionContributorTest extends LightFixtureCompletionTestCase {
+public class MapperCompletionContributorTest extends MapstructBaseCompletionTestCase {
 
     @Override
     protected String getTestDataPath() {

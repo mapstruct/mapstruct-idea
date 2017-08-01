@@ -51,13 +51,11 @@ public class MapperCompletionContributor extends CompletionContributor {
 //            new MapperCompletionProvider()
 //        );
 
-        //TODO I don't know why it doesn't work only with "org.mapstruct.Mapper". For some reason
-        // the qualified name in the tests is just Mapper
         extend(
             CompletionType.BASIC,
             psiElement()
                 .insideAnnotationParam(
-                    StandardPatterns.string().oneOf( "org.mapstruct.Mapper", "Mapper" ),
+                    StandardPatterns.string().oneOf( "org.mapstruct.Mapper" ),
                     "componentModel"
                 ),
             new MapperCompletionProvider()
