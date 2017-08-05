@@ -19,6 +19,7 @@
 package org.mapstruct.intellij;
 
 import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
+import com.intellij.openapi.util.text.StringUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,10 +83,30 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             "    NullValueCheckStrategy nullValueCheckStrategy() default ON_IMPLICIT_CONVERSION;\n" +
             "    boolean disableSubMappingMethodsGeneration() default false;\n" +
             "}" );
+        addEnvironmentClass( "package org.mapstruct;\n" +
+            "import java.lang.annotation.Annotation;\n" +
+            "public @interface Mapping {\n" +
+            "    String target();\n" +
+            "    String source() default \"\";\n" +
+            "    String dateFormat() default \"\";\n" +
+            "    String numberFormat() default \"\";\n" +
+            "    String constant() default \"\";\n" +
+            "    String expression() default \"\";\n" +
+            "    boolean ignore() default false;\n" +
+            "    Class<? extends Annotation>[] qualifiedBy() default { };\n" +
+            "    String[] qualifiedByName() default { };\n" +
+            "    Class<?> resultType() default void.class;\n" +
+            "    String[] dependsOn() default { };\n" +
+            "    String defaultValue() default \"\";\n" +
+            "}" );
         //@formatter:on
     }
 
     protected void addEnvironmentClass(@Language("JAVA") @NotNull String classText) {
         myFixture.addClass( classText );
+    }
+
+    protected void addDirectoryToProject(@NotNull String directory) {
+        myFixture.copyDirectoryToProject( directory, StringUtil.getShortName( directory, '/' ) );
     }
 }
