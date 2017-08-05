@@ -1,5 +1,6 @@
 plugins {
     id "org.jetbrains.intellij" version "0.2.14"
+    id "com.github.hierynomus.license" version "0.14.0"
 }
 
 
@@ -9,6 +10,7 @@ version pluginVersion
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'license'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -29,6 +31,23 @@ intellij {
     alternativeIdePath idePath
     updateSinceUntilBuild false
 }
+
+task licenseTestData(type: com.hierynomus.gradle.license.tasks.LicenseCheck) {
+    source = fileTree(dir: "testData").include("**/*")
+}
+
+license {
+    header rootProject.file('etc/license.txt')
+    strictCheck true
+    mapping {
+        java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
+    }
+    excludes([
+            '**/META-INF/plugin.xml' // For some reason the plugin thinks that the license is not valid
+    ])
+}
+
+licenseTest.dependsOn licenseTestData
 
 dependencies {
     compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: '1.1.0.Final'
