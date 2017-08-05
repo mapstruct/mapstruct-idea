@@ -20,6 +20,7 @@ package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -62,7 +63,7 @@ public class MapstructUtil {
         return annotation != null && Objects.equals( annotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
     }
 
-    public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair) {
+    public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair, Function<PsiMethod, PsiType> typeMapper) {
         PsiMethod method = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
@@ -73,9 +74,9 @@ public class MapstructUtil {
             .withTailText( PsiFormatUtil.formatMethod(method, substitutor,
                 0,
                 PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE));
-        final PsiType returnType = method.getReturnType();
-        if (returnType != null) {
-            builder = builder.withTypeText(substitutor.substitute(returnType).getPresentableText());
+        final PsiType type = typeMapper.apply( method );
+        if (type != null) {
+            builder = builder.withTypeText(substitutor.substitute(type).getPresentableText());
         }
 
         return builder;

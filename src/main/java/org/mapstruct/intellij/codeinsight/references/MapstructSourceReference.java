@@ -66,7 +66,7 @@ class MapstructSourceReference extends MapstructBaseReference {
         return sourceClass.getAllMethodsAndTheirSubstitutors().stream()
             .filter( pair -> MapstructUtil.isGetter( pair.getFirst() ) )
             .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
-            .map( MapstructUtil::asLookup )
+            .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
             .toArray();
     }
 

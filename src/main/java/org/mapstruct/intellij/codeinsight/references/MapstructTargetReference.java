@@ -62,7 +62,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         return returnClass.getAllMethodsAndTheirSubstitutors().stream()
             .filter( pair -> MapstructUtil.isSetter( pair.getFirst() ) )
             .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
-            .map( MapstructUtil::asLookup )
+            .map( pair -> MapstructUtil.asLookup( pair, method -> method.getParameterList().getParameters()[0].getType() ) )
             .toArray();
     }
 
