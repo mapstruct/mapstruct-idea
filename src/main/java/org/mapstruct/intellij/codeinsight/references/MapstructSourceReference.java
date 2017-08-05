@@ -52,6 +52,9 @@ class MapstructSourceReference extends MapstructBaseReference {
             methods = sourceClass.findMethodsByName( "is" + Strings.capitalize( value ), true );
         }
 
+        //If instead of doing the above we replace with the below highlighting, renaming, Find Usages works correctly
+        //PsiMethod[] methods = sourceClass.findMethodsByName(getValue(), true);
+
         return methods.length == 0 ? null : methods[0];
     }
 
