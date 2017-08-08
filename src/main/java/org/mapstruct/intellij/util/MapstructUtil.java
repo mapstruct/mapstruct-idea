@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor;
 
 /**
  * @author Filip Hrisafov
@@ -88,12 +87,18 @@ public final class MapstructUtil {
     }
 
     public static boolean isSetter(@NotNull PsiMethod method) {
+        if ( method.getParameterList().getParametersCount() != 1 ) {
+            return false;
+        }
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
         return methodName.startsWith( "set" );
     }
 
     public static boolean isGetter(@NotNull PsiMethod method) {
+        if ( method.getParameterList().getParametersCount() != 0 ) {
+            return false;
+        }
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
         return methodName.startsWith( "get" ) || methodName.startsWith( "is" );

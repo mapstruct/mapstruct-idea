@@ -109,7 +109,25 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( reference )
             .isInstanceOfSatisfying( PsiMethod.class, method -> {
                 assertThat( method.getName() ).isEqualTo( "setSeatCount" );
-                assertThat( method.getName() ).isEqualTo( "setSeatCount" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "setSeatCount(int)" );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "void" );
+            } );
+    }
+
+    public void testCarMapperReferenceSourcePropertyInCarDto() {
+        myFixture.configureByFile( "CarMapperReferenceSourceProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "getNumberOfSeats" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "getNumberOfSeats()" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "int" );
             } );
     }
 
