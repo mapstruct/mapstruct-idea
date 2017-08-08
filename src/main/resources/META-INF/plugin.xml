@@ -49,7 +49,7 @@
     <completion.contributor language="JAVA" implementationClass="org.mapstruct.intellij.codeinsight.completion.MapperCompletionContributor" />
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
   </extensions>
-
+  
   <actions>
     <!-- Add your actions here -->
   </actions>

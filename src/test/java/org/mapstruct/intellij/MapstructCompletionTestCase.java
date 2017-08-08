@@ -73,7 +73,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
-
     public void testCarMapperSimpleSingleSourceCar() {
         configureByTestName();
 

@@ -22,37 +22,36 @@ import java.beans.Introspector;
 import java.util.Objects;
 import java.util.function.Function;
 
-import com.intellij.codeInsight.completion.JavaLookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor;
 
 /**
  * @author Filip Hrisafov
  */
-public class MapstructUtil {
+public final class MapstructUtil {
 
     public static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
     private static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+
+    /**
+     * Hide constructor.
+     */
+    private MapstructUtil() {
+    }
 
     /**
      * @param annotation
@@ -63,20 +62,22 @@ public class MapstructUtil {
         return annotation != null && Objects.equals( annotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
     }
 
-    public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair, Function<PsiMethod, PsiType> typeMapper) {
+    public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair,
+        Function<PsiMethod, PsiType> typeMapper) {
         PsiMethod method = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
         String propertyName = getPropertyName( method );
-        LookupElementBuilder builder = LookupElementBuilder.create(method, propertyName )
-            .withIcon( PlatformIcons.VARIABLE_ICON)
-            .withPresentableText(propertyName)
-            .withTailText( PsiFormatUtil.formatMethod(method, substitutor,
+        LookupElementBuilder builder = LookupElementBuilder.create( method, propertyName )
+            .withIcon( PlatformIcons.VARIABLE_ICON )
+            .withPresentableText( propertyName )
+            .withTailText( PsiFormatUtil.formatMethod( method, substitutor,
                 0,
-                PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE));
+                PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE
+            ) );
         final PsiType type = typeMapper.apply( method );
-        if (type != null) {
-            builder = builder.withTypeText(substitutor.substitute(type).getPresentableText());
+        if ( type != null ) {
+            builder = builder.withTypeText( substitutor.substitute( type ).getPresentableText() );
         }
 
         return builder;

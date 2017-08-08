@@ -62,7 +62,7 @@ public class MapstructReferenceContributor extends PsiReferenceContributor {
 
         private final String myParameterName;
 
-        public MappingAnnotationFilter(@NotNull @NonNls String parameterName) {
+        MappingAnnotationFilter(@NotNull @NonNls String parameterName) {
             myParameterName = parameterName;
         }
 

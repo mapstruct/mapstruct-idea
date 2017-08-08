@@ -18,7 +18,6 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
@@ -62,7 +61,10 @@ class MapstructTargetReference extends MapstructBaseReference {
         return returnClass.getAllMethodsAndTheirSubstitutors().stream()
             .filter( pair -> MapstructUtil.isSetter( pair.getFirst() ) )
             .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
-            .map( pair -> MapstructUtil.asLookup( pair, method -> method.getParameterList().getParameters()[0].getType() ) )
+            .map( pair -> MapstructUtil.asLookup(
+                pair,
+                method -> method.getParameterList().getParameters()[0].getType()
+            ) )
             .toArray();
     }
 

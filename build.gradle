@@ -11,6 +11,8 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'license'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -48,6 +50,14 @@ license {
 }
 
 licenseTest.dependsOn licenseTestData
+
+checkstyle {
+//    configFile file( new File(new URL("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml").toURI( ) ) )
+}
+
+jacoco {
+    toolVersion "0.7.9"
+}
 
 dependencies {
     compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: '1.1.0.Final'

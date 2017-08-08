@@ -37,6 +37,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
     }
 
     protected void addEnvironmentClasses() {
+        //CHECKSTYLE:OFF
         //@formatter:off
         addEnvironmentClass( "package org.mapstruct;\n" +
             "public enum ReportingPolicy {\n" +
@@ -100,6 +101,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             "    String defaultValue() default \"\";\n" +
             "}" );
         //@formatter:on
+        //CHECKSTYLE:ON
     }
 
     protected void addEnvironmentClass(@Language("JAVA") @NotNull String classText) {

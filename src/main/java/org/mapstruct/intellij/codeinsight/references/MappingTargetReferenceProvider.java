@@ -38,10 +38,9 @@ class MappingTargetReferenceProvider extends PsiReferenceProvider {
         this.reference = reference;
     }
 
-
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        return new PsiReference[] { reference.apply( (PsiLiteral) element )};
+        return new PsiReference[] { reference.apply( (PsiLiteral) element ) };
     }
 }

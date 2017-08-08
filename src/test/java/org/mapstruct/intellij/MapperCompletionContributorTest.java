@@ -20,8 +20,6 @@ package org.mapstruct.intellij;
 
 import java.util.List;
 
-import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
