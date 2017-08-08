@@ -30,6 +30,7 @@ public class Car {
     private List<Person> passengers;
     private int price;
     private Category category;
+    private boolean free;
 
     public Car() {
     }
@@ -96,5 +97,13 @@ public class Car {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public boolean isFree() {
+        return free;
+    }
+
+    public void setFree(boolean free) {
+        this.free = free;
     }
 }

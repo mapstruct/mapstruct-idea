@@ -29,6 +29,7 @@ public class CarDto {
     private List<PersonDto> passengers;
     private Long price;
     private String category;
+    private boolean available;
 
     public CarDto() {
     }
@@ -103,5 +104,13 @@ public class CarDto {
 
     protected String getPrivateField() {
         return null;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }
