@@ -76,7 +76,131 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testCarMapperUpdateTargetCarDto() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "driver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                create( "make", "String" ),
+                create( "seatCount", "int" ),
+                create( "manufacturingYear", "String" ),
+                create( "driver", "PersonDto" ),
+                create( "passengers", "List<PersonDto>" ),
+                create( "price", "Long" ),
+                create( "category", "String" ),
+                create( "available", "boolean" )
+            );
+    }
+
+    public void testCarMapperUpdateTargetCarDto2() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "driver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                create( "make", "String" ),
+                create( "seatCount", "int" ),
+                create( "manufacturingYear", "String" ),
+                create( "driver", "PersonDto" ),
+                create( "passengers", "List<PersonDto>" ),
+                create( "price", "Long" ),
+                create( "category", "String" ),
+                create( "available", "boolean" )
+            );
+    }
+
     public void testCarMapperSimpleSingleSourceCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "numberOfSeats",
+                "manufacturingDate",
+                "driver",
+                "passengers",
+                "price",
+                "category",
+                "free"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                create( "make", "String" ),
+                create( "numberOfSeats", "int" ),
+                create( "manufacturingDate", "Date" ),
+                create( "driver", "Person" ),
+                create( "passengers", "List<Person>" ),
+                create( "price", "int" ),
+                create( "category", "Category" ),
+                create( "free", "boolean" )
+            );
+    }
+
+    public void testCarMapperUpdateSourceCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "numberOfSeats",
+                "manufacturingDate",
+                "driver",
+                "passengers",
+                "price",
+                "category",
+                "free"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                create( "make", "String" ),
+                create( "numberOfSeats", "int" ),
+                create( "manufacturingDate", "Date" ),
+                create( "driver", "Person" ),
+                create( "passengers", "List<Person>" ),
+                create( "price", "int" ),
+                create( "category", "Category" ),
+                create( "free", "boolean" )
+            );
+    }
+
+    public void testCarMapperUpdateSourceCar2() {
         configureByTestName();
 
         assertThat( myItems )

@@ -18,10 +18,13 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.stream.Stream;
+
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -81,8 +84,14 @@ class MapstructSourceReference extends MapstructBaseReference {
             return null;
         }
 
-        //TODO this is not really correct, we need to adapt with @MappingTarget, multiple sources etc
-        return PsiUtil.resolveClassInType( parameters.getParameters()[0].getType() );
+        //TODO this is not really correct, we need to adapt with @MappingTarget and return, multiple sources,
+        // result type etc
+        return Stream.of( parameters.getParameters() )
+            .filter( MapstructUtil::isValidSourceParameter )
+            .findAny()
+            .map( PsiParameter::getType )
+            .map( PsiUtil::resolveClassInType )
+            .orElse( null );
     }
 
 }

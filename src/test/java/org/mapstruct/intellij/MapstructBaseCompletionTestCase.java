@@ -37,6 +37,8 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
     }
 
     protected void addEnvironmentClasses() {
+        //TODO maybe there is a better way to do this. Maybe unpack the dependency somewhere in build
+        // and add the entire API.
         //CHECKSTYLE:OFF
         //@formatter:off
         addEnvironmentClass( "package org.mapstruct;\n" +
@@ -99,6 +101,13 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             "    Class<?> resultType() default void.class;\n" +
             "    String[] dependsOn() default { };\n" +
             "    String defaultValue() default \"\";\n" +
+            "}" );
+
+        addEnvironmentClass( "package org.mapstruct;\n" +
+            "public @interface MappingTarget {\n" +
+            "}" );
+        addEnvironmentClass( "package org.mapstruct;\n" +
+            "public @interface Context {\n" +
             "}" );
         //@formatter:on
         //CHECKSTYLE:ON

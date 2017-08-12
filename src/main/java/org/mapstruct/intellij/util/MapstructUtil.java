@@ -28,6 +28,8 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiFormatUtil;
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 /**
  * @author Filip Hrisafov
@@ -45,6 +48,9 @@ public final class MapstructUtil {
 
     public static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
     private static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
+    //TODO maybe we need to include the 1.2.0-RC1 here
+    private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
 
     /**
      * Hide constructor.
@@ -110,5 +116,53 @@ public final class MapstructUtil {
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
         return Introspector.decapitalize( methodName.substring( methodName.startsWith( "is" ) ? 2 : 3 ) );
+    }
+
+    /**
+     * Check if the parameter is a Mapping Target parameter.
+     *
+     * @param psiParameter to be checked
+     *
+     * @return {@code true} if the parameter is a MappingTarget, {@code false} otherwise
+     */
+    public static boolean isMappingTarget(PsiParameter psiParameter) {
+        return hasAnnotation( psiParameter, MAPPING_TARGET_ANNOTATION_FQN );
+    }
+
+    /**
+     * Checks if the parameter is a valid source parameter. A valid source parameter is a paremeter that is not a
+     * {@code MappingTarget} or a {@code Context}.
+     *
+     * @param psiParameter to be checked
+     *
+     * @return {@code true} if the parameter is a valid source parameter, {@code false} otherwise
+     */
+    public static boolean isValidSourceParameter(PsiParameter psiParameter) {
+        return !isMappingTarget( psiParameter ) && !isContextParameter( psiParameter );
+    }
+
+    /**
+     * Checks if the parameter is a Context parameter.
+     *
+     * @param psiParameter to be checked
+     *
+     * @return {@code true} if the parameter is a Context parameter, {@code false} otherwise
+     */
+    private static boolean isContextParameter(PsiParameter psiParameter) {
+        return hasAnnotation( psiParameter, CONTEXT_ANNOTATION_FQN );
+    }
+
+    /**
+     * Checks if the parameter is annotated with the provided {@code annotation}.
+     *
+     * @param psiParameter the parameter on which we need to check for the annotation
+     * @param annotation the annotation that we need to find
+     *
+     * @return {@code true} if the {@code psiParameter} is annotated with the {@code annotation}, {@code false}
+     * otherwise
+     */
+    private static boolean hasAnnotation(PsiParameter psiParameter, String annotation) {
+        PsiModifierList modifierList = psiParameter.getModifierList();
+        return modifierList != null && modifierList.findAnnotation( annotation ) != null;
     }
 }

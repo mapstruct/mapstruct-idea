@@ -18,10 +18,13 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.stream.Stream;
+
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +73,18 @@ class MapstructTargetReference extends MapstructBaseReference {
 
     @Override
     PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
-        return PsiUtil.resolveClassInType( mappingMethod.getReturnType() );
+        //TODO here we need to take into consideration both with @MappingTarget and return,
+        // returning an interface etc.
+        PsiClass psiClass = PsiUtil.resolveClassInType( mappingMethod.getReturnType() );
+        if ( psiClass == null ) {
+            psiClass = Stream.of( mappingMethod.getParameterList().getParameters() )
+                .filter( MapstructUtil::isMappingTarget )
+                .findAny()
+                .map( PsiParameter::getType )
+                .map( PsiUtil::resolveClassInType )
+                .orElse( null );
+        }
+        return psiClass;
     }
 
 }
