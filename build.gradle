@@ -59,6 +59,13 @@ jacoco {
     toolVersion "0.7.9"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
 dependencies {
     compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: '1.1.0.Final'
     compile group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.1.0.Final'
