@@ -87,6 +87,20 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             "    boolean disableSubMappingMethodsGeneration() default false;\n" +
             "}" );
         addEnvironmentClass( "package org.mapstruct;\n" +
+            "import static org.mapstruct.NullValueCheckStrategy.ON_IMPLICIT_CONVERSION;\n" +
+            "public @interface MapperConfig {\n" +
+            "    Class<?>[] uses() default { };\n" +
+            "    ReportingPolicy unmappedTargetPolicy() default ReportingPolicy.WARN;\n" +
+            "    String componentModel() default \"default\";\n" +
+            "    String implementationName() default \"<CLASS_NAME>Impl\";\n" +
+            "    String implementationPackage() default \"<PACKAGE_NAME>\";\n" +
+            "    CollectionMappingStrategy collectionMappingStrategy() default CollectionMappingStrategy.ACCESSOR_ONLY;\n" +
+            "    NullValueMappingStrategy nullValueMappingStrategy() default NullValueMappingStrategy.RETURN_NULL;\n" +
+            "    MappingInheritanceStrategy mappingInheritanceStrategy() default MappingInheritanceStrategy.EXPLICIT;" +
+            "    NullValueCheckStrategy nullValueCheckStrategy() default ON_IMPLICIT_CONVERSION;\n" +
+            "    boolean disableSubMappingMethodsGeneration() default false;\n" +
+            "}" );
+        addEnvironmentClass( "package org.mapstruct;\n" +
             "import java.lang.annotation.Annotation;\n" +
             "public @interface Mapping {\n" +
             "    String target();\n" +

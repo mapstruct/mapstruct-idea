@@ -28,42 +28,33 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
-import org.mapstruct.intellij.util.MapstructUtil;
 
-import static com.intellij.patterns.PsiJavaPatterns.psiElement;
+import static com.intellij.patterns.StandardPatterns.or;
+import static org.mapstruct.intellij.util.MapstructElementUtils.mapperConfigElementPattern;
+import static org.mapstruct.intellij.util.MapstructElementUtils.mapperElementPattern;
 
 /**
  * @author Filip Hrisafov
  */
-public class MapperCompletionContributor extends CompletionContributor {
+public class ComponentModelCompletionContributor extends CompletionContributor {
 
-    public MapperCompletionContributor() {
-
-//        extend(
-//            CompletionType.BASIC,
-//            PsiJavaPatterns.psiAnnotation()
-//                .qName( StandardPatterns.string().oneOf( "org.mapstruct.Mapper", "Mapper" ) )
-//                .insideAnnotationAttribute( "componentModel", psiElement( PsiAnnotation.class ) ),
-//            new MapperCompletionProvider()
-//        );
+    public ComponentModelCompletionContributor() {
 
         extend(
             CompletionType.BASIC,
-            psiElement()
-                .insideAnnotationParam(
-                    StandardPatterns.string().equalTo( MapstructUtil.MAPPER_ANNOTATION_FQN   ),
-                    "componentModel"
-                ),
-            new MapperCompletionProvider()
+            or(
+                mapperElementPattern( "componentModel" ),
+                mapperConfigElementPattern( "componentModel" )
+            ),
+            new ComponentModelCompletionProvider()
         );
     }
 
-    public static class MapperCompletionProvider extends CompletionProvider<CompletionParameters> {
+    public static class ComponentModelCompletionProvider extends CompletionProvider<CompletionParameters> {
 
         //TODO If we can somehow get access to all the AnnotationBasedComponentModelProcessor and extract
         // their getComponentModelIdentifier then we can use those. I don't know how to do this within the plugin

@@ -16,15 +16,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.mapstruct.intellij;
+import org.mapstruct.MapperConfig;
 
-/**
- * @author Filip Hrisafov
- */
-public class MapperCompletionContributorTest extends BaseComponentModelCompletionTest {
-
-    @Override
-    protected String getTestDataPath() {
-        return "testData/mapper";
-    }
+@MapperConfig( componentModel = s<caret> )
+public interface MyMapper {
 }

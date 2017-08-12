@@ -46,7 +46,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
 
-    <completion.contributor language="JAVA" implementationClass="org.mapstruct.intellij.codeinsight.completion.MapperCompletionContributor" />
+    <completion.contributor language="JAVA" implementationClass="org.mapstruct.intellij.codeinsight.completion.ComponentModelCompletionContributor" />
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
   </extensions>
   

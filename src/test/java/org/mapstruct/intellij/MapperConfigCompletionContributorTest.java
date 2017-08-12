@@ -21,10 +21,10 @@ package org.mapstruct.intellij;
 /**
  * @author Filip Hrisafov
  */
-public class MapperCompletionContributorTest extends BaseComponentModelCompletionTest {
+public class MapperConfigCompletionContributorTest extends BaseComponentModelCompletionTest {
 
     @Override
     protected String getTestDataPath() {
-        return "testData/mapper";
+        return "testData/mapperconfig";
     }
 }
