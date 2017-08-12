@@ -19,13 +19,11 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
-import java.util.Objects;
 import java.util.function.Function;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -38,6 +36,7 @@ import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
+import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
@@ -46,8 +45,9 @@ import org.mapstruct.MappingTarget;
  */
 public final class MapstructUtil {
 
-    public static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
-    private static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
+    static final String MAPPER_CONFIG_ANNOTATION_FQN = MapperConfig.class.getName();
+    static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     //TODO maybe we need to include the 1.2.0-RC1 here
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
@@ -56,15 +56,6 @@ public final class MapstructUtil {
      * Hide constructor.
      */
     private MapstructUtil() {
-    }
-
-    /**
-     * @param annotation
-     *
-     * @return {@code true} if the annotation is the MapStruct {@literal org.mapstring.Mapping} annotation
-     */
-    public static boolean isMappingAnnotation(PsiAnnotation annotation) {
-        return annotation != null && Objects.equals( annotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
     }
 
     public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair,

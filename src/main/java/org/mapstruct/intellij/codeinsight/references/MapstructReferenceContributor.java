@@ -18,72 +18,27 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.Objects;
-
-import com.intellij.patterns.PsiElementPattern;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
-import com.intellij.psi.PsiMember;
-import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
-import com.intellij.psi.PsiStatement;
-import com.intellij.psi.filters.ElementFilter;
-import com.intellij.psi.filters.position.FilterPattern;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.mapstruct.intellij.util.MapstructUtil;
 
-import static com.intellij.patterns.PlatformPatterns.psiElement;
+import static org.mapstruct.intellij.util.MapstructElementUtils.mappingElementPattern;
 
 /**
  * @author Filip Hrisafov
  */
 public class MapstructReferenceContributor extends PsiReferenceContributor {
-    private static PsiElementPattern.Capture<PsiLiteral> elementPattern(String parameterName) {
-        return psiElement( PsiLiteral.class ).and( new FilterPattern( new MappingAnnotationFilter( parameterName ) ) );
-    }
 
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
         registrar.registerReferenceProvider(
-            elementPattern( "target" ),
+            mappingElementPattern( "target" ),
             new MappingTargetReferenceProvider( MapstructTargetReference::new )
         );
         registrar.registerReferenceProvider(
-            elementPattern( "source" ),
+            mappingElementPattern( "source" ),
             new MappingTargetReferenceProvider( MapstructSourceReference::new )
         );
     }
 
-    private static class MappingAnnotationFilter implements ElementFilter {
-
-        private final String myParameterName;
-
-        MappingAnnotationFilter(@NotNull @NonNls String parameterName) {
-            myParameterName = parameterName;
-        }
-
-        public boolean isAcceptable(Object element, PsiElement context) {
-            PsiNameValuePair pair = PsiTreeUtil.getParentOfType(
-                context,
-                PsiNameValuePair.class,
-                false,
-                PsiMember.class,
-                PsiStatement.class
-            );
-            if ( pair == null || !Objects.equals( myParameterName, pair.getName() ) ) {
-                return false;
-            }
-
-            PsiAnnotation annotation = PsiTreeUtil.getParentOfType( pair, PsiAnnotation.class );
-            return MapstructUtil.isMappingAnnotation( annotation );
-        }
-
-        public boolean isClassAcceptable(Class hintClass) {
-            return PsiLiteral.class.isAssignableFrom( hintClass );
-        }
-    }
 }
