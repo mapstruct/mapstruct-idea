@@ -107,7 +107,7 @@ public final class MapstructUtil {
         }
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
-        return methodName.startsWith( "get" ) || methodName.startsWith( "is" );
+        return ( methodName.startsWith( "get" ) && !methodName.equals( "getClass" )) || methodName.startsWith( "is" );
     }
 
     @NotNull
