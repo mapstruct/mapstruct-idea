@@ -341,6 +341,16 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( reference.resolve() ).isNull();
     }
 
+    public void testMappingNotOnMethodForSource() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testMappingNotOnMethodForTarget() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
     private static LookupElementPresentation create(String lookupString, String typeText) {
         return LookupElementPresentation.renderElement( LookupElementBuilder.create( lookupString )
             .withIcon( PlatformIcons.VARIABLE_ICON )
