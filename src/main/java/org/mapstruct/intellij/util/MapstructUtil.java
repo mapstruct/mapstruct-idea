@@ -103,9 +103,15 @@ public final class MapstructUtil {
 
     @NotNull
     @NonNls
-    private static String getPropertyName(@NotNull PsiMethod method) {
+    public static String getPropertyName(@NotNull PsiMethod method) {
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
+        return getPropertyName( methodName );
+    }
+
+    @NotNull
+    @NonNls
+    public static String getPropertyName(@NotNull String methodName) {
         return Introspector.decapitalize( methodName.substring( methodName.startsWith( "is" ) ? 2 : 3 ) );
     }
 

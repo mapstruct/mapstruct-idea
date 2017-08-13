@@ -48,6 +48,7 @@
 
     <completion.contributor language="JAVA" implementationClass="org.mapstruct.intellij.codeinsight.completion.ComponentModelCompletionContributor" />
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
+    <methodReferencesSearch implementation="org.mapstruct.intellij.search.MappingMethodUsagesSearcher" />
   </extensions>
   
   <actions>

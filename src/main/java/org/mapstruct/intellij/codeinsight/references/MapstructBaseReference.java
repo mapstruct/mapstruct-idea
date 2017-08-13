@@ -19,12 +19,15 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.MapstructUtil;
 
 /**
  * @author Filip Hrisafov
@@ -44,4 +47,9 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
     }
 
     abstract PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod);
+
+    @Override
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+        return super.handleElementRename( MapstructUtil.getPropertyName( newElementName ) );
+    }
 }
