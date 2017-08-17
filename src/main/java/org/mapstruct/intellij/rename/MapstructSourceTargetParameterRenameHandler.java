@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
 import com.intellij.refactoring.rename.PsiElementRenameHandler;
 
 import static com.intellij.patterns.StandardPatterns.or;
@@ -41,8 +42,9 @@ public class MapstructSourceTargetParameterRenameHandler extends PsiElementRenam
 
     @Override
     public boolean isAvailableOnDataContext(DataContext dataContext) {
-        return MAPPING_SOURCE_OR_TARGET.accepts( findNameSuggestionContext( dataContext ) ) &&
-            super.isAvailableOnDataContext( dataContext );
+        return MAPPING_SOURCE_OR_TARGET.accepts( findNameSuggestionContext( dataContext ) )
+            && getElement( dataContext ) instanceof PsiMethod
+            && super.isAvailableOnDataContext( dataContext );
     }
 
     private static PsiElement findNameSuggestionContext(DataContext dataContext) {

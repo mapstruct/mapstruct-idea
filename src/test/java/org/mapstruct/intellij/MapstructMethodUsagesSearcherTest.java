@@ -95,4 +95,10 @@ public class MapstructMethodUsagesSearcherTest extends MapstructBaseCompletionTe
         myFixture.renameElementAtCaret( "setNewName" );
         myFixture.checkResultByFile( "RenameTargetReferenceAfter.java" );
     }
+
+    public void testRenameSourceParameterReference() {
+        myFixture.configureByFiles( "RenameSourceParameterReference.java" );
+        myFixture.renameElementAtCaret( "param" );
+        myFixture.checkResultByFile( "RenameSourceParameterReferenceAfter.java" );
+    }
 }

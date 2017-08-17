@@ -24,6 +24,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PlatformIcons;
@@ -157,6 +158,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     }
 
     public void testNestedFirstLevelAutoCompleteSourceProperty() {
+        configureByTestName();
+        assertCarAutoComplete();
+    }
+
+    public void testSourcePropertyAutoCompleteAfterSourceParameter() {
         configureByTestName();
         assertCarAutoComplete();
     }
@@ -318,6 +324,21 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
                 assertThat( method.getReturnType() ).isNotNull();
                 assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "boolean" );
+            } );
+    }
+
+    public void testSourcePropertyReferencesSourceParameter() {
+        myFixture.configureByFile( "SourcePropertyReferencesSourceParameter.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiParameter.class, parameter -> {
+                assertThat( parameter.getName() ).isEqualTo( "source" );
+                assertThat( parameter.getType().getPresentableText() ).isEqualTo( "Car" );
+                PsiMethod mappingMethod = PsiTreeUtil.getParentOfType( parameter, PsiMethod.class );
+                assertThat( mappingMethod ).isNotNull();
+                assertThat( mappingMethod.getName() ).isEqualTo( "map" );
+                assertThat( mappingMethod.getReturnType() ).isNotNull();
+                assertThat( mappingMethod.getReturnType().getPresentableText() ).isEqualTo( "CarDto" );
             } );
     }
 

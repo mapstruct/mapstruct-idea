@@ -36,6 +36,12 @@ public class RenameHandlerTest extends MapstructBaseCompletionTestCase {
         myFixture.checkResultByFile( "RenameSourceParameterAfter.java" );
     }
 
+    public void testRenameMethodSourceParameter() {
+        myFixture.configureByFile( "RenameSourceParameterForMethod.java" );
+        myFixture.renameElementAtCaret( "param" );
+        myFixture.checkResultByFile( "RenameSourceParameterForMethodAfter.java" );
+    }
+
     public void testRenameTargetParameter() {
         myFixture.configureByFile( "RenameTargetParameter.java" );
         myFixture.renameElementAtCaretUsingHandler( "setNewName" );

@@ -18,6 +18,7 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.intellij.openapi.util.TextRange;
@@ -71,7 +72,19 @@ class MapstructSourceReference extends MapstructBaseReference {
         //If instead of doing the above we replace with the below highlighting, renaming, Find Usages works correctly
         //PsiMethod[] methods = sourceClass.findMethodsByName(getValue(), true);
 
-        return methods.length == 0 ? null : methods[0];
+        if ( methods.length == 0 ) {
+            PsiMethod mappingMethod = getMappingMethod();
+            if ( mappingMethod == null || mappingMethod.getParameterList().getParametersCount() == 0 ) {
+                return null;
+            }
+            return Stream.of( mappingMethod.getParameterList().getParameters() )
+                .filter( MapstructUtil::isValidSourceParameter )
+                .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
+                .findAny()
+                .orElse( null );
+        }
+
+        return methods[0];
     }
 
     @NotNull
@@ -113,6 +126,9 @@ class MapstructSourceReference extends MapstructBaseReference {
         PsiElement element = resolve();
         if ( element instanceof PsiMethod ) {
             return ( (PsiMethod) element ).getReturnType();
+        }
+        else if ( element instanceof PsiParameter ) {
+            return ( (PsiParameter) element ).getType();
         }
 
         return null;

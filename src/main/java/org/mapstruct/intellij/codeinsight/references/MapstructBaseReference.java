@@ -66,11 +66,19 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
             return PsiUtil.resolveClassInType( previous.resolvedType() );
         }
 
-        PsiMethod mappingMethod = PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
+        PsiMethod mappingMethod = getMappingMethod();
         if ( mappingMethod == null ) {
             return null;
         }
         return getRelevantClass( mappingMethod );
+    }
+
+    /**
+     * @return The mapping method that this reference belongs to
+     */
+    @Nullable
+    PsiMethod getMappingMethod() {
+        return PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
     }
 
     /**
@@ -91,7 +99,13 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        return super.handleElementRename( MapstructUtil.getPropertyName( newElementName ) );
+        PsiElement reference = resolve();
+        if ( reference instanceof PsiMethod ) {
+            return super.handleElementRename( MapstructUtil.getPropertyName( newElementName ) );
+        }
+        else {
+            return super.handleElementRename( newElementName );
+        }
     }
 
     private static ElementManipulator<PsiLiteral> getManipulator(PsiLiteral psiLiteral) {
