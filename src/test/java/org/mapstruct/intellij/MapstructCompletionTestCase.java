@@ -373,6 +373,24 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems ).isEmpty();
     }
 
+    public void testUnknownNestedSourceProperty() {
+        configureByFile( "DeepNestedUnknownSourceProperty.java" );
+        assertThat( myItems ).isEmpty();
+
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    public void testUnknownNestedTargetProperty() {
+        configureByFile( "DeepNestedUnknownTargetProperty.java" );
+        assertThat( myItems ).isEmpty();
+
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
     private static LookupElementPresentation create(String lookupString, String typeText) {
         return LookupElementPresentation.renderElement( LookupElementBuilder.create( lookupString )
             .withIcon( PlatformIcons.VARIABLE_ICON )

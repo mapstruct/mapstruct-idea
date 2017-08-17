@@ -62,13 +62,10 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
      */
     @Nullable
     PsiClass getRelevantClass() {
-        PsiClass relevantClass = null;
         if ( previous != null ) {
-            relevantClass = PsiUtil.resolveClassInType( previous.resolvedType() );
+            return PsiUtil.resolveClassInType( previous.resolvedType() );
         }
-        if ( relevantClass != null ) {
-            return relevantClass;
-        }
+
         PsiMethod mappingMethod = PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
         if ( mappingMethod == null ) {
             return null;
