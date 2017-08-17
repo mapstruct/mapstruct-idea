@@ -126,6 +126,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarDtoAutoComplete();
     }
 
+    public void testTargetPropertyAutoCompleteAfterTargetParameter() {
+        configureByTestName();
+        assertCarDtoAutoComplete();
+    }
+
     public void testNestedSecondLevelAutoCompleteTargetProperty() {
         configureByTestName();
         assertThat( myItems )
@@ -309,6 +314,21 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( person ).isNotNull();
                 assertThat( person.getName() ).isEqualTo( "PersonDto" );
 
+            } );
+    }
+
+    public void testTargetPropertyReferencesTargetParameter() {
+        myFixture.configureByFile( "TargetPropertyReferencesTargetParameter.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiParameter.class, parameter -> {
+                assertThat( parameter.getName() ).isEqualTo( "target" );
+                assertThat( parameter.getType().getPresentableText() ).isEqualTo( "CarDto" );
+                PsiMethod mappingMethod = PsiTreeUtil.getParentOfType( parameter, PsiMethod.class );
+                assertThat( mappingMethod ).isNotNull();
+                assertThat( mappingMethod.getName() ).isEqualTo( "update" );
+                assertThat( mappingMethod.getReturnType() ).isNotNull();
+                assertThat( mappingMethod.getReturnType().getPresentableText() ).isEqualTo( "void" );
             } );
     }
 
