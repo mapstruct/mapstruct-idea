@@ -20,12 +20,14 @@ package org.example.dto;
 
 import java.util.List;
 
+import org.example.dto.PersonDto;
+
 public class CarDto {
 
     private String make;
     private int seatCount;
     private String manufacturingYear;
-    private PersonDto driver;
+    private PersonDto myDriver;
     private List<PersonDto> passengers;
     private Long price;
     private String category;
@@ -34,11 +36,11 @@ public class CarDto {
     public CarDto() {
     }
 
-    public CarDto(String make, int seatCount, String manufacturingYear, PersonDto driver, List<PersonDto> passengers) {
+    public CarDto(String make, int seatCount, String manufacturingYear, PersonDto myDriver, List<PersonDto> passengers) {
         this.make = make;
         this.seatCount = seatCount;
         this.manufacturingYear = manufacturingYear;
-        this.driver = driver;
+        this.myDriver = myDriver;
         this.passengers = passengers;
     }
 
@@ -66,12 +68,12 @@ public class CarDto {
         this.manufacturingYear = manufacturingYear;
     }
 
-    public PersonDto getDriver() {
-        return driver;
+    public PersonDto getMyDriver() {
+        return myDriver;
     }
 
-    public void setDriver(PersonDto driver) {
-        this.driver = driver;
+    public void setMyDriver(PersonDto myDriver) {
+        this.myDriver = myDriver;
     }
 
     public List<PersonDto> getPassengers() {

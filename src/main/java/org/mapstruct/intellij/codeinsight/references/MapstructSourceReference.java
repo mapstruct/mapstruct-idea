@@ -20,12 +20,15 @@ package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.stream.Stream;
 
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiParameterList;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +36,22 @@ import org.mapstruct.ap.internal.util.Strings;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 /**
+ * Reference for {@link org.mapstruct.Mapping#source()}.
+ *
  * @author Filip Hrisafov
  */
 class MapstructSourceReference extends MapstructBaseReference {
 
-    MapstructSourceReference(PsiLiteral element) {
-        super( element );
+    /**
+     * Create a new {@link MapstructSourceReference} with the provided parameters.
+     *
+     * @param element the element that the reference belongs to
+     * @param previousReference the previous reference if there is one (in nested properties for example)
+     * @param rangeInElement the range that the reference represent in the {@code element}
+     */
+    private MapstructSourceReference(PsiLiteral element, MapstructSourceReference previousReference,
+        TextRange rangeInElement) {
+        super( element, previousReference, rangeInElement );
     }
 
     @Nullable
@@ -94,4 +107,23 @@ class MapstructSourceReference extends MapstructBaseReference {
             .orElse( null );
     }
 
+    @Nullable
+    @Override
+    PsiType resolvedType() {
+        PsiElement element = resolve();
+        if ( element instanceof PsiMethod ) {
+            return ( (PsiMethod) element ).getReturnType();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param psiLiteral the literal for which references need to be created
+     *
+     * @return the references for the given {@code psiLiteral}
+     */
+    static PsiReference[] create(PsiLiteral psiLiteral) {
+        return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
+    }
 }

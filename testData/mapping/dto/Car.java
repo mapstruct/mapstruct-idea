@@ -21,6 +21,8 @@ package org.example.dto;
 import java.util.Date;
 import java.util.List;
 
+import org.example.dto.Person;
+
 public class Car {
 
     private String make;

@@ -18,34 +18,27 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.function.Function;
-
-import com.intellij.psi.PsiElement;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiLiteral;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceProvider;
-import com.intellij.util.ProcessingContext;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * {@link PsiReferenceProvider} for references in target / source properties of {@link org.mapstruct.Mapping}.
+ * Cretor of {@link MapstructBaseReference}.
+ *
+ * @param <T> the type of the reference that would be created
  *
  * @author Filip Hrisafov
  */
-class MappingTargetReferenceProvider extends PsiReferenceProvider {
-
-    private final Function<PsiLiteral, PsiReference[]> reference;
+@FunctionalInterface
+interface ReferenceCreator<T extends MapstructBaseReference> {
 
     /**
-     * @param reference the function that can be used to create the references array
+     * Create a new reference from the provided parameters.
+     *
+     * @param psiLiteral the element that the reference belongs to
+     * @param previousReference the previous reference if there is one (in nested properties for example)
+     * @param rangeInElement the range that the reference represent in the {@code psiLiteral}
+     *
+     * @return a new reference created from the provided parameters
      */
-    MappingTargetReferenceProvider(Function<PsiLiteral, PsiReference[]> reference) {
-        this.reference = reference;
-    }
-
-    @NotNull
-    @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        return reference.apply( (PsiLiteral) element );
-    }
+    T create(PsiLiteral psiLiteral, T previousReference, TextRange rangeInElement);
 }

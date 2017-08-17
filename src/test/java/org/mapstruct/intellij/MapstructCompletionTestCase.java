@@ -21,9 +21,11 @@ package org.mapstruct.intellij;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.PlatformIcons;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,16 +47,14 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         addDirectoryToProject( "dto" );
     }
 
-    public void testCarMapperReturnTargetCarDto() {
-        configureByTestName();
-
+    private void assertCarDtoAutoComplete() {
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
                 "manufacturingYear",
-                "driver",
+                "myDriver",
                 "passengers",
                 "price",
                 "category",
@@ -68,166 +68,112 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 create( "make", "String" ),
                 create( "seatCount", "int" ),
                 create( "manufacturingYear", "String" ),
-                create( "driver", "PersonDto" ),
+                create( "myDriver", "PersonDto" ),
                 create( "passengers", "List<PersonDto>" ),
                 create( "price", "Long" ),
                 create( "category", "String" ),
                 create( "available", "boolean" )
             );
+    }
+
+    private void assertCarAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "numberOfSeats",
+                "manufacturingDate",
+                "driver",
+                "passengers",
+                "price",
+                "category",
+                "free"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                create( "make", "String" ),
+                create( "numberOfSeats", "int" ),
+                create( "manufacturingDate", "Date" ),
+                create( "driver", "Person" ),
+                create( "passengers", "List<Person>" ),
+                create( "price", "int" ),
+                create( "category", "Category" ),
+                create( "free", "boolean" )
+            );
+    }
+
+    public void testCarMapperReturnTargetCarDto() {
+        configureByTestName();
+        assertCarDtoAutoComplete();
     }
 
     public void testCarMapperUpdateTargetCarDto() {
         configureByTestName();
-
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "make",
-                "seatCount",
-                "manufacturingYear",
-                "driver",
-                "passengers",
-                "price",
-                "category",
-                "available"
-            );
-
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "seatCount", "int" ),
-                create( "manufacturingYear", "String" ),
-                create( "driver", "PersonDto" ),
-                create( "passengers", "List<PersonDto>" ),
-                create( "price", "Long" ),
-                create( "category", "String" ),
-                create( "available", "boolean" )
-            );
+        assertCarDtoAutoComplete();
     }
 
     public void testCarMapperUpdateTargetCarDto2() {
         configureByTestName();
+        assertCarDtoAutoComplete();
+    }
 
+    public void testNestedFirstLevelAutoCompleteTargetProperty() {
+        configureByTestName();
+        assertCarDtoAutoComplete();
+    }
+
+    public void testNestedSecondLevelAutoCompleteTargetProperty() {
+        configureByTestName();
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
             .containsExactlyInAnyOrder(
-                "make",
-                "seatCount",
-                "manufacturingYear",
-                "driver",
-                "passengers",
-                "price",
-                "category",
-                "available"
+                "name"
             );
 
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "seatCount", "int" ),
-                create( "manufacturingYear", "String" ),
-                create( "driver", "PersonDto" ),
-                create( "passengers", "List<PersonDto>" ),
-                create( "price", "Long" ),
-                create( "category", "String" ),
-                create( "available", "boolean" )
+                create( "name", "String" )
             );
     }
 
     public void testCarMapperSimpleSingleSourceCar() {
         configureByTestName();
-
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "make",
-                "numberOfSeats",
-                "manufacturingDate",
-                "driver",
-                "passengers",
-                "price",
-                "category",
-                "free"
-            );
-
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "numberOfSeats", "int" ),
-                create( "manufacturingDate", "Date" ),
-                create( "driver", "Person" ),
-                create( "passengers", "List<Person>" ),
-                create( "price", "int" ),
-                create( "category", "Category" ),
-                create( "free", "boolean" )
-            );
+        assertCarAutoComplete();
     }
 
     public void testCarMapperUpdateSourceCar() {
         configureByTestName();
-
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "make",
-                "numberOfSeats",
-                "manufacturingDate",
-                "driver",
-                "passengers",
-                "price",
-                "category",
-                "free"
-            );
-
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "numberOfSeats", "int" ),
-                create( "manufacturingDate", "Date" ),
-                create( "driver", "Person" ),
-                create( "passengers", "List<Person>" ),
-                create( "price", "int" ),
-                create( "category", "Category" ),
-                create( "free", "boolean" )
-            );
+        assertCarAutoComplete();
     }
 
     public void testCarMapperUpdateSourceCar2() {
         configureByTestName();
+        assertCarAutoComplete();
+    }
 
+    public void testNestedFirstLevelAutoCompleteSourceProperty() {
+        configureByTestName();
+        assertCarAutoComplete();
+    }
+
+    public void testNestedSecondLevelAutoCompleteSourceProperty() {
+        configureByTestName();
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
             .containsExactlyInAnyOrder(
-                "make",
-                "numberOfSeats",
-                "manufacturingDate",
-                "driver",
-                "passengers",
-                "price",
-                "category",
-                "free"
+                "name"
             );
 
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "numberOfSeats", "int" ),
-                create( "manufacturingDate", "Date" ),
-                create( "driver", "Person" ),
-                create( "passengers", "List<Person>" ),
-                create( "price", "int" ),
-                create( "category", "Category" ),
-                create( "free", "boolean" )
+                create( "name", "String" )
             );
     }
 
@@ -281,6 +227,82 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
                 assertThat( method.getReturnType() ).isNotNull();
                 assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "int" );
+            } );
+    }
+
+    public void testNestedFirstLevelReferenceSourceProperty() {
+        myFixture.configureByFile( "NestedFirstLevelReferenceSourceProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "getDriver" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "getDriver()" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "Person" );
+                PsiClass person = PsiTreeUtil.getParentOfType( method, PsiClass.class );
+                assertThat( person ).isNotNull();
+                assertThat( person.getName() ).isEqualTo( "Car" );
+
+            } );
+    }
+
+    public void testNestedFirstLevelReferenceTargetProperty() {
+        myFixture.configureByFile( "NestedFirstLevelReferenceTargetProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "setMyDriver" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "setMyDriver(PersonDto)" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 1 );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "void" );
+                PsiClass person = PsiTreeUtil.getParentOfType( method, PsiClass.class );
+                assertThat( person ).isNotNull();
+                assertThat( person.getName() ).isEqualTo( "CarDto" );
+
+            } );
+    }
+
+    public void testNestedSecondLevelReferenceSourceProperty() {
+        myFixture.configureByFile( "NestedSecondLevelReferenceSourceProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "getName" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "getName()" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "String" );
+                PsiClass person = PsiTreeUtil.getParentOfType( method, PsiClass.class );
+                assertThat( person ).isNotNull();
+                assertThat( person.getName() ).isEqualTo( "Person" );
+
+            } );
+    }
+
+    public void testNestedSecondLevelReferenceTargetProperty() {
+        myFixture.configureByFile( "NestedSecondLevelReferenceTargetProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "setName" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "setName(String)" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 1 );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "void" );
+                PsiClass person = PsiTreeUtil.getParentOfType( method, PsiClass.class );
+                assertThat( person ).isNotNull();
+                assertThat( person.getName() ).isEqualTo( "PersonDto" );
+
             } );
     }
 
