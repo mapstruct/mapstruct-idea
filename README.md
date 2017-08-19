@@ -8,6 +8,7 @@ An IntelliJ IDEA plugin for working with MapStruct
 [![Coverage Status](https://codecov.io/gh/mapstruct/mapstruct-idea/branch/master/graph/badge.svg)](https://codecov.io/gh/mapstruct/mapstruct-idea)
 
 * [What is MapStruct?](#what-is-mapstruct)
+* [Features](#features)
 * [Requirements](#requirements)
 * [Building from Source](#building-from-source)
 * [Licensing](#licensing)
@@ -17,6 +18,15 @@ An IntelliJ IDEA plugin for working with MapStruct
 MapStruct is a Java [annotation processor](http://docs.oracle.com/javase/6/docs/technotes/guides/apt/index.html) for the generation of type-safe and performant mappers for Java bean classes.
 
 To learn more about MapStruct have a look at the [mapstruct](https://github.com/mapstruct/mapstruct) repository or the [website](http://mapstruct.org/)
+
+## Features
+
+* Code completions
+  * Completion of `target` and `source` properties in `@Mapping` annotation (nested properties also work)
+  * Completion of `componentModel` in `@Mapper` and `@MapperConfig` annotations
+* Go To Declaration for properties in `target` and `source` to setters / getters
+* Find usages of properties in `target` and `source` and find usages of setters / getters in `@Mapping` annotations
+* Highlighting properties in `target` and `source`  
 
 ## Requirements
 
