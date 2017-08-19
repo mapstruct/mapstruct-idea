@@ -18,6 +18,8 @@
  */
 package org.mapstruct.intellij;
 
+import javax.swing.Icon;
+
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
@@ -66,14 +68,14 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "seatCount", "int" ),
-                create( "manufacturingYear", "String" ),
-                create( "myDriver", "PersonDto" ),
-                create( "passengers", "List<PersonDto>" ),
-                create( "price", "Long" ),
-                create( "category", "String" ),
-                create( "available", "boolean" )
+                createVariable( "make", "String" ),
+                createVariable( "seatCount", "int" ),
+                createVariable( "manufacturingYear", "String" ),
+                createVariable( "myDriver", "PersonDto" ),
+                createVariable( "passengers", "List<PersonDto>" ),
+                createVariable( "price", "Long" ),
+                createVariable( "category", "String" ),
+                createVariable( "available", "boolean" )
             );
     }
 
@@ -95,14 +97,14 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "make", "String" ),
-                create( "numberOfSeats", "int" ),
-                create( "manufacturingDate", "Date" ),
-                create( "driver", "Person" ),
-                create( "passengers", "List<Person>" ),
-                create( "price", "int" ),
-                create( "category", "Category" ),
-                create( "free", "boolean" )
+                createVariable( "make", "String" ),
+                createVariable( "numberOfSeats", "int" ),
+                createVariable( "manufacturingDate", "Date" ),
+                createVariable( "driver", "Person" ),
+                createVariable( "passengers", "List<Person>" ),
+                createVariable( "price", "int" ),
+                createVariable( "category", "Category" ),
+                createVariable( "free", "boolean" )
             );
     }
 
@@ -143,7 +145,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "name", "String" )
+                createVariable( "name", "String" )
             );
     }
 
@@ -172,6 +174,28 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarAutoComplete();
     }
 
+    public void testMultipleSourceParametersUpdateMapping() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "source1",
+                "source2",
+                "doors"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            //For some reason the icon is empty in the returned items. However, in actual completion it is OK
+            .usingElementComparatorIgnoringFields( "myIcon" )
+            .containsExactlyInAnyOrder(
+                createParameter( "source1", "Car" ),
+                createParameter( "source2", "Car" ),
+                createParameter( "doors", "Long" )
+            );
+    }
+
     public void testNestedSecondLevelAutoCompleteSourceProperty() {
         configureByTestName();
         assertThat( myItems )
@@ -184,7 +208,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                create( "name", "String" )
+                createVariable( "name", "String" )
             );
     }
 
@@ -432,10 +456,25 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( reference.resolve() ).isNull();
     }
 
-    private static LookupElementPresentation create(String lookupString, String typeText) {
+    public void testMultipleSourceParametersSourceIsNotParameter() {
+        myFixture.configureByFile( "MultipleSourceParametersSourceIsNotParameter.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    private static LookupElementPresentation createVariable(String lookupString, String typeText) {
+        return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, "" );
+    }
+
+    private static LookupElementPresentation createParameter(String lookupString, String typeText) {
+        return create( lookupString, typeText, PlatformIcons.PARAMETER_ICON, null );
+    }
+
+    private static LookupElementPresentation create(String lookupString, String typeText, Icon icon, String tailText) {
         return LookupElementPresentation.renderElement( LookupElementBuilder.create( lookupString )
-            .withIcon( PlatformIcons.VARIABLE_ICON )
-            .withTailText( "" )
+            .withIcon( icon )
+            .withTailText( tailText )
             .withTypeText( typeText ) );
     }
 }

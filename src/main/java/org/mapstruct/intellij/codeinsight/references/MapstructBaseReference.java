@@ -18,6 +18,7 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
@@ -57,21 +58,77 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
         this.previous = previous;
     }
 
-    /**
-     * @return the class that should be used for doing auto-completion against
-     */
     @Nullable
-    PsiClass getRelevantClass() {
+    @Override
+    public final PsiElement resolve() {
+        String value = getValue();
+        if ( value.isEmpty() ) {
+            return null;
+        }
+
         if ( previous != null ) {
-            return PsiUtil.resolveClassInType( previous.resolvedType() );
+            PsiClass psiClass = PsiUtil.resolveClassInType( previous.resolvedType() );
+            return psiClass == null ? null : resolveInternal( value, psiClass );
         }
 
         PsiMethod mappingMethod = getMappingMethod();
-        if ( mappingMethod == null ) {
-            return null;
-        }
-        return getRelevantClass( mappingMethod );
+
+        return mappingMethod == null ? null : resolveInternal( value, mappingMethod );
     }
+
+    /**
+     * Resolved the reference from the {@code value} for the reference {@code psiClass}
+     *
+     * @param value the value in the annotation (never empty)
+     * @param psiClass the class in which the {@code value} needs to be found
+     *
+     * @return the resolved {@link PsiElement}
+     */
+    @Nullable
+    abstract PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass);
+
+    /**
+     * Resolve the reference from the {@code value} for the {@code mappingMethod}
+     *
+     * @param value the value in the annotation (never empty)
+     * @param mappingMethod the method that is under mapping
+     *
+     * @return the resolved {@link PsiElement}
+     */
+    @Nullable
+    abstract PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod);
+
+    @NotNull
+    @Override
+    public final Object[] getVariants() {
+        if ( previous != null ) {
+            PsiClass psiClass = PsiUtil.resolveClassInType( previous.resolvedType() );
+            return psiClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( psiClass );
+        }
+
+        PsiMethod mappingMethod = getMappingMethod();
+        return mappingMethod == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( mappingMethod );
+    }
+
+    /**
+     * Find all the variants for the given {@code psiClass}.
+     *
+     * @param psiClass the class for which variants need to be returned
+     *
+     * @return all the variants for the provided {@code psiClass}
+     */
+    @NotNull
+    abstract Object[] getVariantsInternal(@NotNull PsiClass psiClass);
+
+    /**
+     * Find all the variants for the given {@code mappingMethod}.
+     *
+     * @param mappingMethod the mapping method for which variants need to be returned
+     *
+     * @return all the variants for the provided {@code mappingMethod}
+     */
+    @NotNull
+    abstract Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod);
 
     /**
      * @return The mapping method that this reference belongs to
@@ -80,13 +137,6 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
     PsiMethod getMappingMethod() {
         return PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
     }
-
-    /**
-     * @param mappingMethod the method that is being mapped
-     *
-     * @return the class that should be used for doing auto-completion against
-     */
-    abstract PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod);
 
     /**
      * Should return the type that can be used for continuing the auto-completion. For example for source it is the

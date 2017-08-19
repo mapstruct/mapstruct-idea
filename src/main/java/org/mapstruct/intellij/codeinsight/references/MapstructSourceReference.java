@@ -21,13 +21,13 @@ package org.mapstruct.intellij.codeinsight.references;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
@@ -55,69 +55,57 @@ class MapstructSourceReference extends MapstructBaseReference {
         super( element, previousReference, rangeInElement );
     }
 
-    @Nullable
     @Override
-    public PsiElement resolve() {
-        PsiClass sourceClass = getRelevantClass();
-        String value = getValue();
-        if ( sourceClass == null || value.isEmpty()) {
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass) {
+        PsiMethod[] methods = psiClass.findMethodsByName( "get" + Strings.capitalize( value ), true );
+
+        if ( methods.length == 0 ) {
+            methods = psiClass.findMethodsByName( "is" + Strings.capitalize( value ), true );
+        }
+        return methods.length == 0 ? null : methods[0];
+    }
+
+    @Override
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod) {
+        PsiParameter[] sourceParameters = MapstructUtil.getSourceParameters( mappingMethod );
+        if ( sourceParameters.length == 0 ) {
             return null;
         }
-        PsiMethod[] methods = sourceClass.findMethodsByName( "get" + Strings.capitalize( value ), true );
 
-        if ( methods.length == 0 ) {
-            methods = sourceClass.findMethodsByName( "is" + Strings.capitalize( value ), true );
-        }
-
-        //If instead of doing the above we replace with the below highlighting, renaming, Find Usages works correctly
-        //PsiMethod[] methods = sourceClass.findMethodsByName(getValue(), true);
-
-        if ( methods.length == 0 ) {
-            PsiMethod mappingMethod = getMappingMethod();
-            if ( mappingMethod == null || mappingMethod.getParameterList().getParametersCount() == 0 ) {
-                return null;
+        if ( sourceParameters.length == 1 ) {
+            PsiClass parameterClass = getParameterClass( sourceParameters[0] );
+            PsiElement psiElement = parameterClass == null ? null : resolveInternal( value, parameterClass );
+            if ( psiElement != null ) {
+                return psiElement;
             }
-            return Stream.of( mappingMethod.getParameterList().getParameters() )
-                .filter( MapstructUtil::isValidSourceParameter )
-                .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
-                .findAny()
-                .orElse( null );
         }
 
-        return methods[0];
+        return Stream.of( sourceParameters )
+            .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
+            .findAny()
+            .orElse( null );
     }
 
     @NotNull
     @Override
-    public Object[] getVariants() {
-        PsiClass sourceClass = getRelevantClass();
-        if ( sourceClass == null ) {
-            return new Object[0];
-        }
-
-        return sourceClass.getAllMethodsAndTheirSubstitutors().stream()
+    Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
+        return psiClass.getAllMethodsAndTheirSubstitutors().stream()
             .filter( pair -> MapstructUtil.isGetter( pair.getFirst() ) )
             .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
             .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
             .toArray();
     }
 
+    @NotNull
     @Override
-    PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
-        PsiParameterList parameters = mappingMethod.getParameterList();
-
-        if ( parameters.getParametersCount() == 0 ) {
-            return null;
+    Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
+        PsiParameter[] sourceParameters = MapstructUtil.getSourceParameters( mappingMethod );
+        if ( sourceParameters.length == 1 ) {
+            PsiClass parameterClass = getParameterClass( sourceParameters[0] );
+            return parameterClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( parameterClass );
         }
 
-        //TODO this is not really correct, we need to adapt with @MappingTarget and return, multiple sources,
-        // result type etc
-        return Stream.of( parameters.getParameters() )
-            .filter( MapstructUtil::isValidSourceParameter )
-            .findAny()
-            .map( PsiParameter::getType )
-            .map( PsiUtil::resolveClassInType )
-            .orElse( null );
+        return sourceParameters;
     }
 
     @Nullable
@@ -141,5 +129,17 @@ class MapstructSourceReference extends MapstructBaseReference {
      */
     static PsiReference[] create(PsiLiteral psiLiteral) {
         return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
+    }
+
+    /**
+     * Find the class for the given {@code parameter}
+     *
+     * @param parameter the parameter
+     *
+     * @return the class for the parameter
+     */
+    @Nullable
+    private static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
+        return PsiUtil.resolveClassInType( parameter.getType() );
     }
 }

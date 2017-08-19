@@ -21,6 +21,7 @@ package org.mapstruct.intellij.codeinsight.references;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -54,40 +55,35 @@ class MapstructTargetReference extends MapstructBaseReference {
         super( element, previousReference, rangeInElement );
     }
 
-    @Nullable
     @Override
-    public PsiElement resolve() {
-        PsiClass returnClass = getRelevantClass();
-        String value = getValue();
-        if ( returnClass == null || value.isEmpty() ) {
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass) {
+        PsiMethod[] methods = psiClass.findMethodsByName( "set" + Strings.capitalize( value ), true );
+        return methods.length == 0 ? null : methods[0];
+    }
+
+    @Override
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod) {
+        PsiClass relevantClass = getRelevantClass( mappingMethod );
+        if ( relevantClass == null ) {
             return null;
         }
-        PsiMethod[] methods = returnClass.findMethodsByName( "set" + Strings.capitalize( value ), true );
 
-        if ( methods.length == 0 ) {
-            PsiMethod mappingMethod = getMappingMethod();
-            if ( mappingMethod == null || mappingMethod.getParameterList().getParametersCount() == 0 ) {
-                return null;
-            }
-            return Stream.of( mappingMethod.getParameterList().getParameters() )
-                .filter( MapstructUtil::isMappingTarget )
-                .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
-                .findAny()
-                .orElse( null );
+        PsiElement psiElement = resolveInternal( value, relevantClass );
+        if ( psiElement != null ) {
+            return psiElement;
         }
 
-        return methods[0];
+        return Stream.of( mappingMethod.getParameterList().getParameters() )
+            .filter( MapstructUtil::isMappingTarget )
+            .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
+            .findAny()
+            .orElse( null );
     }
 
     @NotNull
     @Override
-    public Object[] getVariants() {
-        PsiClass returnClass = getRelevantClass();
-        if ( returnClass == null ) {
-            return new Object[0];
-        }
-
-        return returnClass.getAllMethodsAndTheirSubstitutors().stream()
+    Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
+        return psiClass.getAllMethodsAndTheirSubstitutors().stream()
             .filter( pair -> MapstructUtil.isSetter( pair.getFirst() ) )
             .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
             .map( pair -> MapstructUtil.asLookup(
@@ -97,8 +93,23 @@ class MapstructTargetReference extends MapstructBaseReference {
             .toArray();
     }
 
+    @NotNull
     @Override
-    PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
+    Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
+        PsiClass targetClass = getRelevantClass( mappingMethod );
+        return targetClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( targetClass );
+    }
+
+    /**
+     * Get the relevant class for the {@code mappingMethod}. This can be the return of the method, the parameter
+     * annotated with {@link org.mapstruct.MappingTarget}, or {@code null}
+     *
+     * @param mappingMethod the mapping method
+     *
+     * @return the target class for the given {@code mappingMethod}
+     */
+    @Nullable
+    private static PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
         //TODO here we need to take into consideration both with @MappingTarget and return,
         // returning an interface etc.
         PsiClass psiClass = PsiUtil.resolveClassInType( mappingMethod.getReturnType() );

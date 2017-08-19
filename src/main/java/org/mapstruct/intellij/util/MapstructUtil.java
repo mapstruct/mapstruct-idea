@@ -20,6 +20,7 @@ package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -161,5 +162,22 @@ public final class MapstructUtil {
     private static boolean hasAnnotation(PsiParameter psiParameter, String annotation) {
         PsiModifierList modifierList = psiParameter.getModifierList();
         return modifierList != null && modifierList.findAnnotation( annotation ) != null;
+    }
+
+    /**
+     * Extract all valid source parameters from the provided {@code mappingMethod}
+     *
+     * @param mappingMethod the mapping method
+     *
+     * @return all source parameters from the provided {@code mappingMethod}
+     */
+    @NotNull
+    public static PsiParameter[] getSourceParameters(@NotNull PsiMethod mappingMethod) {
+        if ( mappingMethod.getParameterList().getParametersCount() == 0 ) {
+            return PsiParameter.EMPTY_ARRAY;
+        }
+        return Stream.of( mappingMethod.getParameterList().getParameters() )
+            .filter( MapstructUtil::isValidSourceParameter )
+            .toArray( PsiParameter[]::new );
     }
 }
