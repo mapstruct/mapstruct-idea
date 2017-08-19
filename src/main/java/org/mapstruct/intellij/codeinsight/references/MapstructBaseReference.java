@@ -36,6 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+
 /**
  * A base reference to target / source annotation.
  *
@@ -67,7 +69,8 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
         }
 
         if ( previous != null ) {
-            PsiClass psiClass = PsiUtil.resolveClassInType( previous.resolvedType() );
+            PsiClass psiClass = canDescendIntoType( previous.resolvedType() ) ?
+                PsiUtil.resolveClassInType( previous.resolvedType() ) : null;
             return psiClass == null ? null : resolveInternal( value, psiClass );
         }
 

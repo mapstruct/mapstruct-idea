@@ -463,6 +463,46 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( reference.resolve() ).isNull();
     }
 
+    public void testSourcePropertyIsList() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testSourcePropertyIsArray() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testSourcePropertyIsMap() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testNestedSecondLevelSourcePropertyIsIterable() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testTargetPropertyIsArray() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testTargetPropertyIsIterable() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testTargetPropertyIsMap() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
+    public void testNestedSecondLevelTargetPropertyIsIterable() {
+        configureByTestName();
+        assertThat( myItems ).isEmpty();
+    }
+
     private static LookupElementPresentation createVariable(String lookupString, String typeText) {
         return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, "" );
     }

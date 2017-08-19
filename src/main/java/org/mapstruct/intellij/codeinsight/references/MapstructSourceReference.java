@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import org.mapstruct.ap.internal.util.Strings;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+
 /**
  * Reference for {@link org.mapstruct.Mapping#source()}.
  *
@@ -140,6 +142,6 @@ class MapstructSourceReference extends MapstructBaseReference {
      */
     @Nullable
     private static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
-        return PsiUtil.resolveClassInType( parameter.getType() );
+        return canDescendIntoType( parameter.getType() ) ? PsiUtil.resolveClassInType( parameter.getType() ) : null;
     }
 }

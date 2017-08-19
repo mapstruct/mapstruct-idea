@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import org.mapstruct.ap.internal.util.Strings;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+
 /**
  * Reference for {@link org.mapstruct.Mapping#target()}.
  *
@@ -112,12 +114,16 @@ class MapstructTargetReference extends MapstructBaseReference {
     private static PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
         //TODO here we need to take into consideration both with @MappingTarget and return,
         // returning an interface etc.
+        if ( !canDescendIntoType( mappingMethod.getReturnType() ) ) {
+            return null;
+        }
         PsiClass psiClass = PsiUtil.resolveClassInType( mappingMethod.getReturnType() );
         if ( psiClass == null ) {
             psiClass = Stream.of( mappingMethod.getParameterList().getParameters() )
                 .filter( MapstructUtil::isMappingTarget )
                 .findAny()
                 .map( PsiParameter::getType )
+                .filter( MapstructUtil::canDescendIntoType )
                 .map( PsiUtil::resolveClassInType )
                 .orElse( null );
         }

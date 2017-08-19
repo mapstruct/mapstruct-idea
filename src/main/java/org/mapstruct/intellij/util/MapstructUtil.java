@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -179,5 +180,26 @@ public final class MapstructUtil {
         return Stream.of( mappingMethod.getParameterList().getParameters() )
             .filter( MapstructUtil::isValidSourceParameter )
             .toArray( PsiParameter[]::new );
+    }
+
+    /**
+     * Checks if MapStruct can descend into a type. MapStruct, cannot descend into following types:
+     * <ul>
+     * <li>An Array</li>
+     * <li>An Iterable</li>
+     * <li>A Map</li>
+     * </ul>
+     *
+     * @param psiType the type to be checked
+     *
+     * @return {@code true} if MapStruct can descend into type
+     */
+    public static boolean canDescendIntoType(PsiType psiType) {
+        if ( psiType instanceof PsiArrayType ) {
+            return false;
+        }
+        //TODO add checks for Iterable and Map
+
+        return true;
     }
 }
