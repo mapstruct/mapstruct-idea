@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.2.14"
+    id "org.jetbrains.intellij" version "0.2.16"
     id "com.github.hierynomus.license" version "0.14.0"
 }
 
