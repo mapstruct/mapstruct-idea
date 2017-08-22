@@ -23,6 +23,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import org.jetbrains.annotations.NotNull;
 
 import static org.mapstruct.intellij.util.MapstructElementUtils.mappingElementPattern;
+import static org.mapstruct.intellij.util.MapstructElementUtils.valueMappingElementPattern;
 
 /**
  * {@link PsiReferenceContributor} for MapStruct annotations.
@@ -40,6 +41,15 @@ public class MapstructReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
             mappingElementPattern( "source" ),
             new MappingTargetReferenceProvider( MapstructSourceReference::create )
+        );
+
+        registrar.registerReferenceProvider(
+            valueMappingElementPattern( "source" ),
+            new MappingTargetReferenceProvider( ValueMappingSourceReference::create )
+        );
+        registrar.registerReferenceProvider(
+            valueMappingElementPattern( "target" ),
+            new MappingTargetReferenceProvider( ValueMappingTargetReference::create )
         );
     }
 

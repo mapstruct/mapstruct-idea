@@ -118,6 +118,13 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             "}" );
 
         addEnvironmentClass( "package org.mapstruct;\n" +
+            "import java.lang.annotation.Annotation;\n" +
+            "public @interface ValueMapping {\n" +
+            "    String target();\n" +
+            "    String source();\n" +
+            "}" );
+
+        addEnvironmentClass( "package org.mapstruct;\n" +
             "public @interface MappingTarget {\n" +
             "}" );
         addEnvironmentClass( "package org.mapstruct;\n" +

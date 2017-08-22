@@ -18,10 +18,7 @@
  */
 package org.mapstruct.intellij;
 
-import javax.swing.Icon;
-
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -29,9 +26,10 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.PlatformIcons;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mapstruct.intellij.testutil.TestUtils.createParameter;
+import static org.mapstruct.intellij.testutil.TestUtils.createVariable;
 
 /**
  * @author Filip Hrisafov
@@ -503,18 +501,4 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems ).isEmpty();
     }
 
-    private static LookupElementPresentation createVariable(String lookupString, String typeText) {
-        return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, "" );
-    }
-
-    private static LookupElementPresentation createParameter(String lookupString, String typeText) {
-        return create( lookupString, typeText, PlatformIcons.PARAMETER_ICON, null );
-    }
-
-    private static LookupElementPresentation create(String lookupString, String typeText, Icon icon, String tailText) {
-        return LookupElementPresentation.renderElement( LookupElementBuilder.create( lookupString )
-            .withIcon( icon )
-            .withTailText( tailText )
-            .withTypeText( typeText ) );
-    }
 }

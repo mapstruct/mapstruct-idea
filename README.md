@@ -23,6 +23,7 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
 
 * Code completions
   * Completion of `target` and `source` properties in `@Mapping` annotation (nested properties also work)
+  * Completion of `target` and `source` properties in `@ValueMapping` annotation
   * Completion of `componentModel` in `@Mapper` and `@MapperConfig` annotations
 * Go To Declaration for properties in `target` and `source` to setters / getters
 * Find usages of properties in `target` and `source` and find usages of setters / getters in `@Mapping` annotations

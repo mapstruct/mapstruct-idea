@@ -38,6 +38,15 @@ public final class MapstructElementUtils {
     }
 
     /**
+     * @param parameterName the name of the parameter in the {@code @ValueMapping} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @ValueMapping} annotation
+     */
+    public static PsiJavaElementPattern.Capture<PsiElement> valueMappingElementPattern(String parameterName) {
+        return elementPattern( parameterName, MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN );
+    }
+
+    /**
      * @param parameterName the name of the parameter in the {@code @Mapping} annotation
      *
      * @return an element pattern for a parameter in the {@code @Mapping} annotation

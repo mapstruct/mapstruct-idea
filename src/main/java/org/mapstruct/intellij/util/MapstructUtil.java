@@ -41,6 +41,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ValueMapping;
 
 /**
  * @author Filip Hrisafov
@@ -50,6 +51,7 @@ public final class MapstructUtil {
     static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
     static final String MAPPER_CONFIG_ANNOTATION_FQN = MapperConfig.class.getName();
     static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     //TODO maybe we need to include the 1.2.0-RC1 here
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";

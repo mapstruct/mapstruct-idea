@@ -27,9 +27,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +41,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
  *
  * @author Filip Hrisafov
  */
-abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
+abstract class MapstructBaseReference extends BaseReference {
 
     private final MapstructBaseReference previous;
 
@@ -132,14 +130,6 @@ abstract class MapstructBaseReference extends PsiReferenceBase<PsiLiteral> {
      */
     @NotNull
     abstract Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod);
-
-    /**
-     * @return The mapping method that this reference belongs to
-     */
-    @Nullable
-    PsiMethod getMappingMethod() {
-        return PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
-    }
 
     /**
      * Should return the type that can be used for continuing the auto-completion. For example for source it is the

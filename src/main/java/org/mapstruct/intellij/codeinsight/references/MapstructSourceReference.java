@@ -141,7 +141,7 @@ class MapstructSourceReference extends MapstructBaseReference {
      * @return the class for the parameter
      */
     @Nullable
-    private static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
+    static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
         return canDescendIntoType( parameter.getType() ) ? PsiUtil.resolveClassInType( parameter.getType() ) : null;
     }
 }
