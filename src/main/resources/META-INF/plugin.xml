@@ -20,19 +20,8 @@
 -->
 <idea-plugin>
   <id>org.mapstruct.intellij</id>
-  <name>MapStruct IntelliJ Plugin</name>
-  <version>0.0.1-SNAPSHOT</version>
-  <vendor email="TODO" url="http://www.mapstruct.org">MapStruct</vendor>
-
-  <description><![CDATA[
-      Plugin for completions in MapStruct annotations
-    ]]></description>
-
-  <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
-    ]]>
-  </change-notes>
+  <name>MapStruct Support</name>
+  <vendor url="http://www.mapstruct.org">MapStruct</vendor>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
   <idea-version since-build="162"/>

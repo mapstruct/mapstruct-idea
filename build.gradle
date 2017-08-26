@@ -32,6 +32,15 @@ intellij {
     sameSinceUntilBuild Boolean.valueOf(isEAP)
     alternativeIdePath idePath
     updateSinceUntilBuild false
+    pluginName 'MapStruct-Intellij-Plugin'
+}
+
+// Simple function to load change-notes.html and description.html into valid text for plugin.xml
+def htmlFixer = {f -> file(f).text.replace('<html>', '').replace('</html>', '')}
+
+patchPluginXml {
+    changeNotes = htmlFixer('change-notes.html')
+    pluginDescription = htmlFixer('description.html')
 }
 
 task licenseTestData(type: com.hierynomus.gradle.license.tasks.LicenseCheck) {
