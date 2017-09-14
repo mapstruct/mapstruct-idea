@@ -33,7 +33,6 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mapstruct.ap.internal.util.Strings;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
@@ -59,10 +58,10 @@ class MapstructSourceReference extends MapstructBaseReference {
 
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass) {
-        PsiMethod[] methods = psiClass.findMethodsByName( "get" + Strings.capitalize( value ), true );
+        PsiMethod[] methods = psiClass.findMethodsByName( "get" + MapstructUtil.capitalize( value ), true );
 
         if ( methods.length == 0 ) {
-            methods = psiClass.findMethodsByName( "is" + Strings.capitalize( value ), true );
+            methods = psiClass.findMethodsByName( "is" + MapstructUtil.capitalize( value ), true );
         }
         return methods.length == 0 ? null : methods[0];
     }

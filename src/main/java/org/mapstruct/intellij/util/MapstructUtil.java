@@ -204,4 +204,8 @@ public final class MapstructUtil {
 
         return true;
     }
+
+    public static String capitalize(String string) {
+        return string == null ? null : string.substring( 0, 1 ).toUpperCase() + string.substring( 1 );
+    }
 }
