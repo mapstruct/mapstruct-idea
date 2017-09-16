@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.MapstructUtil.isMapStructPresent;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 
@@ -43,11 +42,7 @@ public class MissingMapperOrMapperConfigAnnotationInspection extends InspectionB
 
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        if ( !isMapStructPresent( holder.getFile() ) ) {
-            return PsiElementVisitor.EMPTY_VISITOR;
-        }
-
+    PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
         return new MyJavaElementVisitor( holder );
     }
 

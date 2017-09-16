@@ -19,9 +19,13 @@
 package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
+
+import static org.mapstruct.intellij.util.MapstructUtil.isMapStructPresent;
 
 /**
  * Inspection base for MapStruct issues.
@@ -36,4 +40,17 @@ public abstract class InspectionBase extends LocalInspectionTool {
     public String getGroupDisplayName() {
         return MapStructBundle.message( "group.names.mapstruct.issues" );
     }
+
+    @NotNull
+    @Override
+    public final PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
+        if ( !isMapStructPresent( holder.getFile() ) ) {
+            return PsiElementVisitor.EMPTY_VISITOR;
+        }
+
+        return buildVisitorInternal( holder, isOnTheFly );
+    }
+
+    @NotNull
+    abstract PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly);
 }
