@@ -21,9 +21,18 @@ package org.mapstruct.intellij;
 import java.io.File;
 
 import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.projectRoots.JavaSdk;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ContentEntry;
+import com.intellij.openapi.roots.LanguageLevelModuleExtension;
+import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
+import com.intellij.pom.java.LanguageLevel;
+import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PsiTestUtil;
+import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +46,7 @@ import static com.intellij.testFramework.LightPlatformTestCase.getModule;
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
     private static final String BUILD_LIBS_DIRECTORY = "build/libs";
+    private static final String BUILD_MOCK_JDK_DIRECTORY = "build/mockJDK-1.7";
 
     @Override
     protected void setUp() throws Exception {
@@ -49,5 +59,23 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
 
     protected void addDirectoryToProject(@NotNull String directory) {
         myFixture.copyDirectoryToProject( directory, StringUtil.getShortName( directory, '/' ) );
+    }
+
+    @NotNull
+    @Override
+    protected LightProjectDescriptor getProjectDescriptor() {
+        return new DefaultLightProjectDescriptor() {
+            @Override
+            public Sdk getSdk() {
+                return JavaSdk.getInstance().createJdk( "java 1.7", BUILD_MOCK_JDK_DIRECTORY, false );
+            }
+
+            @Override
+            public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model,
+                @NotNull ContentEntry contentEntry) {
+                model.getModuleExtension( LanguageLevelModuleExtension.class )
+                    .setLanguageLevel( LanguageLevel.JDK_1_7 );
+            }
+        };
     }
 }

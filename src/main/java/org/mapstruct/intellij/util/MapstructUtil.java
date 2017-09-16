@@ -32,11 +32,13 @@ import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
@@ -196,11 +198,28 @@ public final class MapstructUtil {
      *
      * @return {@code true} if MapStruct can descend into type
      */
-    public static boolean canDescendIntoType(PsiType psiType) {
-        if ( psiType instanceof PsiArrayType ) {
+    public static boolean canDescendIntoType(@Nullable PsiType psiType) {
+        if ( psiType == null || psiType instanceof PsiArrayType ) {
             return false;
         }
-        //TODO add checks for Iterable and Map
+
+        GlobalSearchScope resolveScope = psiType.getResolveScope();
+        if ( resolveScope == null || resolveScope.getProject() == null ) {
+            return true;
+        }
+
+        if ( psiType instanceof PsiClassType ) {
+            return !PsiType.getTypeByName(
+                "java.lang.Iterable",
+                resolveScope.getProject(),
+                resolveScope
+            ).isAssignableFrom( psiType )
+                && !PsiType.getTypeByName(
+                "java.util.Map",
+                resolveScope.getProject(),
+                resolveScope
+            ).isAssignableFrom( psiType );
+        }
 
         return true;
     }

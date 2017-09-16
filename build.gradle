@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.intellij" version "0.2.16"
     id "com.github.hierynomus.license" version "0.14.0"
+    id "de.undercouch.download" version "3.2.0"
 }
 
 
@@ -90,4 +91,26 @@ task libs(type: Sync) {
     rename 'mapstruct-jdk8.*', 'mapstruct.jar'
 }
 
-test.dependsOn( libs )
+def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mockJDK-1.7"
+def mockJdkDest = "$buildDir/mockJDK-1.7"
+task downloadMockJdk() {
+    download {
+        src([
+             "$mockJdkLocation/jre/lib/annotations.jar",
+             "$mockJdkLocation/jre/lib/rt.jar"
+        ])
+        dest "$mockJdkDest/jre/lib/"
+        overwrite false
+        quiet false
+    }
+    download {
+        src([
+             "$mockJdkLocation/src.zip"
+        ])
+        dest "$mockJdkDest"
+        overwrite false
+        quiet false
+    }
+}
+
+test.dependsOn( libs, downloadMockJdk )

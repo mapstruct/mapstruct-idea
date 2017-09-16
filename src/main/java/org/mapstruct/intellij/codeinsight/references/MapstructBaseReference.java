@@ -103,7 +103,8 @@ abstract class MapstructBaseReference extends BaseReference {
     @Override
     public final Object[] getVariants() {
         if ( previous != null ) {
-            PsiClass psiClass = PsiUtil.resolveClassInType( previous.resolvedType() );
+            PsiType resolvedType = previous.resolvedType();
+            PsiClass psiClass = canDescendIntoType( resolvedType ) ? PsiUtil.resolveClassInType( resolvedType ) : null;
             return psiClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( psiClass );
         }
 
