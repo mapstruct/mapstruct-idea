@@ -24,8 +24,15 @@ import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -33,6 +40,8 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
 import com.intellij.util.PlatformIcons;
@@ -43,17 +52,29 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
 import org.mapstruct.ValueMapping;
+import org.mapstruct.ValueMappings;
+
+import static com.intellij.codeInsight.AnnotationUtil.isAnnotated;
 
 /**
  * @author Filip Hrisafov
  */
 public final class MapstructUtil {
 
-    static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
-    static final String MAPPER_CONFIG_ANNOTATION_FQN = MapperConfig.class.getName();
+    /**
+     * The FQN of the {@link Mapper} annotation.
+     */
+    public static final String MAPPER_ANNOTATION_FQN = Mapper.class.getName();
+    /**
+     * The FQN of the {@link MapperConfig} annotation.
+     */
+    public static final String MAPPER_CONFIG_ANNOTATION_FQN = MapperConfig.class.getName();
     static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
+    static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     //TODO maybe we need to include the 1.2.0-RC1 here
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
@@ -130,6 +151,48 @@ public final class MapstructUtil {
      */
     public static boolean isMappingTarget(PsiParameter psiParameter) {
         return hasAnnotation( psiParameter, MAPPING_TARGET_ANNOTATION_FQN );
+    }
+
+    /**
+     * Checks of the {@code psiClass} is annotated with {@link Mapper}.
+     *
+     * @param psiClass the class that needs to be checked
+     *
+     * @return {@code true} if the {@code psiClass} is annotated with {@link Mapper}, {@code false} otherwise
+     */
+    public static boolean isMapper(PsiClass psiClass) {
+        return isAnnotated( psiClass, MAPPER_ANNOTATION_FQN, false );
+    }
+
+    /**
+     * Checks of the {@code psiClass} is annotated with {@link MapperConfig}.
+     *
+     * @param psiClass the class that needs to be checked
+     *
+     * @return {@code true} if the {@code psiClass} is annotated with {@link MapperConfig}, {@code false} otherwise
+     */
+    public static boolean isMapperConfig(PsiClass psiClass) {
+        return isAnnotated( psiClass, MAPPER_CONFIG_ANNOTATION_FQN, false );
+    }
+
+    /**
+     * Checks if the {@code psiMethod} is a mapping method. A mapping method is a method that is annotated with one of:
+     * <ul>
+     * <li>{@link Mapping}</li>
+     * <li>{@link Mappings}</li>
+     * <li>{@link ValueMapping}</li>
+     * <li>{@link ValueMappings}</li>
+     * </ul>
+     *
+     * @param psiMethod
+     *
+     * @return
+     */
+    public static boolean isMappingMethod(PsiMethod psiMethod) {
+        return isAnnotated( psiMethod, MAPPING_ANNOTATION_FQN, false )
+            || isAnnotated( psiMethod, MAPPINGS_ANNOTATION_FQN, false )
+            || isAnnotated( psiMethod, VALUE_MAPPING_ANNOTATION_FQN, false )
+            || isAnnotated( psiMethod, VALUE_MAPPINGS_ANNOTATION_FQN, false );
     }
 
     /**
@@ -226,5 +289,35 @@ public final class MapstructUtil {
 
     public static String capitalize(String string) {
         return string == null ? null : string.substring( 0, 1 ).toUpperCase() + string.substring( 1 );
+    }
+
+    /**
+     * Checks if the {@code psiFile} is located within a module that contains MapStruct.
+     *
+     * @param psiFile the file for which the check needs to be done
+     *
+     * @return {@code true} if MapStruct is in the module of the given {@code psiFile}, {@code false} otherwise
+     */
+    public static boolean isMapStructPresent(@NotNull PsiFile psiFile) {
+        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
+        return module != null && isMapStructPresent( module );
+    }
+
+    /**
+     * Checks if MapStruct is withing the provided module.
+     *
+     * @param module that needs to be checked
+     *
+     * @return {@code true} if MapStruct is present within the {@code module}, {@code false} otherwise
+     */
+    private static boolean isMapStructPresent(@NotNull Module module) {
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
+            boolean foundMarkerClass = JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( MAPPER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null;
+            return CachedValueProvider.Result.createSingleDependency(
+                foundMarkerClass,
+                ProjectRootManager.getInstance( module.getProject() )
+            );
+        } );
     }
 }

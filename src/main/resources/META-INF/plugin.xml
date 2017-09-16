@@ -37,6 +37,15 @@
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
     <methodReferencesSearch implementation="org.mapstruct.intellij.search.MappingMethodUsagesSearcher" />
     <renameHandler implementation="org.mapstruct.intellij.rename.MapstructSourceTargetParameterRenameHandler"/>
+
+    <localInspection language="JAVA"
+                     enabledByDefault="true"
+                     level="ERROR"
+                     bundle="org.mapstruct.intellij.messages.MapStructBundle"
+                     key="inspection.missing.annotation"
+                     shortName="MapperOrMapperConfigMissing"
+                     implementationClass="org.mapstruct.intellij.inspection.MissingMapperOrMapperConfigAnnotationInspection"
+    />
   </extensions>
   
   <actions>

@@ -1,0 +1,31 @@
+<html>
+<body>
+<p>
+    This inspection reports when a class / interface that contains <code>@Mapping</code> or <code>@ValueMapping</code>
+    annotations is not annotated with <code>@Mapper</code> or <code>@MapperConfig</code>.
+    <br/>
+    Classes not annotated with <code>@Mapper</code> will not be picked up by the MapStruct annotation processor,
+    and class not annotated with <code>@MapperConfig</code> will not be used as configuration.
+</p>
+<p>
+<pre><code>
+//wrong
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", target = "name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", target = "name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

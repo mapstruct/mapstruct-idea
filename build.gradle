@@ -55,7 +55,9 @@ license {
         java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
     }
     excludes([
-            '**/META-INF/plugin.xml' // For some reason the plugin thinks that the license is not valid
+            '**/META-INF/plugin.xml', // For some reason the plugin thinks that the license is not valid
+            '**/*.properties',
+            '**/inspectionDescriptions/*.html'
     ])
 }
 
