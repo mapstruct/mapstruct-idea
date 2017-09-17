@@ -18,6 +18,7 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import com.intellij.codeInspection.LocalInspectionTool;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapstructBaseCompletionTestCase;
 
@@ -37,7 +38,7 @@ public abstract class BaseInspectionTest extends MapstructBaseCompletionTestCase
     }
 
     @NotNull
-    abstract Class<MissingMapperOrMapperConfigAnnotationInspection> getInspection();
+    abstract Class<? extends LocalInspectionTool> getInspection();
 
     void doTest() {
         String testName = getTestName( false );
