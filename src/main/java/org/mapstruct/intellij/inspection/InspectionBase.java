@@ -51,6 +51,16 @@ public abstract class InspectionBase extends LocalInspectionTool {
         return buildVisitorInternal( holder, isOnTheFly );
     }
 
+    /**
+     * This method is only invoked if mapstruct is present in the module of the file being checked
+     *
+     * @param holder the problem holder
+     * @param isOnTheFly true if inspection was run in non-batch mode
+     *
+     * @return The visitor that needs to be used for the inspection
+     *
+     * @see InspectionBase#buildVisitor(ProblemsHolder, boolean)
+     */
     @NotNull
     abstract PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly);
 }
