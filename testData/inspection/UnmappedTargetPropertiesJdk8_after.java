@@ -35,6 +35,7 @@ interface SingleMappingsMapper {
 
     @Mappings({
             @Mapping(target = "moreTarget", source = "moreSource"),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     Target map(Source source);
@@ -44,6 +45,7 @@ interface SingleMappingsMapper {
 interface SingleMappingMapper {
 
     @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
     @Mapping(target = "testName", source = "name")
     Target map(Source source);
 }
@@ -52,7 +54,9 @@ interface SingleMappingMapper {
 interface NoMappingMapper {
 
     @Mapping(target = "testName", source = "")
+    @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
     Target map(Source source);
 
     @org.mapstruct.InheritInverseConfiguration
@@ -71,6 +75,7 @@ interface AllMappingMapper {
 interface UpdateMapper {
 
     @Mapping(target = "testName", source = "")
+    @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", source = "moreSource")
     void update(@MappingTarget Target target, Source source);
 }
@@ -79,6 +84,8 @@ interface UpdateMapper {
 interface MultiSourceUpdateMapper {
 
     @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
     @Mapping(target = "matching", source = "")
+    @Mapping(target = "matching", ignore = true)
     void update(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }

@@ -35,6 +35,7 @@ interface SingleMappingMapper {
 
     @Mappings({
             @Mapping(target = "testName", source = "name"),
+            @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = "")
     })
     Target map(Source source);
@@ -45,6 +46,7 @@ interface SingleMappingsMapper {
 
     @Mappings({
             @Mapping(target = "moreTarget", source = "moreSource"),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     Target map(Source source);
@@ -55,6 +57,7 @@ interface SingleMappingsNoBracesMapper {
 
     @Mappings({
             @Mapping(target = "moreTarget", source = "moreSource"),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     Target map(Source source);
@@ -64,7 +67,9 @@ interface SingleMappingsNoBracesMapper {
 interface NoMappingMapper {
 
     @Mappings({
+            @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = ""),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     Target map(Source source);
@@ -77,7 +82,9 @@ interface NoMappingMapper {
 interface NoMappingsMapper {
 
     @Mappings({
+            @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = ""),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     Target map(Source source);
@@ -98,6 +105,7 @@ interface UpdateMapper {
 
     @Mappings({
             @Mapping(target = "moreTarget", source = "moreSource"),
+            @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
     void update(@MappingTarget Target target, Source source);
@@ -107,7 +115,9 @@ interface UpdateMapper {
 interface MultiSourceUpdateMapper {
 
     @Mappings({
+            @Mapping(target = "matching", ignore = true),
             @Mapping(target = "matching", source = ""),
+            @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = "")
     })
     void update(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
