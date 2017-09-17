@@ -30,12 +30,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
+import static org.mapstruct.intellij.util.SourceUtils.publicGetters;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#source()}.
@@ -80,6 +80,7 @@ class MapstructSourceReference extends MapstructBaseReference {
                 return psiElement;
             }
         }
+        //TODO first do property mapping then parameter
 
         return Stream.of( sourceParameters )
             .filter( psiParameter -> Objects.equals( psiParameter.getName(), value ) )
@@ -90,9 +91,7 @@ class MapstructSourceReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
-        return psiClass.getAllMethodsAndTheirSubstitutors().stream()
-            .filter( pair -> MapstructUtil.isGetter( pair.getFirst() ) )
-            .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
+        return publicGetters( psiClass )
             .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
             .toArray();
     }
@@ -130,17 +129,5 @@ class MapstructSourceReference extends MapstructBaseReference {
      */
     static PsiReference[] create(PsiLiteral psiLiteral) {
         return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
-    }
-
-    /**
-     * Find the class for the given {@code parameter}
-     *
-     * @param parameter the parameter
-     *
-     * @return the class for the parameter
-     */
-    @Nullable
-    static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
-        return canDescendIntoType( parameter.getType() ) ? PsiUtil.resolveClassInType( parameter.getType() ) : null;
     }
 }

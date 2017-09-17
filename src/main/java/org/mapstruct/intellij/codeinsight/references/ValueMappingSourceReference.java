@@ -31,7 +31,7 @@ import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.mapstruct.intellij.codeinsight.references.MapstructSourceReference.getParameterClass;
+import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
 
 /**
  * Reference for {@link org.mapstruct.ValueMapping#source()}.
