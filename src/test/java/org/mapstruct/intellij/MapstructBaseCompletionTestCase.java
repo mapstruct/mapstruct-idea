@@ -46,7 +46,7 @@ import static com.intellij.testFramework.LightPlatformTestCase.getModule;
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
     private static final String BUILD_LIBS_DIRECTORY = "build/libs";
-    private static final String BUILD_MOCK_JDK_DIRECTORY = "build/mockJDK-1.7";
+    private static final String BUILD_MOCK_JDK_DIRECTORY = "build/mockJDK-";
 
     @Override
     protected void setUp() throws Exception {
@@ -64,18 +64,25 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
     @NotNull
     @Override
     protected LightProjectDescriptor getProjectDescriptor() {
+        LanguageLevel languageLevel = getLanguageLevel();
         return new DefaultLightProjectDescriptor() {
             @Override
             public Sdk getSdk() {
-                return JavaSdk.getInstance().createJdk( "java 1.7", BUILD_MOCK_JDK_DIRECTORY, false );
+                String compilerOption = languageLevel.getCompilerComplianceDefaultOption();
+                return JavaSdk.getInstance()
+                    .createJdk( "java " + compilerOption, BUILD_MOCK_JDK_DIRECTORY + compilerOption, false );
             }
 
             @Override
             public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model,
                 @NotNull ContentEntry contentEntry) {
                 model.getModuleExtension( LanguageLevelModuleExtension.class )
-                    .setLanguageLevel( LanguageLevel.JDK_1_7 );
+                    .setLanguageLevel( languageLevel );
             }
         };
+    }
+
+    protected LanguageLevel getLanguageLevel() {
+        return LanguageLevel.JDK_1_7;
     }
 }
