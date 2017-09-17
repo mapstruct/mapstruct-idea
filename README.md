@@ -29,7 +29,9 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
 * Find usages of properties in `target` and `source` and find usages of setters / getters in `@Mapping` annotations
 * Highlighting properties in `target` and `source`
 * Errors and Quick fixes:
-  * `@Mapper` or `@MapperConfig` annotation missing  
+  * `@Mapper` or `@MapperConfig` annotation missing
+  * Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property. 
+  NB: `unmappedTargetPolicy` is not yet considered  
 
 ## Requirements
 
