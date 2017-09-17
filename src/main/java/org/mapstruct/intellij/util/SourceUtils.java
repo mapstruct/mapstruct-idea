@@ -18,6 +18,7 @@
  */
 package org.mapstruct.intellij.util;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.intellij.openapi.util.Pair;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
 
 /**
  * Utils for working with source properties (extracting sources for MapStruct).
@@ -39,6 +41,29 @@ import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 public class SourceUtils {
 
     private SourceUtils() {
+    }
+
+    /**
+     * Find all source properties for the given {@code method}. If the method has only one source parameter then the
+     * properties of the source class are returned. Otherwise the names of all the source parameters are returned
+     *
+     * @param method to be used
+     *
+     * @return see description
+     */
+    public static Stream<String> findAllSourceProperties(@NotNull PsiMethod method) {
+        PsiParameter[] sourceParameters = getSourceParameters( method );
+        if ( sourceParameters.length == 1 ) {
+            return Stream.of( sourceParameters[0] )
+                .map( SourceUtils::getParameterClass )
+                .filter( Objects::nonNull )
+                .flatMap( SourceUtils::publicGetters )
+                .map( pair -> pair.getFirst() )
+                .map( MapstructUtil::getPropertyName );
+        }
+
+        return Stream.of( sourceParameters )
+            .map( PsiParameter::getName );
     }
 
     /**

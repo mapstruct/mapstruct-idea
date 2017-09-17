@@ -28,6 +28,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
@@ -48,6 +49,7 @@ import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
@@ -56,6 +58,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
 
+import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.isAnnotated;
 
 /**
@@ -71,13 +74,17 @@ public final class MapstructUtil {
      * The FQN of the {@link MapperConfig} annotation.
      */
     public static final String MAPPER_CONFIG_ANNOTATION_FQN = MapperConfig.class.getName();
-    static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    /**
+     * The FQN of the {@link Mapping} annotation.
+     */
+    public static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     //TODO maybe we need to include the 1.2.0-RC1 here
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
+    private static final String INHERIT_INVERSE_CONFIGURATION = InheritInverseConfiguration.class.getName();
 
     /**
      * Hide constructor.
@@ -320,4 +327,41 @@ public final class MapstructUtil {
             );
         } );
     }
+
+    /**
+     * Checks if MapStruct jdk8 is within the provided module. The MapStruct JDK 8 module is present when the
+     * {@link Mapping} annotation is annotated with {@link java.lang.annotation.Repeatable}
+     *
+     * @param module that needs to be checked
+     *
+     * @return {@code true} if MapStruct jdk8 is present within the {@code module}, {@code false} otherwise
+     */
+    static boolean isMapStructJdk8Present(@NotNull Module module) {
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
+            PsiClass mappingAnnotation = JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( MAPPING_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) );
+            boolean mapstructJdk8Present = findAnnotation(
+                mappingAnnotation,
+                true,
+                CommonClassNames.JAVA_LANG_ANNOTATION_REPEATABLE
+            ) != null;
+            return CachedValueProvider.Result.createSingleDependency(
+                mapstructJdk8Present,
+                ProjectRootManager.getInstance( module.getProject() )
+            );
+        } );
+    }
+
+    /**
+     * Checks if the {@code psiMethod} is annotated with {@link InheritInverseConfiguration}.
+     *
+     * @param method to be checked
+     *
+     * @return {@code true} if the {@code method} is annotated with {@link InheritInverseConfiguration},
+     * {@code false} otherwise
+     */
+    public static boolean isInheritInverseConfiguration(PsiMethod method) {
+        return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION, false );
+    }
+
 }
