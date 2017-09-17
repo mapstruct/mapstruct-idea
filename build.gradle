@@ -93,26 +93,39 @@ task libs(type: Sync) {
     rename 'mapstruct-jdk8.*', 'mapstruct.jar'
 }
 
-def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mockJDK-1.7"
-def mockJdkDest = "$buildDir/mockJDK-1.7"
-task downloadMockJdk() {
+def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mock"
+def mockJdkDest = "$buildDir/mock"
+def downloadMockJdk(mockJdkLocation, mockJdkDest, mockJdkVersion) {
+    def location = mockJdkLocation + mockJdkVersion
+    def destination = mockJdkDest + mockJdkVersion
     download {
         src([
-             "$mockJdkLocation/jre/lib/annotations.jar",
-             "$mockJdkLocation/jre/lib/rt.jar"
+            "$location/jre/lib/annotations.jar",
+            "$location/jre/lib/rt.jar"
         ])
-        dest "$mockJdkDest/jre/lib/"
-        overwrite false
-        quiet false
-    }
-    download {
-        src([
-             "$mockJdkLocation/src.zip"
-        ])
-        dest "$mockJdkDest"
+        dest "$destination/jre/lib/"
         overwrite false
         quiet false
     }
 }
 
-test.dependsOn( libs, downloadMockJdk )
+task downloadMockJdk7() {
+    def jdkVersion = "JDK-1.7"
+    def mockJdk7Location = mockJdkLocation + jdkVersion
+    def mockJdk7Dest = mockJdkDest + jdkVersion
+    downloadMockJdk(mockJdkLocation, mockJdkDest, jdkVersion)
+    download {
+        src([
+             "$mockJdk7Location/src.zip"
+        ])
+        dest "$mockJdk7Dest"
+        overwrite false
+        quiet false
+    }
+}
+
+task downloadMockJdk8() {
+    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-1.8")
+}
+
+test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8 )
