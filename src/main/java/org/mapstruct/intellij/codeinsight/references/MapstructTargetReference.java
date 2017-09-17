@@ -30,12 +30,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+import static org.mapstruct.intellij.util.TargetUtils.getRelevantClass;
+import static org.mapstruct.intellij.util.TargetUtils.publicSetters;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#target()}.
@@ -84,9 +84,7 @@ class MapstructTargetReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
-        return psiClass.getAllMethodsAndTheirSubstitutors().stream()
-            .filter( pair -> MapstructUtil.isSetter( pair.getFirst() ) )
-            .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) )
+        return publicSetters( psiClass )
             .map( pair -> MapstructUtil.asLookup(
                 pair,
                 MapstructTargetReference::firstParameterPsiType
@@ -99,34 +97,6 @@ class MapstructTargetReference extends MapstructBaseReference {
     Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
         PsiClass targetClass = getRelevantClass( mappingMethod );
         return targetClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( targetClass );
-    }
-
-    /**
-     * Get the relevant class for the {@code mappingMethod}. This can be the return of the method, the parameter
-     * annotated with {@link org.mapstruct.MappingTarget}, or {@code null}
-     *
-     * @param mappingMethod the mapping method
-     *
-     * @return the target class for the given {@code mappingMethod}
-     */
-    @Nullable
-    private static PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
-        //TODO here we need to take into consideration both with @MappingTarget and return,
-        // returning an interface etc.
-        if ( !canDescendIntoType( mappingMethod.getReturnType() ) ) {
-            return null;
-        }
-        PsiClass psiClass = PsiUtil.resolveClassInType( mappingMethod.getReturnType() );
-        if ( psiClass == null ) {
-            psiClass = Stream.of( mappingMethod.getParameterList().getParameters() )
-                .filter( MapstructUtil::isMappingTarget )
-                .findAny()
-                .map( PsiParameter::getType )
-                .filter( MapstructUtil::canDescendIntoType )
-                .map( PsiUtil::resolveClassInType )
-                .orElse( null );
-        }
-        return psiClass;
     }
 
     @Nullable
