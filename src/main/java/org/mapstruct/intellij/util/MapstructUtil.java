@@ -116,7 +116,14 @@ public final class MapstructUtil {
     @NotNull
     @NonNls
     public static String getPropertyName(@NotNull String methodName) {
-        return Introspector.decapitalize( methodName.substring( methodName.startsWith( "is" ) ? 2 : 3 ) );
+        String name = "";
+        if ( methodName.startsWith( "is" ) ) {
+            name = methodName.substring( 2 );
+        }
+        else if ( methodName.length() > 2 ) {
+            name = methodName.substring( 3 );
+        }
+        return Introspector.decapitalize( name );
     }
 
     /**
