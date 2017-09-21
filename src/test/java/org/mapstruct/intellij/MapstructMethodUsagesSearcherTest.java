@@ -72,6 +72,12 @@ public class MapstructMethodUsagesSearcherTest extends MapstructBaseCompletionTe
             } );
     }
 
+    public void testIssue10Mapper() {
+        myFixture.configureByFiles( getTestName( false ) + ".java" );
+        Collection<UsageInfo> usages = myFixture.findUsages( myFixture.getElementAtCaret() );
+        assertThat( usages ).isEmpty();
+    }
+
     public void testFindUsagesForOnlyGetMethodOnSource() {
         myFixture.configureByFiles( "OnlyGetMethodOnSource.java" );
         Collection<UsageInfo> usages = myFixture.findUsages( myFixture.getElementAtCaret() );
