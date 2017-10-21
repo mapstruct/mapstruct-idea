@@ -129,3 +129,9 @@ task downloadMockJdk8() {
 }
 
 test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8 )
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}

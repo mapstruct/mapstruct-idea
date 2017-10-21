@@ -24,7 +24,7 @@ install:
   - ./gradlew -version
 
 script:
-  - ./gradlew build --stacktrace
+  - ./gradlew build
 
 after_success:
   - ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash)
