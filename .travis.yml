@@ -18,5 +18,13 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
+# Don't let Travis CI execute './gradlew assemble' by default
+install:
+# Display Gradle, Groovy, JVM and other versions
+  - ./gradlew -version
+
+script:
+  - ./gradlew build --stacktrace
+
 after_success:
   - ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash)
