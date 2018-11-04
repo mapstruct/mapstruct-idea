@@ -54,7 +54,13 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         final String mapstructLibPath = PathUtil.toSystemIndependentName( new File( BUILD_LIBS_DIRECTORY )
             .getAbsolutePath() );
         VfsRootAccess.allowRootAccess( mapstructLibPath );
-        PsiTestUtil.addLibrary( getModule(), "Mapstruct", mapstructLibPath, "mapstruct.jar" );
+        PsiTestUtil.addLibrary(
+            myFixture.getProjectDisposable(),
+            getModule(),
+            "Mapstruct",
+            mapstructLibPath,
+            "mapstruct.jar"
+        );
     }
 
     protected void addDirectoryToProject(@NotNull String directory) {
