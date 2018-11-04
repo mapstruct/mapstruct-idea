@@ -18,7 +18,12 @@
  */
 package org.mapstruct.intellij.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.intellij.openapi.util.Pair;
@@ -86,8 +91,18 @@ public class SourceUtils {
      * @return a stream that holds all public getters for the given {@code psiClass}
      */
     public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiClass psiClass) {
-        return psiClass.getAllMethodsAndTheirSubstitutors().stream()
-            .filter( pair -> MapstructUtil.isGetter( pair.getFirst() ) )
-            .filter( pair -> MapstructUtil.isPublic( pair.getFirst() ) );
+        Set<PsiMethod> overriddenMethods = new HashSet<>();
+        List<Pair<PsiMethod, PsiSubstitutor>> publicGetters = new ArrayList<>();
+        for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
+            PsiMethod method = pair.getFirst();
+            if ( MapstructUtil.isGetter( method ) && MapstructUtil.isPublic( method ) &&
+                !overriddenMethods.contains( method ) ) {
+                // If this is a public getter then populate its overridden methods and use it
+                overriddenMethods.addAll( Arrays.asList( method.findSuperMethods() ) );
+                publicGetters.add( pair );
+            }
+        }
+
+        return publicGetters.stream();
     }
 }

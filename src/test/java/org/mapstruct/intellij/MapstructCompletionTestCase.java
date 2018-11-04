@@ -501,4 +501,24 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems ).isEmpty();
     }
 
+    public void testOverriddenSource() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "id"
+            );
+    }
+
+    public void testOverriddenTarget() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "id"
+            );
+    }
+
 }
