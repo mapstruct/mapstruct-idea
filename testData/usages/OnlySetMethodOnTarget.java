@@ -52,7 +52,7 @@ public interface SimpleMapper {
             this.testName = testName;
         }
 
-        public void set(String something) {
+        public void set<caret>(String something) {
             //do nothing
         }
     }
