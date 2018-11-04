@@ -51,7 +51,7 @@ public class MappingMethodUsagesSearcher
     // know about needStrictSignatureSearch
     @Override
     public void processQuery(@NotNull final MethodReferencesSearch.SearchParameters p,
-        @NotNull final Processor<PsiReference> consumer) {
+        @NotNull Processor<? super PsiReference> consumer) {
         final PsiMethod method = p.getMethod();
         // Instead of looking for the method name we need to look for the property name.
         // All the other things are taken over from the IntelliJ MethodUsagesSearcher

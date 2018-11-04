@@ -7,9 +7,7 @@ jdk:
 
 env:
   - IDEA_VERSION=LATEST-EAP-SNAPSHOT
-  - IDEA_VERSION=2017.2.1
-  - IDEA_VERSION=2017.1.5
-  - IDEA_VERSION=2016.3.7
+  - IDEA_VERSION=2018.2.4
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
