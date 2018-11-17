@@ -74,7 +74,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         return new DefaultLightProjectDescriptor() {
             @Override
             public Sdk getSdk() {
-                String compilerOption = languageLevel.getCompilerComplianceDefaultOption();
+                String compilerOption = languageLevel.toJavaVersion().toString();
                 return JavaSdk.getInstance()
                     .createJdk( "java " + compilerOption, BUILD_MOCK_JDK_DIRECTORY + compilerOption, false );
             }
@@ -89,6 +89,6 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
     }
 
     protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_1_7;
+        return LanguageLevel.JDK_1_8;
     }
 }
