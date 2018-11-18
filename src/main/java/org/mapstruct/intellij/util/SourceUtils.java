@@ -31,6 +31,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
+import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +61,7 @@ public class SourceUtils {
         PsiParameter[] sourceParameters = getSourceParameters( method );
         if ( sourceParameters.length == 1 ) {
             return Stream.of( sourceParameters[0] )
-                .map( SourceUtils::getParameterClass )
+                .map( SourceUtils::getParameterType )
                 .filter( Objects::nonNull )
                 .flatMap( SourceUtils::publicGetters )
                 .map( pair -> pair.getFirst() )
@@ -80,17 +81,34 @@ public class SourceUtils {
      */
     @Nullable
     public static PsiClass getParameterClass(@NotNull PsiParameter parameter) {
-        return canDescendIntoType( parameter.getType() ) ? PsiUtil.resolveClassInType( parameter.getType() ) : null;
+        PsiType parameterType = getParameterType( parameter );
+        return parameterType != null ? PsiUtil.resolveClassInType( parameterType ) : null;
     }
 
     /**
-     * Extract all public getters with their psi substitutors from the given {@code psiClass}
+     * Find the type for the given {@code parameter}
      *
-     * @param psiClass to use to extract the getters
+     * @param parameter the parameter
      *
-     * @return a stream that holds all public getters for the given {@code psiClass}
+     * @return the type for the parameter
      */
-    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiClass psiClass) {
+    @Nullable
+    public static PsiType getParameterType(@NotNull PsiParameter parameter) {
+        return canDescendIntoType( parameter.getType() ) ? parameter.getType() : null;
+    }
+
+    /**
+     * Extract all public getters with their psi substitutors from the given {@code psiType}
+     *
+     * @param psiType to use to extract the getters
+     *
+     * @return a stream that holds all public getters for the given {@code psiType}
+     */
+    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiType psiType) {
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass == null ) {
+            return Stream.empty();
+        }
         Set<PsiMethod> overriddenMethods = new HashSet<>();
         List<Pair<PsiMethod, PsiSubstitutor>> publicGetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {

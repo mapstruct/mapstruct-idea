@@ -63,4 +63,18 @@ public class MapstructUsagesHighlighterTest extends MapstructBaseCompletionTestC
         assertThat( rangeHighlighter.getStartOffset() ).isEqualTo( caretOffset );
         assertThat( rangeHighlighter.getEndOffset() ).isEqualTo( caretOffset + "seatCount".length() );
     }
+
+    public void testFluentTargetRangeHighlighter() {
+        RangeHighlighter[] rangeHighlighters = myFixture.testHighlightUsages(
+            "CarMapperReturnTargetFluentCarDto.java"
+        );
+        assertThat( rangeHighlighters )
+            .isNotEmpty()
+            .hasSize( 1 );
+        RangeHighlighter rangeHighlighter = rangeHighlighters[0];
+        assertThat( rangeHighlighter.getTargetArea() ).isEqualTo( HighlighterTargetArea.EXACT_RANGE );
+        int caretOffset = myFixture.getCaretOffset();
+        assertThat( rangeHighlighter.getStartOffset() ).isEqualTo( caretOffset );
+        assertThat( rangeHighlighter.getEndOffset() ).isEqualTo( caretOffset + "seatCount".length() );
+    }
 }

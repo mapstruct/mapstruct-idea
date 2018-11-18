@@ -36,6 +36,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
+import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,38 +65,46 @@ public class TargetUtils {
      * @return the target class for the given {@code mappingMethod}
      */
     @Nullable
-    public static PsiClass getRelevantClass(@NotNull PsiMethod mappingMethod) {
+    public static PsiType getRelevantType(@NotNull PsiMethod mappingMethod) {
         //TODO here we need to take into consideration both with @MappingTarget and return,
         // returning an interface etc.
         if ( !canDescendIntoType( mappingMethod.getReturnType() ) ) {
             return null;
         }
-        PsiClass psiClass = PsiUtil.resolveClassInType( mappingMethod.getReturnType() );
-        if ( psiClass == null ) {
-            psiClass = Stream.of( mappingMethod.getParameterList().getParameters() )
+        PsiType psiType = mappingMethod.getReturnType();
+        if ( psiType == null || PsiType.VOID.equalsToText( psiType.getCanonicalText() ) ) {
+            psiType = Stream.of( mappingMethod.getParameterList().getParameters() )
                 .filter( MapstructUtil::isMappingTarget )
                 .findAny()
                 .map( PsiParameter::getType )
                 .filter( MapstructUtil::canDescendIntoType )
-                .map( PsiUtil::resolveClassInType )
                 .orElse( null );
         }
-        return psiClass;
+        return psiType;
     }
 
     /**
-     * Extract all public setters with their psi substitutors from the given {@code psiClass}
+     * Extract all public setters with their psi substitutors from the given {@code psiType}
      *
-     * @param psiClass to use to extract the setters
+     * @param psiType to use to extract the setters
+     * @param builderSupportPresent whether MapStruct (1.3) with builder suppot is present
      *
-     * @return a stream that holds all public setters for the given {@code psiClass}
+     * @return a stream that holds all public setters for the given {@code psiType}
      */
-    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicSetters(@NotNull PsiClass psiClass) {
+    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicSetters(@NotNull PsiType psiType,
+        boolean builderSupportPresent) {
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass == null ) {
+            return Stream.empty();
+        }
         Set<PsiMethod> overriddenMethods = new HashSet<>();
         List<Pair<PsiMethod, PsiSubstitutor>> publicSetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
-            if ( MapstructUtil.isSetter( method ) && MapstructUtil.isPublic( method ) &&
+            boolean isSetter = builderSupportPresent ?
+                MapstructUtil.isSetterOrFluentSetter( method, psiType ) :
+                MapstructUtil.isSetter( method );
+            if ( isSetter && MapstructUtil.isPublic( method ) &&
                 !overriddenMethods.contains( method ) ) {
                 // If this is a public setter then populate its overridden methods and use it
                 overriddenMethods.addAll( Arrays.asList( method.findSuperMethods() ) );
@@ -169,12 +178,13 @@ public class TargetUtils {
     /**
      * Find all target properties from the {@code targetClass} that can be used for mapping
      *
-     * @param targetClass that needs to be used
+     * @param targetType that needs to be used
+     * @param builderSupportPresent whether MapStruct (1.3) with builder support is present
      *
      * @return all target properties for the given {@code targetClass}
      */
-    public static Stream<String> findAllTargetProperties(@NotNull PsiClass targetClass) {
-        return publicSetters( targetClass )
+    public static Stream<String> findAllTargetProperties(@NotNull PsiType targetType, boolean builderSupportPresent) {
+        return publicSetters( targetType, builderSupportPresent )
             .map( pair -> pair.getFirst() )
             .map( MapstructUtil::getPropertyName );
     }

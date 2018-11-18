@@ -45,6 +45,7 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
+import com.intellij.psi.util.TypeConversionUtil;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -85,6 +86,7 @@ public final class MapstructUtil {
     //TODO maybe we need to include the 1.2.0-RC1 here
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
     private static final String INHERIT_INVERSE_CONFIGURATION = InheritInverseConfiguration.class.getName();
+    private static final String BUILDER_ANNOTATION_FQN = "org.mapstruct.Builder";
 
     /**
      * Hide constructor.
@@ -126,6 +128,22 @@ public final class MapstructUtil {
         return methodName.startsWith( "set" );
     }
 
+    public static boolean isSetterOrFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+        if ( method.getParameterList().getParametersCount() != 1 ) {
+            return false;
+        }
+
+        //TODO if we can use the AccessorNamingStrategy it would be awesome
+        String methodName = method.getName();
+        return methodName.startsWith( "set" ) && methodName.length() > 3 || isFluentSetter( method, psiType );
+    }
+
+    public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+        return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
+            method.getReturnType() != null &&
+            TypeConversionUtil.isAssignable( method.getReturnType(), psiType );
+    }
+
     public static boolean isGetter(@NotNull PsiMethod method) {
         if ( method.getParameterList().getParametersCount() != 0 ) {
             return false;
@@ -148,12 +166,15 @@ public final class MapstructUtil {
     public static String getPropertyName(@NotNull String methodName) {
         String name = "";
         if ( methodName.startsWith( "is" ) ) {
-            name = methodName.substring( 2 );
+            name = Introspector.decapitalize( methodName.substring( 2 ) );
         }
-        else if ( methodName.length() > 2 ) {
-            name = methodName.substring( 3 );
+        else if ( methodName.startsWith( "get" ) || methodName.startsWith( "set" ) ) {
+            name = Introspector.decapitalize( methodName.substring( 3 ) );
         }
-        return Introspector.decapitalize( name );
+        else {
+            name = methodName;
+        }
+        return name;
     }
 
     /**
@@ -334,6 +355,29 @@ public final class MapstructUtil {
             );
         } );
     }
+
+    /**
+     * Checks if MapStruct 1.3.0 is within the module of the provided psi file.
+     *
+     * @param psiFile that needs to be checked
+     *
+     * @return {@code true} if MapStruct is present within the {@code psiFIle}, {@code false} otherwise
+     */
+    public static boolean isMapStructBuilderSupportPresent(@NotNull PsiFile psiFile) {
+        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
+        if ( module == null ) {
+            return false;
+        }
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
+            boolean foundMarkerClass = JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( BUILDER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null;
+            return CachedValueProvider.Result.createSingleDependency(
+                foundMarkerClass,
+                ProjectRootManager.getInstance( module.getProject() )
+            );
+        } );
+    }
+
 
     /**
      * Checks if MapStruct jdk8 is within the provided module. The MapStruct JDK 8 module is present when the

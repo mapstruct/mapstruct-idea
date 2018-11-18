@@ -35,6 +35,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -59,26 +60,28 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
     @NotNull
     @Override
     PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        return new MyJavaElementVisitor( holder );
+        return new MyJavaElementVisitor( holder, MapstructUtil.isMapStructBuilderSupportPresent( holder.getFile() ) );
     }
 
     private static class MyJavaElementVisitor extends JavaElementVisitor {
         private final ProblemsHolder holder;
+        private final boolean builderSupportPresent;
 
-        private MyJavaElementVisitor(ProblemsHolder holder) {
+        private MyJavaElementVisitor(ProblemsHolder holder, boolean builderSupportPresent) {
             this.holder = holder;
+            this.builderSupportPresent = builderSupportPresent;
         }
 
         @Override
         public void visitMethod(PsiMethod method) {
             super.visitMethod( method );
 
-            PsiClass targetClass = getTargetClass( method );
-            if ( targetClass == null ) {
+            PsiType targetType = getTargetType( method );
+            if ( targetType == null ) {
                 return;
             }
 
-            Set<String> allTargetProperties = findAllTargetProperties( targetClass )
+            Set<String> allTargetProperties = findAllTargetProperties( targetType, builderSupportPresent )
                 .collect( Collectors.toSet() );
 
             // find and remove all defined mapping targets
@@ -123,7 +126,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
          * @return the target class for the inspection, or {@code null} if no inspection needs to be performed
          */
         @Nullable
-        private static PsiClass getTargetClass(PsiMethod method) {
+        private static PsiType getTargetType(PsiMethod method) {
             if ( isInheritInverseConfiguration( method ) ) {
                 return null;
             }
@@ -134,11 +137,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 || !( isMapper( containingClass ) || isMapperConfig( containingClass ) ) ) {
                 return null;
             }
-            PsiClass targetClass = TargetUtils.getRelevantClass( method );
-            if ( targetClass == null ) {
+            PsiType targetType = TargetUtils.getRelevantType( method );
+            if ( targetType == null ) {
                 return null;
             }
-            return targetClass;
+            return targetType;
         }
     }
 

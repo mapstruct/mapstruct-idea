@@ -30,11 +30,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.TargetUtils.getRelevantClass;
+import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 import static org.mapstruct.intellij.util.TargetUtils.publicSetters;
 
 /**
@@ -43,6 +44,8 @@ import static org.mapstruct.intellij.util.TargetUtils.publicSetters;
  * @author Filip Hrisafov
  */
 class MapstructTargetReference extends MapstructBaseReference {
+
+    private final boolean builderSupportPresent;
 
     /**
      * Create a new {@link MapstructTargetReference} with the provided parameters
@@ -54,22 +57,42 @@ class MapstructTargetReference extends MapstructBaseReference {
     private MapstructTargetReference(PsiLiteral element, MapstructTargetReference previousReference,
         TextRange rangeInElement) {
         super( element, previousReference, rangeInElement );
+        builderSupportPresent = MapstructUtil.isMapStructBuilderSupportPresent( element.getContainingFile()
+            .getOriginalFile() );
     }
 
     @Override
-    PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass) {
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass == null ) {
+            return null;
+        }
+
         PsiMethod[] methods = psiClass.findMethodsByName( "set" + MapstructUtil.capitalize( value ), true );
-        return methods.length == 0 ? null : methods[0];
+        if ( methods.length != 0 ) {
+            return methods[0];
+        }
+
+        if ( builderSupportPresent ) {
+            for ( PsiMethod method : psiClass.findMethodsByName( value, true ) ) {
+                if ( method.getParameterList().getParametersCount() == 1 &&
+                    MapstructUtil.isFluentSetter( method, psiType ) ) {
+                    return method;
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod) {
-        PsiClass relevantClass = getRelevantClass( mappingMethod );
-        if ( relevantClass == null ) {
+        PsiType relevantType = getRelevantType( mappingMethod );
+        if ( relevantType == null ) {
             return null;
         }
 
-        PsiElement psiElement = resolveInternal( value, relevantClass );
+        PsiElement psiElement = resolveInternal( value, relevantType );
         if ( psiElement != null ) {
             return psiElement;
         }
@@ -83,8 +106,8 @@ class MapstructTargetReference extends MapstructBaseReference {
 
     @NotNull
     @Override
-    Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
-        return publicSetters( psiClass )
+    Object[] getVariantsInternal(@NotNull PsiType psiType) {
+        return publicSetters( psiType, builderSupportPresent )
             .map( pair -> MapstructUtil.asLookup(
                 pair,
                 MapstructTargetReference::firstParameterPsiType
@@ -95,8 +118,8 @@ class MapstructTargetReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
-        PsiClass targetClass = getRelevantClass( mappingMethod );
-        return targetClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( targetClass );
+        PsiType targetType = getRelevantType( mappingMethod );
+        return targetType == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( targetType );
     }
 
     @Nullable

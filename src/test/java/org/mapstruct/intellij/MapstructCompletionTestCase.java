@@ -111,7 +111,17 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarDtoAutoComplete();
     }
 
+    public void testCarMapperReturnTargetFluentCarDto() {
+        configureByTestName();
+        assertCarDtoAutoComplete();
+    }
+
     public void testCarMapperUpdateTargetCarDto() {
+        configureByTestName();
+        assertCarDtoAutoComplete();
+    }
+
+    public void testCarMapperUpdateTargetFluentCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();
     }
@@ -207,6 +217,25 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
                 createVariable( "name", "String" )
+            );
+    }
+
+    public void testFluentGenericTargetMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "id",
+                "value"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "id", "String" ),
+                createVariable( "value", "String" )
             );
     }
 
@@ -398,6 +427,13 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( reference.resolve() ).isNull();
     }
 
+    public void testFluentCarMapperReferenceEmptyTargetProperty() {
+        myFixture.configureByFile( "FluentCarMapperReferenceEmptyTargetProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
     public void testCarMapperReferenceUnknownSourceProperty() {
         myFixture.configureByFile( "CarMapperReferenceUnknownSourceProperty.java" );
         PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
@@ -407,6 +443,13 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
 
     public void testCarMapperReferenceUnknownTargetProperty() {
         myFixture.configureByFile( "CarMapperReferenceUnknownTargetProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    public void testFluentCarMapperReferenceUnknownTargetProperty() {
+        myFixture.configureByFile( "FluentCarMapperReferenceUnknownTargetProperty.java" );
         PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
         assertThat( reference ).isNotNull();
         assertThat( reference.resolve() ).isNull();

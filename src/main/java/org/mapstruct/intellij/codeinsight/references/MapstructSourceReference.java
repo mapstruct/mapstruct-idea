@@ -30,11 +30,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
+import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
 import static org.mapstruct.intellij.util.SourceUtils.publicGetters;
 
 /**
@@ -57,7 +58,11 @@ class MapstructSourceReference extends MapstructBaseReference {
     }
 
     @Override
-    PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass) {
+    PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass == null ) {
+            return null;
+        }
         PsiMethod[] methods = psiClass.findMethodsByName( "get" + MapstructUtil.capitalize( value ), true );
 
         if ( methods.length == 0 ) {
@@ -74,8 +79,8 @@ class MapstructSourceReference extends MapstructBaseReference {
         }
 
         if ( sourceParameters.length == 1 ) {
-            PsiClass parameterClass = getParameterClass( sourceParameters[0] );
-            PsiElement psiElement = parameterClass == null ? null : resolveInternal( value, parameterClass );
+            PsiType parameterType = getParameterType( sourceParameters[0] );
+            PsiElement psiElement = parameterType == null ? null : resolveInternal( value, parameterType );
             if ( psiElement != null ) {
                 return psiElement;
             }
@@ -90,8 +95,8 @@ class MapstructSourceReference extends MapstructBaseReference {
 
     @NotNull
     @Override
-    Object[] getVariantsInternal(@NotNull PsiClass psiClass) {
-        return publicGetters( psiClass )
+    Object[] getVariantsInternal(@NotNull PsiType psiType) {
+        return publicGetters( psiType )
             .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
             .toArray();
     }
@@ -101,8 +106,8 @@ class MapstructSourceReference extends MapstructBaseReference {
     Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
         PsiParameter[] sourceParameters = MapstructUtil.getSourceParameters( mappingMethod );
         if ( sourceParameters.length == 1 ) {
-            PsiClass parameterClass = getParameterClass( sourceParameters[0] );
-            return parameterClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( parameterClass );
+            PsiType parameterType = getParameterType( sourceParameters[0] );
+            return parameterType == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( parameterType );
         }
 
         return sourceParameters;

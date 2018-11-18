@@ -22,13 +22,11 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,9 +65,8 @@ abstract class MapstructBaseReference extends BaseReference {
         }
 
         if ( previous != null ) {
-            PsiClass psiClass = canDescendIntoType( previous.resolvedType() ) ?
-                PsiUtil.resolveClassInType( previous.resolvedType() ) : null;
-            return psiClass == null ? null : resolveInternal( value, psiClass );
+            PsiType psiType = canDescendIntoType( previous.resolvedType() ) ? previous.resolvedType() : null;
+            return psiType == null ? null : resolveInternal( value, psiType );
         }
 
         PsiMethod mappingMethod = getMappingMethod();
@@ -81,12 +78,12 @@ abstract class MapstructBaseReference extends BaseReference {
      * Resolved the reference from the {@code value} for the reference {@code psiClass}
      *
      * @param value the value in the annotation (never empty)
-     * @param psiClass the class in which the {@code value} needs to be found
+     * @param psiType the type in which the {@code value} needs to be found
      *
      * @return the resolved {@link PsiElement}
      */
     @Nullable
-    abstract PsiElement resolveInternal(@NotNull String value, @NotNull PsiClass psiClass);
+    abstract PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType);
 
     /**
      * Resolve the reference from the {@code value} for the {@code mappingMethod}
@@ -104,8 +101,9 @@ abstract class MapstructBaseReference extends BaseReference {
     public final Object[] getVariants() {
         if ( previous != null ) {
             PsiType resolvedType = previous.resolvedType();
-            PsiClass psiClass = canDescendIntoType( resolvedType ) ? PsiUtil.resolveClassInType( resolvedType ) : null;
-            return psiClass == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( psiClass );
+
+            return !canDescendIntoType( resolvedType ) ? LookupElement.EMPTY_ARRAY :
+                getVariantsInternal( resolvedType );
         }
 
         PsiMethod mappingMethod = getMappingMethod();
@@ -115,12 +113,12 @@ abstract class MapstructBaseReference extends BaseReference {
     /**
      * Find all the variants for the given {@code psiClass}.
      *
-     * @param psiClass the class for which variants need to be returned
+     * @param psiType the type for which variants need to be returned
      *
-     * @return all the variants for the provided {@code psiClass}
+     * @return all the variants for the provided {@code psiType}
      */
     @NotNull
-    abstract Object[] getVariantsInternal(@NotNull PsiClass psiClass);
+    abstract Object[] getVariantsInternal(@NotNull PsiType psiType);
 
     /**
      * Find all the variants for the given {@code mappingMethod}.
