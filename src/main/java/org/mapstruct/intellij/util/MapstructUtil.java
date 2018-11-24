@@ -119,6 +119,10 @@ public final class MapstructUtil {
         return method.hasModifierProperty( PsiModifier.PUBLIC );
     }
 
+    public static boolean isPublicStatic(@NotNull PsiMethod method) {
+        return isPublic( method ) && method.hasModifierProperty( PsiModifier.STATIC );
+    }
+
     public static boolean isSetter(@NotNull PsiMethod method) {
         if ( method.getParameterList().getParametersCount() != 1 ) {
             return false;
@@ -159,6 +163,51 @@ public final class MapstructUtil {
         //TODO if we can use the AccessorNamingStrategy it would be awesome
         String methodName = method.getName();
         return ( methodName.startsWith( "get" ) && !methodName.equals( "getClass" )) || methodName.startsWith( "is" );
+    }
+
+    /**
+     * Checks if the {@code method} is a possible builder creation method.
+     * <p>
+     * The default implementation considers a method as a possible creation method if the following is satisfied:
+     * <ul>
+     * <li>The method has no parameters</li>
+     * <li>It is a {@code public static} method</li>
+     * <li>The return type of the {@code method} is not the same as the {@code type}</li>
+     * <li></li>
+     * </ul>
+     *
+     * See also {@code DefaultBuilderProvider} in the mapstruct processor.
+     *
+     * @param method The method that needs to be checked
+     * @param type the enclosing element of the method, i.e. the type in which the method is located in
+     * @return {@code true} if the {@code method} is a possible builder creation method, {@code false} otherwise
+     */
+    public static boolean isPossibleBuilderCreationMethod(@NotNull PsiMethod method, @NotNull PsiType type) {
+        return method.getParameterList().isEmpty()
+            && MapstructUtil.isPublicStatic( method )
+            && !type.equals( method.getReturnType() );
+    }
+
+    /**
+     * Checks if the {@code buildMethod} is a method that creates {@code typeToBuild}.
+     * <p>
+     * The default implementation considers a method to be a build method if the following is satisfied:
+     * <ul>
+     * <li>The method has no parameters</li>
+     * <li>The method is public</li>
+     * <li>The return type of method is assignable to the {@code typeElement}</li>
+     * </ul>
+     *
+     * @param buildMethod the method that should be checked
+     * @param typeToBuild the type element that needs to be built
+     * @return {@code true} if the {@code buildMethod} is a build method for {@code typeToBuild}, {@code false}
+     * otherwise
+     */
+    public static boolean isBuildMethod(@NotNull PsiMethod buildMethod, @NotNull PsiType typeToBuild) {
+        return buildMethod.getParameterList().isEmpty() &&
+            isPublic( buildMethod ) &&
+            buildMethod.getReturnType() != null &&
+            TypeConversionUtil.isAssignable( typeToBuild, buildMethod.getReturnType() );
     }
 
     @NotNull

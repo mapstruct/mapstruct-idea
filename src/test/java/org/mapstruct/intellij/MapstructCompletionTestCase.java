@@ -77,6 +77,35 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertCarDtoWithBuilderAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "make", "String" ),
+                createVariable( "seatCount", "int" ),
+                createVariable( "manufacturingYear", "String" ),
+                createVariable( "myDriver", "PersonDtoWithBuilder" ),
+                createVariable( "passengers", "List<PersonDtoWithBuilder>" ),
+                createVariable( "price", "Long" ),
+                createVariable( "category", "String" ),
+                createVariable( "available", "boolean" )
+            );
+    }
+
     private void assertCarAutoComplete() {
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
@@ -133,6 +162,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarDtoAutoComplete();
     }
 
+    public void testCarMapperReturnTargetCarDtoWithBuilder() {
+        configureByTestName();
+        assertCarDtoWithBuilderAutoComplete();
+    }
+
     public void testPersonMapperReturnTargetFluentPersonDto() {
         configureByTestName();
         assertFluentPersonDtoAutoComplete();
@@ -141,6 +175,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     public void testCarMapperUpdateTargetCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();
+    }
+
+    public void testCarMapperUpdateTargetCarDtoWithBuilder() {
+        configureByTestName();
+        assertCarDtoWithBuilderAutoComplete();
     }
 
     public void testCarMapperUpdateTargetFluentCarDto() {
@@ -164,6 +203,22 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     }
 
     public void testNestedSecondLevelAutoCompleteTargetProperty() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "name", "String" )
+            );
+    }
+
+    public void testNestedSecondLevelAutoCompleteBuilderTargetProperty() {
         configureByTestName();
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
@@ -296,6 +351,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "setSeatCount(int)" );
                 assertThat( method.getReturnType() ).isNotNull();
                 assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "void" );
+            } );
+    }
+
+    public void testCarMapperReferenceTargetPropertyInCarDtoWithBuilder() {
+        myFixture.configureByFile( "CarMapperReferenceBuilderTargetProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "seatCount" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "seatCount(int)" );
+                assertThat( method.getReturnType() ).isNotNull();
+                assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "Builder" );
             } );
     }
 

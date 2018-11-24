@@ -93,16 +93,19 @@ public class TargetUtils {
      */
     public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicSetters(@NotNull PsiType psiType,
         boolean builderSupportPresent) {
-        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
-        if ( psiClass == null ) {
+        Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        if ( classAndType == null ) {
             return Stream.empty();
         }
+
+        PsiClass psiClass = classAndType.getFirst();
+        PsiType typeToUse = classAndType.getSecond();
         Set<PsiMethod> overriddenMethods = new HashSet<>();
         List<Pair<PsiMethod, PsiSubstitutor>> publicSetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
             boolean isSetter = builderSupportPresent ?
-                MapstructUtil.isSetterOrFluentSetter( method, psiType ) :
+                MapstructUtil.isSetterOrFluentSetter( method, typeToUse ) :
                 MapstructUtil.isSetter( method );
             if ( isSetter && MapstructUtil.isPublic( method ) &&
                 !overriddenMethods.contains( method ) ) {
@@ -113,6 +116,65 @@ public class TargetUtils {
         }
 
         return publicSetters.stream();
+    }
+
+    /**
+     * Resolve the builder or self class for the {@code psiType}.
+     *
+     * @param psiType the type for which the {@link PsiClass} needs to be resolved
+     * @param builderSupportPresent whether MapStruct (1.3) with builder support is present
+     *
+     * @return the pair containing the {@link PsiClass} and the corresponding {@link PsiType}
+     */
+    public static Pair<PsiClass, PsiType> resolveBuilderOrSelfClass(@NotNull PsiType psiType,
+        boolean builderSupportPresent) {
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass == null ) {
+            return null;
+        }
+        PsiType typeToUse = psiType;
+
+        if ( builderSupportPresent ) {
+            for ( PsiMethod classMethod : psiClass.getMethods() ) {
+                if ( MapstructUtil.isPossibleBuilderCreationMethod( classMethod, typeToUse ) &&
+                    hasBuildMethod( classMethod.getReturnType(), psiType ) ) {
+                    typeToUse = classMethod.getReturnType();
+                    break;
+                }
+            }
+        }
+
+        psiClass = PsiUtil.resolveClassInType( typeToUse );
+        return psiClass == null ? null : Pair.createNonNull( psiClass, typeToUse );
+    }
+
+    /**
+     * Check if the {@code builderType} has a build method for the {@code type}
+     *
+     * @param builderType the type of the builder that should be checked
+     * @param type the type for which a build method is searched for
+     *
+     * @return {@code true} if the builder type has a build method for the type
+     */
+    private static boolean hasBuildMethod(@Nullable PsiType builderType, @NotNull PsiType type) {
+        if ( builderType == null ||
+            builderType.getCanonicalText().startsWith( "java." ) ||
+            builderType.getCanonicalText().startsWith( "javax." ) ) {
+            return false;
+        }
+
+        PsiClass builderClass = PsiUtil.resolveClassInType( builderType );
+        if ( builderClass == null ) {
+            return false;
+        }
+
+        for ( PsiMethod buildMethod : builderClass.getAllMethods() ) {
+            if ( MapstructUtil.isBuildMethod( buildMethod, type ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

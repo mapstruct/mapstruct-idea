@@ -45,6 +45,10 @@ public class CarDto {
         this.passengers = passengers;
     }
 
+    public static CarDto createDefault() {
+        return new CarDto();
+    }
+
     public String getMake() {
         return make;
     }

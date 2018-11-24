@@ -89,6 +89,23 @@ public class MapstructMethodUsagesSearcherTest extends MapstructBaseCompletionTe
             } );
     }
 
+    public void testFindUsagesBuilderTargetReferenceMethod() {
+        myFixture.configureByFiles( "RenameBuilderTargetReference.java" );
+        Collection<UsageInfo> usages = myFixture.findUsages( myFixture.getElementAtCaret() );
+        assertThat( usages ).hasSize( 1 );
+        UsageInfo usageInfo = usages.iterator().next();
+        PsiElement element = usageInfo.getElement();
+        assertThat( element )
+            .isInstanceOfSatisfying( PsiLiteralExpression.class, expression -> {
+                PsiReference[] references = expression.getReferences();
+                assertThat( references ).hasSize( 1 );
+                assertThat( references[0] )
+                    .isInstanceOfSatisfying( PsiReferenceBase.class, psiReferenceBase -> {
+                        assertThat( psiReferenceBase.getValue() ).isEqualTo( "testName" );
+                    } );
+            } );
+    }
+
     public void testIssue10Mapper() {
         myFixture.configureByFiles( getTestName( false ) + ".java" );
         Collection<UsageInfo> usages = myFixture.findUsages( myFixture.getElementAtCaret() );
@@ -123,6 +140,12 @@ public class MapstructMethodUsagesSearcherTest extends MapstructBaseCompletionTe
         myFixture.configureByFiles( "RenameFluentTargetReference.java" );
         myFixture.renameElementAtCaret( "newName" );
         myFixture.checkResultByFile( "RenameFluentTargetReferenceAfter.java" );
+    }
+
+    public void testRenameBuilderTargetReferenceMethod() {
+        myFixture.configureByFiles( "RenameBuilderTargetReference.java" );
+        myFixture.renameElementAtCaret( "newName" );
+        myFixture.checkResultByFile( "RenameBuilderTargetReferenceAfter.java" );
     }
 
     public void testRenameSourceParameterReference() {
