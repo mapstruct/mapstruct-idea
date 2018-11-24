@@ -18,6 +18,7 @@
  */
 package org.example.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.example.dto.PersonDto;
@@ -82,6 +83,13 @@ public class CarDto {
 
     public void setPassengers(List<PersonDto> passengers) {
         this.passengers = passengers;
+    }
+
+    public void addPassenger(PersonDto passenger) {
+        if ( this.passengers == null ) {
+            this.passengers = new ArrayList<>();
+        }
+        this.passengers.add( passenger );
     }
 
     public Long getPrice() {

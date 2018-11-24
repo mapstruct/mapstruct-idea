@@ -106,6 +106,23 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertFluentPersonDtoAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name",
+                "address"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "name", "String" ),
+                createVariable( "address", "String" )
+            );
+    }
+
     public void testCarMapperReturnTargetCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();
@@ -114,6 +131,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     public void testCarMapperReturnTargetFluentCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();
+    }
+
+    public void testPersonMapperReturnTargetFluentPersonDto() {
+        configureByTestName();
+        assertFluentPersonDtoAutoComplete();
     }
 
     public void testCarMapperUpdateTargetCarDto() {

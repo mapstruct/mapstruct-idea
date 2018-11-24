@@ -141,7 +141,15 @@ public final class MapstructUtil {
     public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
+            !isAdderWithUpperCase4thCharacter( method ) &&
             TypeConversionUtil.isAssignable( method.getReturnType(), psiType );
+    }
+
+    private static boolean isAdderWithUpperCase4thCharacter(@NotNull PsiMethod method) {
+        String methodName = method.getName();
+        return methodName.startsWith( "add" ) &&
+            methodName.length() > 3 &&
+            Character.isUpperCase( methodName.charAt( 3 ) );
     }
 
     public static boolean isGetter(@NotNull PsiMethod method) {

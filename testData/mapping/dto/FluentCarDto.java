@@ -18,6 +18,7 @@
  */
 package org.example.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.example.dto.PersonDto;
@@ -75,6 +76,15 @@ public class FluentCarDto {
 
     public FluentCarDto passengers(List<PersonDto> passengers) {
         this.passengers = passengers;
+        return this;
+    }
+
+    public FluentCarDto addPassenger(PersonDto passenger) {
+        if ( this.passengers == null ) {
+            this.passengers = new ArrayList<>();
+        }
+
+        this.passengers.add( passenger );
         return this;
     }
 
