@@ -1,0 +1,38 @@
+<html>
+<body>
+<p>
+    This inspection reports when the <code>Mappers</code> is used wrongly
+    <br/>
+    The factory should only be used for classes / interfaces annotated with <code>@Mapper</code> that
+    have the <code>componentModel</code> <code>default</code>.
+</p>
+<p>
+<pre><code>
+//wrong
+public interface EmployeeMapper {
+    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+}
+
+@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+}
+
+@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

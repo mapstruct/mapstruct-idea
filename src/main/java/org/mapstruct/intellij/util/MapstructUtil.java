@@ -58,6 +58,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
+import org.mapstruct.factory.Mappers;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.isAnnotated;
@@ -79,6 +80,8 @@ public final class MapstructUtil {
      * The FQN of the {@link Mapping} annotation.
      */
     public static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
+    public static final String MAPPERS_FQN = Mappers.class.getName();
+
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();

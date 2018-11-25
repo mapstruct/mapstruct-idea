@@ -54,6 +54,16 @@
               key="inspection.unmapped.target.properties"
               shortName="UnmappedTargetProperties"
               implementationClass="org.mapstruct.intellij.inspection.UnmappedTargetPropertiesInspection"/>
+
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="WARNING"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.wrong.usage.mappers.factory"
+            shortName="WrongUsageOfMappersFactory"
+            implementationClass="org.mapstruct.intellij.inspection.WrongUsageOfMappersFactoryInspection"/>
+
   </extensions>
   
   <actions>
