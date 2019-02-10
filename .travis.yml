@@ -10,9 +10,9 @@ env:
   - IDEA_VERSION=2018.2.7
   - IDEA_VERSION=2018.3.3
   
-matrix:
-  allow_failures:
-    - env: IDEA_VERSION=LATEST-EAP-SNAPSHOT
+#matrix:
+#  allow_failures:
+#    - env: IDEA_VERSION=LATEST-EAP-SNAPSHOT
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

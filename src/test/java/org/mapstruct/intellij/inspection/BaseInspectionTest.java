@@ -31,6 +31,8 @@ public abstract class BaseInspectionTest extends MapstructBaseCompletionTestCase
         String testName = getTestName( false );
         configureByFile( testName + ".java" );
         myFixture.enableInspections( getInspection() );
-        myFixture.testHighlighting( true, true, true );
+        // Disable info checks as there is a difference between 2018.x and 2019.x
+        // Links in 2019.x have an info highlighting
+        myFixture.testHighlighting( true, false, true );
     }
 }
