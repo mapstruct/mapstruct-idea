@@ -6,12 +6,15 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
@@ -22,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+import static org.mapstruct.intellij.util.MapstructUtil.isPublic;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
 import static org.mapstruct.intellij.util.SourceUtils.publicGetters;
 
@@ -55,7 +60,15 @@ class MapstructSourceReference extends MapstructBaseReference {
         if ( methods.length == 0 ) {
             methods = psiClass.findMethodsByName( "is" + MapstructUtil.capitalize( value ), true );
         }
-        return methods.length == 0 ? null : methods[0];
+        if ( methods.length > 0 ) {
+            return methods[0];
+        }
+
+        PsiField field = psiClass.findFieldByName( value, true );
+        if ( field != null && isPublic( field ) ) {
+            return field;
+        }
+        return null;
     }
 
     @Override
@@ -83,9 +96,20 @@ class MapstructSourceReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        return publicGetters( psiType )
-            .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
-            .toArray();
+        Set<LookupElement> elements = publicGetters( psiType )
+                .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
+                .collect( Collectors.toSet() );
+
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass != null ) {
+            for ( PsiField field : psiClass.getAllFields() ) {
+                if ( isPublic( field ) ) {
+                    elements.add( asLookup( field ) );
+                }
+            }
+        }
+
+        return elements.toArray();
     }
 
     @NotNull

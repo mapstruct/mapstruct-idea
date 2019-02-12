@@ -9,6 +9,7 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
@@ -93,6 +94,35 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertCarDtoPublicAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "make", "String" ),
+                createVariable( "seatCount", "int" ),
+                createVariable( "manufacturingYear", "String" ),
+                createVariable( "myDriver", "PersonDto" ),
+                createVariable( "passengers", "List<PersonDto>" ),
+                createVariable( "price", "Long" ),
+                createVariable( "category", "String" ),
+                createVariable( "available", "boolean" )
+            );
+    }
+
     private void assertCarAutoComplete() {
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
@@ -154,6 +184,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarDtoWithBuilderAutoComplete();
     }
 
+    public void testCarMapperReturnTargetCarDtoPublic() {
+        configureByTestName();
+        assertCarDtoPublicAutoComplete();
+    }
+
     public void testPersonMapperReturnTargetFluentPersonDto() {
         configureByTestName();
         assertFluentPersonDtoAutoComplete();
@@ -167,6 +202,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     public void testCarMapperUpdateTargetCarDtoWithBuilder() {
         configureByTestName();
         assertCarDtoWithBuilderAutoComplete();
+    }
+
+    public void testCarMapperUpdateTargetCarDtoPublic() {
+        configureByTestName();
+        assertCarDtoPublicAutoComplete();
     }
 
     public void testCarMapperUpdateTargetFluentCarDto() {
@@ -339,6 +379,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( method.getReturnType() ).isNotNull();
                 assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "void" );
             } );
+    }
+
+    public void testCarMapperReferencePublicTargetProperty() {
+        myFixture.configureByFile( "CarMapperReferencePublicTargetProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+                .isInstanceOfSatisfying( PsiField.class, field -> {
+                    assertThat( field.getName() ).isEqualTo( "seatCount" );
+                    assertThat( field.getPresentation() ).isNotNull();
+                    assertThat( field.getPresentation().getPresentableText() ).isEqualTo( "seatCount" );
+                    assertThat( field.getType() ).isNotNull();
+                    assertThat( field.getType().getPresentableText() ).isEqualTo( "int" );
+                } );
     }
 
     public void testCarMapperReferenceTargetPropertyInCarDtoWithBuilder() {
