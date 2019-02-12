@@ -6,6 +6,8 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -13,18 +15,22 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
-import org.mapstruct.intellij.util.TargetUtils;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 import static org.mapstruct.intellij.util.TargetUtils.publicSetters;
+import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#target()}.
@@ -51,7 +57,7 @@ class MapstructTargetReference extends MapstructBaseReference {
 
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
-        Pair<PsiClass, PsiType> pair = TargetUtils.resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        Pair<PsiClass, PsiType> pair = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( pair == null ) {
             return null;
         }
@@ -70,6 +76,14 @@ class MapstructTargetReference extends MapstructBaseReference {
                     MapstructUtil.isFluentSetter( method, typeToUse ) ) {
                     return method;
                 }
+            }
+        }
+
+        PsiClass selfClass = PsiUtil.resolveClassInType( psiType );
+        if ( selfClass != null ) {
+            PsiField field = selfClass.findFieldByName( value, true );
+            if ( field != null && isPublicModifiable( field ) ) {
+                return field;
             }
         }
 
@@ -98,12 +112,23 @@ class MapstructTargetReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        return publicSetters( psiType, builderSupportPresent )
-            .map( pair -> MapstructUtil.asLookup(
-                pair,
-                MapstructTargetReference::firstParameterPsiType
-            ) )
-            .toArray();
+
+        Set<LookupElement> elements = publicSetters( psiType, builderSupportPresent )
+                .map( pair -> asLookup(
+                        pair,
+                        MapstructTargetReference::firstParameterPsiType
+                ) ).collect( Collectors.toSet() );
+
+        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
+        if ( psiClass != null ) {
+            for ( PsiField field : psiClass.getAllFields() ) {
+                if ( isPublicModifiable( field ) ) {
+                    elements.add( asLookup( field ) );
+                }
+            }
+        }
+
+        return elements.toArray();
     }
 
     @NotNull
