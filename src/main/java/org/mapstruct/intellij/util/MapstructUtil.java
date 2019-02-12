@@ -20,6 +20,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
@@ -105,12 +106,29 @@ public final class MapstructUtil {
         return builder;
     }
 
+    public static LookupElement asLookup(@NotNull PsiField field) {
+        return LookupElementBuilder.create( field )
+                .withIcon( PlatformIcons.FIELD_ICON )
+                .withPresentableText( field.getNameIdentifier().getText() )
+                .withTypeText( field.getType().getPresentableText() );
+    }
+
     public static boolean isPublic(@NotNull PsiMethod method) {
         return method.hasModifierProperty( PsiModifier.PUBLIC );
     }
 
     public static boolean isPublicStatic(@NotNull PsiMethod method) {
         return isPublic( method ) && method.hasModifierProperty( PsiModifier.STATIC );
+    }
+
+    public static boolean isPublic(@NotNull PsiField field) {
+        return field.hasModifierProperty( PsiModifier.PUBLIC );
+    }
+
+    public static boolean isPublicModifiable(@NotNull PsiField field) {
+        return isPublic( field ) &&
+               !field.hasModifierProperty( PsiModifier.FINAL ) &&
+               !field.hasModifierProperty( PsiModifier.STATIC );
     }
 
     public static boolean isSetter(@NotNull PsiMethod method) {
