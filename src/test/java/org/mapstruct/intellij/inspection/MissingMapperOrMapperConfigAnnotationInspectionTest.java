@@ -27,6 +27,10 @@ public class MissingMapperOrMapperConfigAnnotationInspectionTest extends BaseIns
         doTest();
     }
 
+    public void testMissingMapperOrMapperConfigDecorator() {
+        doTest();
+    }
+
     public void testMissingMapperOrConfigIntent() {
         doTest();
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();

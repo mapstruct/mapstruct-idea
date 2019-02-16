@@ -51,7 +51,7 @@ public class MissingMapperOrMapperConfigAnnotationInspection extends InspectionB
                 return;
             }
 
-            for ( PsiMethod method : aClass.getAllMethods() ) {
+            for ( PsiMethod method : aClass.getMethods() ) {
                 if ( MapstructUtil.isMappingMethod( method ) ) {
                     holder.registerProblem(
                         aClass.getNameIdentifier(),
