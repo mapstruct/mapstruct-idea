@@ -23,8 +23,6 @@ import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.testFramework.LightPlatformTestCase.getModule;
-
 /**
  * Base completion test case for MapStruct.
  *
@@ -43,7 +41,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         VfsRootAccess.allowRootAccess( mapstructLibPath );
         PsiTestUtil.addLibrary(
             myFixture.getProjectDisposable(),
-            getModule(),
+            myFixture.getModule(),
             "Mapstruct",
             mapstructLibPath,
             "mapstruct.jar"
