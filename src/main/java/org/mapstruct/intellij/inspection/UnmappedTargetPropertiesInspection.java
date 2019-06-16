@@ -21,6 +21,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
@@ -114,6 +115,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
          */
         @Nullable
         private static PsiType getTargetType(PsiMethod method) {
+            if ( !method.getModifierList().hasModifierProperty( PsiModifier.ABSTRACT ) ) {
+                return null;
+            }
+
             if ( isInheritInverseConfiguration( method ) ) {
                 return null;
             }

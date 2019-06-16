@@ -62,3 +62,19 @@ interface MultiSourceUpdateMapper {
 
     void <warning descr="Unmapped target properties: matching, moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }
+
+@Mapper
+interface DefaultMapper {
+
+    default Target map(Source source) {
+        return null;
+    }
+}
+
+@Mapper
+abstract class AbstrctMapperWithoutAbstractMethod {
+
+    protected Target map(Source source) {
+        return null;
+    }
+}
