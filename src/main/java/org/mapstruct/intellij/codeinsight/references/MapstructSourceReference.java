@@ -6,8 +6,6 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -16,19 +14,20 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteral;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublic;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
-import static org.mapstruct.intellij.util.SourceUtils.publicGetters;
+import static org.mapstruct.intellij.util.SourceUtils.publicReadAccessors;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#source()}.
@@ -96,20 +95,9 @@ class MapstructSourceReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        Set<LookupElement> elements = publicGetters( psiType )
-                .map( pair -> MapstructUtil.asLookup( pair, PsiMethod::getReturnType ) )
-                .collect( Collectors.toSet() );
-
-        PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
-        if ( psiClass != null ) {
-            for ( PsiField field : psiClass.getAllFields() ) {
-                if ( isPublic( field ) ) {
-                    elements.add( asLookup( field ) );
-                }
-            }
-        }
-
-        return elements.toArray();
+        return publicReadAccessors( psiType )
+            .map( pair -> MapstructUtil.asLookup( pair, MapstructSourceReference::memberPsiType ) )
+            .toArray();
     }
 
     @NotNull
@@ -145,5 +133,18 @@ class MapstructSourceReference extends MapstructBaseReference {
      */
     static PsiReference[] create(PsiLiteral psiLiteral) {
         return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
+    }
+
+    private static PsiType memberPsiType(PsiMember psiMember) {
+        if ( psiMember instanceof PsiMethod ) {
+            return ( (PsiMethod) psiMember ).getReturnType();
+        }
+        else if ( psiMember instanceof PsiVariable ) {
+            return ( (PsiVariable) psiMember ).getType();
+        }
+        else {
+            return null;
+        }
+
     }
 }

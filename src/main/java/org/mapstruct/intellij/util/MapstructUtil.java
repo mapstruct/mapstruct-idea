@@ -6,6 +6,9 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -22,12 +25,15 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiVariable;
+import com.intellij.psi.impl.PsiClassImplUtil;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
@@ -85,20 +91,17 @@ public final class MapstructUtil {
     private MapstructUtil() {
     }
 
-    public static LookupElement asLookup(@NotNull Pair<PsiMethod, PsiSubstitutor> pair,
-        Function<PsiMethod, PsiType> typeMapper) {
-        PsiMethod method = pair.getFirst();
+    public static <T extends PsiMember> LookupElement asLookup(@NotNull Pair<T, PsiSubstitutor> pair,
+        Function<T, PsiType> typeMapper) {
+        T member = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
-        String propertyName = getPropertyName( method );
-        LookupElementBuilder builder = LookupElementBuilder.create( method, propertyName )
+        String propertyName = getPropertyName( member );
+        LookupElementBuilder builder = LookupElementBuilder.create( member, propertyName )
             .withIcon( PlatformIcons.VARIABLE_ICON )
             .withPresentableText( propertyName )
-            .withTailText( PsiFormatUtil.formatMethod( method, substitutor,
-                0,
-                PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE
-            ) );
-        final PsiType type = typeMapper.apply( method );
+            .withTailText( formatTailText( member, substitutor ) );
+        final PsiType type = typeMapper.apply( member );
         if ( type != null ) {
             builder = builder.withTypeText( substitutor.substitute( type ).getPresentableText() );
         }
@@ -106,11 +109,21 @@ public final class MapstructUtil {
         return builder;
     }
 
-    public static LookupElement asLookup(@NotNull PsiField field) {
-        return LookupElementBuilder.create( field )
-                .withIcon( PlatformIcons.FIELD_ICON )
-                .withPresentableText( field.getNameIdentifier().getText() )
-                .withTypeText( field.getType().getPresentableText() );
+    private static String formatTailText(PsiMember member, PsiSubstitutor substitutor) {
+        if ( member instanceof PsiMethod ) {
+            return PsiFormatUtil.formatMethod(
+                (PsiMethod) member,
+                substitutor,
+                0,
+                PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE
+            );
+        }
+        else if ( member instanceof PsiVariable ) {
+            return PsiFormatUtil.formatVariable( (PsiVariable) member, 0, substitutor );
+        }
+        else {
+            return "";
+        }
     }
 
     public static boolean isPublic(@NotNull PsiMethod method) {
@@ -216,6 +229,17 @@ public final class MapstructUtil {
             isPublic( buildMethod ) &&
             buildMethod.getReturnType() != null &&
             TypeConversionUtil.isAssignable( typeToBuild, buildMethod.getReturnType() );
+    }
+
+    @NotNull
+    @NonNls
+    public static String getPropertyName(@NotNull PsiMember psiMember) {
+        if ( psiMember instanceof PsiMethod ) {
+            return getPropertyName( (PsiMethod) psiMember );
+        }
+        else {
+            return psiMember.getName() == null ? "" : psiMember.getName();
+        }
     }
 
     @NotNull
@@ -347,6 +371,28 @@ public final class MapstructUtil {
         return Stream.of( mappingMethod.getParameterList().getParameters() )
             .filter( MapstructUtil::isValidSourceParameter )
             .toArray( PsiParameter[]::new );
+    }
+
+    public static List<Pair<PsiField, PsiSubstitutor>> publicFields(PsiClass psiClass) {
+        List<Pair<PsiField, PsiSubstitutor>> fieldPairs = PsiClassImplUtil.getAllWithSubstitutorsByMap(
+            psiClass,
+            PsiClassImplUtil.MemberType.FIELD
+        );
+
+        if ( fieldPairs.isEmpty() ) {
+            return Collections.emptyList();
+        }
+
+        List<Pair<PsiField, PsiSubstitutor>> publicFields = new ArrayList<>( fieldPairs.size() );
+
+        for ( Pair<PsiField, PsiSubstitutor> fieldPair : fieldPairs ) {
+            PsiField field = fieldPair.getFirst();
+            if ( MapstructUtil.isPublic( field ) ) {
+                publicFields.add( fieldPair );
+            }
+        }
+
+        return publicFields;
     }
 
     /**
