@@ -266,6 +266,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarAutoComplete();
     }
 
+    public void testCarMapperSimpleSingleSourceCarPublic() {
+        configureByTestName();
+        assertCarAutoComplete();
+    }
+
     public void testCarMapperUpdateSourceCar() {
         configureByTestName();
         assertCarAutoComplete();
@@ -393,6 +398,18 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                     assertThat( field.getType() ).isNotNull();
                     assertThat( field.getType().getPresentableText() ).isEqualTo( "int" );
                 } );
+    }
+
+    public void testCarMapperReferencePublicSourceProperty() {
+        myFixture.configureByFile( "CarMapperReferencePublicSourceProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiField.class, fields -> {
+                assertThat( fields.getName() ).isEqualTo( "numberOfSeats" );
+                assertThat( fields.getPresentation() ).isNotNull();
+                assertThat( fields.getPresentation().getPresentableText() ).isEqualTo( "numberOfSeats" );
+            } );
     }
 
     public void testCarMapperReferenceTargetPropertyInCarDtoWithBuilder() {
