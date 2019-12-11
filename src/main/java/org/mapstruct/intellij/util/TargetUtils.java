@@ -19,6 +19,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
@@ -32,6 +33,7 @@ import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
  * Utils for working with target properties (extracting targets  for MapStruct).
@@ -71,24 +73,45 @@ public class TargetUtils {
     }
 
     /**
-     * Extract all public setters with their psi substitutors from the given {@code psiType}
+     * Extract all public write accessors (public setters and fields)
+     * with their psi substitutors from the given {@code psiType}
      *
-     * @param psiType to use to extract the setters
-     * @param builderSupportPresent whether MapStruct (1.3) with builder suppot is present
+     * @param psiType to use to extract the accessors
      *
-     * @return a stream that holds all public setters for the given {@code psiType}
+     * @return a stream that holds all public write accessors for the given {@code psiType}
      */
-    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicSetters(@NotNull PsiType psiType,
+    public static Stream<Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         boolean builderSupportPresent) {
         Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( classAndType == null ) {
             return Stream.empty();
         }
 
+        List<Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors = new ArrayList<>();
+
         PsiClass psiClass = classAndType.getFirst();
         PsiType typeToUse = classAndType.getSecond();
+
+        publicWriteAccessors.addAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
+        publicWriteAccessors.addAll( publicFields( psiClass ) );
+
+        return publicWriteAccessors.stream();
+    }
+
+    /**
+     * Extract all public setters with their psi substitutors from the given {@code psiClass}
+     *
+     * @param psiClass to use to extract the setters
+     * @param typeToUse the type in which the methods are located (needed for fluent setters)
+     * @param builderSupportPresent whether MapStruct (1.3) with builder suppot is present
+     *
+     * @return a stream that holds all public setters for the given {@code psiType}
+     */
+    private static List<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters(@NotNull PsiClass psiClass,
+        @NotNull PsiType typeToUse,
+        boolean builderSupportPresent) {
         Set<PsiMethod> overriddenMethods = new HashSet<>();
-        List<Pair<PsiMethod, PsiSubstitutor>> publicSetters = new ArrayList<>();
+        List<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
             boolean isSetter = builderSupportPresent ?
@@ -102,7 +125,7 @@ public class TargetUtils {
             }
         }
 
-        return publicSetters.stream();
+        return publicSetters;
     }
 
     /**
@@ -233,7 +256,7 @@ public class TargetUtils {
      * @return all target properties for the given {@code targetClass}
      */
     public static Stream<String> findAllTargetProperties(@NotNull PsiType targetType, boolean builderSupportPresent) {
-        return publicSetters( targetType, builderSupportPresent )
+        return publicWriteAccessors( targetType, builderSupportPresent )
             .map( pair -> pair.getFirst() )
             .map( MapstructUtil::getPropertyName );
     }

@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
+import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
  * Utils for working with source properties (extracting sources for MapStruct).
@@ -50,7 +52,7 @@ public class SourceUtils {
             return Stream.of( sourceParameters[0] )
                 .map( SourceUtils::getParameterType )
                 .filter( Objects::nonNull )
-                .flatMap( SourceUtils::publicGetters )
+                .flatMap( SourceUtils::publicReadAccessors )
                 .map( pair -> pair.getFirst() )
                 .map( MapstructUtil::getPropertyName );
         }
@@ -85,17 +87,35 @@ public class SourceUtils {
     }
 
     /**
-     * Extract all public getters with their psi substitutors from the given {@code psiType}
+     * Extract all public read accessors (public getters and fields)
+     * with their psi substitutors from the given {@code psiType}
      *
-     * @param psiType to use to extract the getters
+     * @param psiType to use to extract the accessors
      *
-     * @return a stream that holds all public getters for the given {@code psiType}
+     * @return a stream that holds all public read accessors for the given {@code psiType}
      */
-    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiType psiType) {
+    public static Stream<Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors(@NotNull PsiType psiType) {
         PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
         if ( psiClass == null ) {
             return Stream.empty();
         }
+
+        List<Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors = new ArrayList<>();
+
+        publicReadAccessors.addAll( publicGetters( psiClass ) );
+        publicReadAccessors.addAll( publicFields( psiClass ) );
+
+        return publicReadAccessors.stream();
+    }
+
+    /**
+     * Extract all public getters with their psi substitutors from the given {@code psiClass}
+     *
+     * @param psiClass to use to extract the getters
+     *
+     * @return a list that holds all public getters for the given {@code psiClass}
+     */
+    private static List<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiClass psiClass) {
         Set<PsiMethod> overriddenMethods = new HashSet<>();
         List<Pair<PsiMethod, PsiSubstitutor>> publicGetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
@@ -108,6 +128,6 @@ public class SourceUtils {
             }
         }
 
-        return publicGetters.stream();
+        return publicGetters;
     }
 }
