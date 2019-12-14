@@ -5,10 +5,12 @@
  */
 package org.mapstruct.intellij.util;
 
-import java.util.ArrayList;
+import java.beans.Introspector;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -33,6 +35,7 @@ import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
+import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
@@ -80,22 +83,22 @@ public class TargetUtils {
      *
      * @return a stream that holds all public write accessors for the given {@code psiType}
      */
-    public static Stream<Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
+    public static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         boolean builderSupportPresent) {
         Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( classAndType == null ) {
-            return Stream.empty();
+            return Collections.emptyMap();
         }
 
-        List<Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors = new ArrayList<>();
+        Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors = new LinkedHashMap<>();
 
         PsiClass psiClass = classAndType.getFirst();
         PsiType typeToUse = classAndType.getSecond();
 
-        publicWriteAccessors.addAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
-        publicWriteAccessors.addAll( publicFields( psiClass ) );
+        publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
+        publicWriteAccessors.putAll( publicFields( psiClass ) );
 
-        return publicWriteAccessors.stream();
+        return publicWriteAccessors;
     }
 
     /**
@@ -107,25 +110,61 @@ public class TargetUtils {
      *
      * @return a stream that holds all public setters for the given {@code psiType}
      */
-    private static List<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters(@NotNull PsiClass psiClass,
+    private static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicSetters(@NotNull PsiClass psiClass,
         @NotNull PsiType typeToUse,
         boolean builderSupportPresent) {
         Set<PsiMethod> overriddenMethods = new HashSet<>();
-        List<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new ArrayList<>();
+        Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new LinkedHashMap<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
-            boolean isSetter = builderSupportPresent ?
-                MapstructUtil.isSetterOrFluentSetter( method, typeToUse ) :
-                MapstructUtil.isSetter( method );
-            if ( isSetter && MapstructUtil.isPublic( method ) &&
+            String propertyName = extractPublicSetterPropertyName( method, typeToUse, builderSupportPresent );
+
+            if ( propertyName != null &&
                 !overriddenMethods.contains( method ) ) {
                 // If this is a public setter then populate its overridden methods and use it
                 overriddenMethods.addAll( Arrays.asList( method.findSuperMethods() ) );
-                publicSetters.add( pair );
+                publicSetters.put( propertyName, pair );
             }
         }
 
         return publicSetters;
+    }
+
+    @Nullable
+    private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
+        boolean builderSupportPresent) {
+        if ( method.getParameterList().getParametersCount() != 1 || !MapstructUtil.isPublic( method ) ) {
+            // If the method does not have 1 parameter or is not public then there is no property
+            return null;
+        }
+
+        // This logic is aligned with the DefaultAccessorNamingStrategy
+        String methodName = method.getName();
+        if ( builderSupportPresent ) {
+            if ( isFluentSetter( method, typeToUse ) ) {
+                if ( methodName.startsWith( "set" )
+                    && methodName.length() > 3
+                    && Character.isUpperCase( methodName.charAt( 3 ) ) ) {
+                    return Introspector.decapitalize( methodName.substring( 3 ) );
+                }
+                else {
+                    return methodName;
+                }
+            }
+            else if ( methodName.startsWith( "set" ) ) {
+                return Introspector.decapitalize( methodName.substring( 3 ) );
+            }
+            else {
+                return null;
+            }
+        }
+        else if ( methodName.startsWith( "set" ) ) {
+            return Introspector.decapitalize( methodName.substring( 3 ) );
+        }
+        else {
+            return null;
+        }
+
     }
 
     /**
@@ -255,9 +294,7 @@ public class TargetUtils {
      *
      * @return all target properties for the given {@code targetClass}
      */
-    public static Stream<String> findAllTargetProperties(@NotNull PsiType targetType, boolean builderSupportPresent) {
-        return publicWriteAccessors( targetType, builderSupportPresent )
-            .map( pair -> pair.getFirst() )
-            .map( MapstructUtil::getPropertyName );
+    public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, boolean builderSupportPresent) {
+        return publicWriteAccessors( targetType, builderSupportPresent ).keySet();
     }
 }
