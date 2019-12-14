@@ -6,9 +6,10 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -91,12 +92,34 @@ public final class MapstructUtil {
     private MapstructUtil() {
     }
 
-    public static <T extends PsiMember> LookupElement asLookup(@NotNull Pair<T, PsiSubstitutor> pair,
-        Function<T, PsiType> typeMapper) {
-        T member = pair.getFirst();
+    public static LookupElement[] asLookup(Map<String, Pair<? extends PsiMember, PsiSubstitutor>> accessors,
+        Function<PsiMember, PsiType> typeMapper) {
+        if ( !accessors.isEmpty() ) {
+            LookupElement[] lookupElements = new LookupElement[accessors.size()];
+            int index = 0;
+            for ( Map.Entry<String, Pair<? extends PsiMember, PsiSubstitutor>> entry :
+                accessors.entrySet() ) {
+                String propertyName = entry.getKey();
+                Pair<? extends PsiMember, PsiSubstitutor> pair = entry.getValue();
+                lookupElements[index++] = asLookup(
+                    propertyName,
+                    pair,
+                    typeMapper
+                );
+            }
+            return lookupElements;
+        }
+        else {
+            return LookupElement.EMPTY_ARRAY;
+        }
+
+    }
+
+    public static LookupElement asLookup(String propertyName, @NotNull Pair<? extends PsiMember, PsiSubstitutor> pair,
+        Function<PsiMember, PsiType> typeMapper) {
+        PsiMember member = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
-        String propertyName = getPropertyName( member );
         LookupElementBuilder builder = LookupElementBuilder.create( member, propertyName )
             .withIcon( PlatformIcons.VARIABLE_ICON )
             .withPresentableText( propertyName )
@@ -144,25 +167,6 @@ public final class MapstructUtil {
                !field.hasModifierProperty( PsiModifier.STATIC );
     }
 
-    public static boolean isSetter(@NotNull PsiMethod method) {
-        if ( method.getParameterList().getParametersCount() != 1 ) {
-            return false;
-        }
-        //TODO if we can use the AccessorNamingStrategy it would be awesome
-        String methodName = method.getName();
-        return methodName.startsWith( "set" );
-    }
-
-    public static boolean isSetterOrFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
-        if ( method.getParameterList().getParametersCount() != 1 ) {
-            return false;
-        }
-
-        //TODO if we can use the AccessorNamingStrategy it would be awesome
-        String methodName = method.getName();
-        return methodName.startsWith( "set" ) && methodName.length() > 3 || isFluentSetter( method, psiType );
-    }
-
     public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
@@ -175,15 +179,6 @@ public final class MapstructUtil {
         return methodName.startsWith( "add" ) &&
             methodName.length() > 3 &&
             Character.isUpperCase( methodName.charAt( 3 ) );
-    }
-
-    public static boolean isGetter(@NotNull PsiMethod method) {
-        if ( method.getParameterList().getParametersCount() != 0 ) {
-            return false;
-        }
-        //TODO if we can use the AccessorNamingStrategy it would be awesome
-        String methodName = method.getName();
-        return ( methodName.startsWith( "get" ) && !methodName.equals( "getClass" )) || methodName.startsWith( "is" );
     }
 
     /**
@@ -229,17 +224,6 @@ public final class MapstructUtil {
             isPublic( buildMethod ) &&
             buildMethod.getReturnType() != null &&
             TypeConversionUtil.isAssignable( typeToBuild, buildMethod.getReturnType() );
-    }
-
-    @NotNull
-    @NonNls
-    public static String getPropertyName(@NotNull PsiMember psiMember) {
-        if ( psiMember instanceof PsiMethod ) {
-            return getPropertyName( (PsiMethod) psiMember );
-        }
-        else {
-            return psiMember.getName() == null ? "" : psiMember.getName();
-        }
     }
 
     @NotNull
@@ -373,22 +357,22 @@ public final class MapstructUtil {
             .toArray( PsiParameter[]::new );
     }
 
-    public static List<Pair<PsiField, PsiSubstitutor>> publicFields(PsiClass psiClass) {
+    public static Map<String, Pair<PsiField, PsiSubstitutor>> publicFields(PsiClass psiClass) {
         List<Pair<PsiField, PsiSubstitutor>> fieldPairs = PsiClassImplUtil.getAllWithSubstitutorsByMap(
             psiClass,
             PsiClassImplUtil.MemberType.FIELD
         );
 
         if ( fieldPairs.isEmpty() ) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
 
-        List<Pair<PsiField, PsiSubstitutor>> publicFields = new ArrayList<>( fieldPairs.size() );
+        Map<String, Pair<PsiField, PsiSubstitutor>> publicFields = new HashMap<>();
 
         for ( Pair<PsiField, PsiSubstitutor> fieldPair : fieldPairs ) {
             PsiField field = fieldPair.getFirst();
             if ( MapstructUtil.isPublic( field ) ) {
-                publicFields.add( fieldPair );
+                publicFields.put( field.getName(), fieldPair );
             }
         }
 

@@ -69,8 +69,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 return;
             }
 
-            Set<String> allTargetProperties = findAllTargetProperties( targetType, builderSupportPresent )
-                .collect( Collectors.toSet() );
+            Set<String> allTargetProperties = findAllTargetProperties( targetType, builderSupportPresent );
 
             // find and remove all defined mapping targets
             Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method )
@@ -78,8 +77,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             allTargetProperties.removeAll( definedTargets );
 
             //TODO maybe we need to improve this by more granular extraction
-            Set<String> sourceProperties = findAllSourceProperties( method )
-                .collect( Collectors.toSet() );
+            Set<String> sourceProperties = findAllSourceProperties( method );
             allTargetProperties.removeAll( sourceProperties );
 
             int missingTargetProperties = allTargetProperties.size();

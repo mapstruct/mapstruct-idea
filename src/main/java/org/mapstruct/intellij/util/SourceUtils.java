@@ -5,15 +5,18 @@
  */
 package org.mapstruct.intellij.util;
 
-import java.util.ArrayList;
+import java.beans.Introspector;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
@@ -46,19 +49,16 @@ public class SourceUtils {
      *
      * @return see description
      */
-    public static Stream<String> findAllSourceProperties(@NotNull PsiMethod method) {
+    public static Set<String> findAllSourceProperties(@NotNull PsiMethod method) {
         PsiParameter[] sourceParameters = getSourceParameters( method );
         if ( sourceParameters.length == 1 ) {
-            return Stream.of( sourceParameters[0] )
-                .map( SourceUtils::getParameterType )
-                .filter( Objects::nonNull )
-                .flatMap( SourceUtils::publicReadAccessors )
-                .map( pair -> pair.getFirst() )
-                .map( MapstructUtil::getPropertyName );
+            PsiType parameterType = SourceUtils.getParameterType( sourceParameters[0] );
+            return SourceUtils.publicReadAccessors( parameterType ).keySet();
         }
 
         return Stream.of( sourceParameters )
-            .map( PsiParameter::getName );
+            .map( PsiParameter::getName )
+            .collect( Collectors.toSet() );
     }
 
     /**
@@ -94,18 +94,19 @@ public class SourceUtils {
      *
      * @return a stream that holds all public read accessors for the given {@code psiType}
      */
-    public static Stream<Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors(@NotNull PsiType psiType) {
+    public static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors(
+        @Nullable PsiType psiType) {
         PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
         if ( psiClass == null ) {
-            return Stream.empty();
+            return Collections.emptyMap();
         }
 
-        List<Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors = new ArrayList<>();
+        Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors = new HashMap<>();
 
-        publicReadAccessors.addAll( publicGetters( psiClass ) );
-        publicReadAccessors.addAll( publicFields( psiClass ) );
+        publicReadAccessors.putAll( publicGetters( psiClass ) );
+        publicReadAccessors.putAll( publicFields( psiClass ) );
 
-        return publicReadAccessors.stream();
+        return publicReadAccessors;
     }
 
     /**
@@ -115,19 +116,54 @@ public class SourceUtils {
      *
      * @return a list that holds all public getters for the given {@code psiClass}
      */
-    private static List<Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiClass psiClass) {
+    private static Map<String, Pair<PsiMethod, PsiSubstitutor>> publicGetters(@NotNull PsiClass psiClass) {
         Set<PsiMethod> overriddenMethods = new HashSet<>();
-        List<Pair<PsiMethod, PsiSubstitutor>> publicGetters = new ArrayList<>();
+        Map<String, Pair<PsiMethod, PsiSubstitutor>> publicGetters = new HashMap<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
-            if ( MapstructUtil.isGetter( method ) && MapstructUtil.isPublic( method ) &&
+            String propertyName = extractPublicGetterPropertyName( method );
+            if ( propertyName != null &&
                 !overriddenMethods.contains( method ) ) {
                 // If this is a public getter then populate its overridden methods and use it
                 overriddenMethods.addAll( Arrays.asList( method.findSuperMethods() ) );
-                publicGetters.add( pair );
+                publicGetters.put( propertyName, pair );
             }
         }
 
         return publicGetters;
+    }
+
+    @Nullable
+    private static String extractPublicGetterPropertyName(PsiMethod method) {
+        if ( method.getParameterList().getParametersCount() != 0 || !MapstructUtil.isPublic( method ) ) {
+            return null;
+        }
+        // This logic is aligned with the DefaultAccessorNamingStrategy
+
+        PsiType returnType = method.getReturnType();
+        if ( returnType == null || PsiType.VOID.equals( returnType ) ) {
+            return null;
+        }
+
+        String methodName = method.getName();
+        if ( methodName.startsWith( "get" ) ) {
+            if ( !methodName.equals( "getClass" ) ) {
+                return Introspector.decapitalize( methodName.substring( 3 ) );
+            }
+            else {
+                return null;
+            }
+        }
+        else if ( methodName.startsWith( "is" ) && (
+            PsiType.BOOLEAN.equals( returnType ) ||
+                returnType.equalsToText( CommonClassNames.JAVA_LANG_BOOLEAN ) )
+        ) {
+            // boolean getter
+            return Introspector.decapitalize( methodName.substring( 2 ) );
+        }
+        else {
+            return null;
+        }
+
     }
 }

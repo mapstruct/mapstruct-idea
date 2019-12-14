@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 import static org.mapstruct.intellij.util.TargetUtils.publicWriteAccessors;
@@ -111,9 +112,10 @@ class MapstructTargetReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        return publicWriteAccessors( psiType, builderSupportPresent )
-            .map( pair -> MapstructUtil.asLookup( pair, MapstructTargetReference::memberPsiType ) )
-            .toArray();
+        return asLookup(
+            publicWriteAccessors( psiType, builderSupportPresent ),
+            MapstructTargetReference::memberPsiType
+        );
     }
 
     @NotNull

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublic;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
 import static org.mapstruct.intellij.util.SourceUtils.publicReadAccessors;
@@ -95,9 +96,7 @@ class MapstructSourceReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        return publicReadAccessors( psiType )
-            .map( pair -> MapstructUtil.asLookup( pair, MapstructSourceReference::memberPsiType ) )
-            .toArray();
+        return asLookup( publicReadAccessors( psiType ), MapstructSourceReference::memberPsiType );
     }
 
     @NotNull
