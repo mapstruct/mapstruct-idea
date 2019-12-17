@@ -135,7 +135,7 @@ public class SourceUtils {
 
     @Nullable
     private static String extractPublicGetterPropertyName(PsiMethod method) {
-        if ( method.getParameterList().getParametersCount() != 0 || !MapstructUtil.isPublic( method ) ) {
+        if ( method.getParameterList().getParametersCount() != 0 || !MapstructUtil.isPublicNonStatic( method ) ) {
             return null;
         }
         // This logic is aligned with the DefaultAccessorNamingStrategy

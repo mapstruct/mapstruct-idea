@@ -153,6 +153,10 @@ public final class MapstructUtil {
         return method.hasModifierProperty( PsiModifier.PUBLIC );
     }
 
+    public static boolean isPublicNonStatic(@NotNull PsiMethod method) {
+        return isPublic( method ) && !method.hasModifierProperty( PsiModifier.STATIC );
+    }
+
     public static boolean isPublicStatic(@NotNull PsiMethod method) {
         return isPublic( method ) && method.hasModifierProperty( PsiModifier.STATIC );
     }

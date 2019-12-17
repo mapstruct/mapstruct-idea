@@ -133,7 +133,7 @@ public class TargetUtils {
     @Nullable
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
         boolean builderSupportPresent) {
-        if ( method.getParameterList().getParametersCount() != 1 || !MapstructUtil.isPublic( method ) ) {
+        if ( method.getParameterList().getParametersCount() != 1 || !MapstructUtil.isPublicNonStatic( method ) ) {
             // If the method does not have 1 parameter or is not public then there is no property
             return null;
         }
