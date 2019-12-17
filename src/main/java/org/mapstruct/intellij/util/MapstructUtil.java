@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.module.Module;
@@ -273,7 +274,7 @@ public final class MapstructUtil {
      * @return {@code true} if the {@code psiClass} is annotated with {@link Mapper}, {@code false} otherwise
      */
     public static boolean isMapper(PsiClass psiClass) {
-        return isAnnotated( psiClass, MAPPER_ANNOTATION_FQN, false );
+        return isAnnotated( psiClass, MAPPER_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
     /**
@@ -284,7 +285,7 @@ public final class MapstructUtil {
      * @return {@code true} if the {@code psiClass} is annotated with {@link MapperConfig}, {@code false} otherwise
      */
     public static boolean isMapperConfig(PsiClass psiClass) {
-        return isAnnotated( psiClass, MAPPER_CONFIG_ANNOTATION_FQN, false );
+        return isAnnotated( psiClass, MAPPER_CONFIG_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
     /**
@@ -301,10 +302,10 @@ public final class MapstructUtil {
      * @return
      */
     public static boolean isMappingMethod(PsiMethod psiMethod) {
-        return isAnnotated( psiMethod, MAPPING_ANNOTATION_FQN, false )
-            || isAnnotated( psiMethod, MAPPINGS_ANNOTATION_FQN, false )
-            || isAnnotated( psiMethod, VALUE_MAPPING_ANNOTATION_FQN, false )
-            || isAnnotated( psiMethod, VALUE_MAPPINGS_ANNOTATION_FQN, false );
+        return isAnnotated( psiMethod, MAPPING_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE )
+            || isAnnotated( psiMethod, MAPPINGS_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE )
+            || isAnnotated( psiMethod, VALUE_MAPPING_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE )
+            || isAnnotated( psiMethod, VALUE_MAPPINGS_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
     /**
