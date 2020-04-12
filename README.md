@@ -4,7 +4,7 @@ An IntelliJ IDEA plugin for working with MapStruct
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://github.com/mapstruct/mapstruct/blob/master/LICENSE.txt)
 
-[![Build Status](https://travis-ci.org/mapstruct/mapstruct-idea.svg?branch=master)](https://travis-ci.org/mapstruct/mapstruct-idea)
+[![Build Status](https://github.com/mapstruct/mapstruct-idea/workflows/CI/badge.svg?branch=master)](https://github.com/mapstruct/mapstruct-idea/actions?query=workflow%3ACI+branch%3Amaster)
 [![Coverage Status](https://codecov.io/gh/mapstruct/mapstruct-idea/branch/master/graph/badge.svg)](https://codecov.io/gh/mapstruct/mapstruct-idea)
 
 * [What is MapStruct?](#what-is-mapstruct)
