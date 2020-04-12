@@ -478,7 +478,6 @@ public final class MapstructUtil {
         } );
     }
 
-
     /**
      * Checks if MapStruct jdk8 is within the provided module. The MapStruct JDK 8 module is present when the
      * {@link Mapping} annotation is annotated with {@link java.lang.annotation.Repeatable}
