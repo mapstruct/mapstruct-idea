@@ -1,0 +1,29 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test_idea:
+    strategy:
+      fail-fast: false
+      matrix:
+        ideaVersion: [2019.1, 2019.2, 2019.3, 2020.1, LATEST-EAP-SNAPSHOT]
+    name: 'IDEA ${{ matrix.ideaVersion }}'
+    env:
+      IDEA_VERSION: ${{ matrix.ideaVersion }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Set up JDK'
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: 'Test'
+        run: ./gradlew --warning-mode=all build
+      - name: 'Generate coverage report'
+        run: ./gradlew --warning-mode=all jacocoTestReport
+      - name: 'Upload coverage to Codecov'
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
