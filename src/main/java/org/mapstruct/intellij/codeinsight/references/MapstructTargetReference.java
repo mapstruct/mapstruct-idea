@@ -24,6 +24,7 @@ import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
@@ -39,7 +40,7 @@ import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
  */
 class MapstructTargetReference extends MapstructBaseReference {
 
-    private final boolean builderSupportPresent;
+    private final MapStructVersion mapStructVersion;
 
     /**
      * Create a new {@link MapstructTargetReference} with the provided parameters
@@ -51,12 +52,13 @@ class MapstructTargetReference extends MapstructBaseReference {
     private MapstructTargetReference(PsiLiteral element, MapstructTargetReference previousReference,
         TextRange rangeInElement) {
         super( element, previousReference, rangeInElement );
-        builderSupportPresent = MapstructUtil.isMapStructBuilderSupportPresent( element.getContainingFile()
+        mapStructVersion = MapstructUtil.resolveMapStructProjectVersion( element.getContainingFile()
             .getOriginalFile() );
     }
 
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
+        boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
         Pair<PsiClass, PsiType> pair = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( pair == null ) {
             return null;
@@ -113,7 +115,7 @@ class MapstructTargetReference extends MapstructBaseReference {
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
         return asLookup(
-            publicWriteAccessors( psiType, builderSupportPresent ),
+            publicWriteAccessors( psiType, mapStructVersion ),
             MapstructTargetReference::memberPsiType
         );
     }

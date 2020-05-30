@@ -86,6 +86,7 @@ public final class MapstructUtil {
     private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
     private static final String INHERIT_INVERSE_CONFIGURATION = InheritInverseConfiguration.class.getName();
     private static final String BUILDER_ANNOTATION_FQN = "org.mapstruct.Builder";
+    private static final String ENUM_MAPPING_ANNOTATION_FQN = "org.mapstruct.EnumMapping";
 
     /**
      * Hide constructor.
@@ -457,22 +458,30 @@ public final class MapstructUtil {
     }
 
     /**
-     * Checks if MapStruct 1.3.0 is within the module of the provided psi file.
-     *
+     * Resolve the MapStruct project version with the module of the provided psi file
      * @param psiFile that needs to be checked
-     *
-     * @return {@code true} if MapStruct is present within the {@code psiFIle}, {@code false} otherwise
+     * @return the MapStruct project version
      */
-    public static boolean isMapStructBuilderSupportPresent(@NotNull PsiFile psiFile) {
+    public static MapStructVersion resolveMapStructProjectVersion(@NotNull PsiFile psiFile) {
         Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
         if ( module == null ) {
-            return false;
+            return MapStructVersion.V1_2_O;
         }
         return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
-            boolean foundMarkerClass = JavaPsiFacade.getInstance( module.getProject() )
-                .findClass( BUILDER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null;
+            MapStructVersion mapStructVersion;
+            if ( JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( ENUM_MAPPING_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
+                mapStructVersion = MapStructVersion.V1_4_O;
+            }
+            else if ( JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( BUILDER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
+                mapStructVersion = MapStructVersion.V1_3_O;
+            }
+            else {
+                mapStructVersion = MapStructVersion.V1_2_O;
+            }
             return CachedValueProvider.Result.createSingleDependency(
-                foundMarkerClass,
+                mapStructVersion,
                 ProjectRootManager.getInstance( module.getProject() )
             );
         } );

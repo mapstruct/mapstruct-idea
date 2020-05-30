@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.MapStructBundle;
+import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
 
@@ -52,16 +53,16 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
     @NotNull
     @Override
     PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        return new MyJavaElementVisitor( holder, MapstructUtil.isMapStructBuilderSupportPresent( holder.getFile() ) );
+        return new MyJavaElementVisitor( holder, MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ) );
     }
 
     private static class MyJavaElementVisitor extends JavaElementVisitor {
         private final ProblemsHolder holder;
-        private final boolean builderSupportPresent;
+        private final MapStructVersion mapStructVersion;
 
-        private MyJavaElementVisitor(ProblemsHolder holder, boolean builderSupportPresent) {
+        private MyJavaElementVisitor(ProblemsHolder holder, MapStructVersion mapStructVersion) {
             this.holder = holder;
-            this.builderSupportPresent = builderSupportPresent;
+            this.mapStructVersion = mapStructVersion;
         }
 
         @Override
@@ -73,7 +74,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 return;
             }
 
-            Set<String> allTargetProperties = findAllTargetProperties( targetType, builderSupportPresent );
+            Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion );
 
             // find and remove all defined mapping targets
             Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method )

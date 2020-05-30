@@ -80,11 +80,13 @@ public class TargetUtils {
      * with their psi substitutors from the given {@code psiType}
      *
      * @param psiType to use to extract the accessors
+     * @param mapStructVersion the MapStruct project version
      *
      * @return a stream that holds all public write accessors for the given {@code psiType}
      */
     public static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
-        boolean builderSupportPresent) {
+        MapStructVersion mapStructVersion) {
+        boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
         Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( classAndType == null ) {
             return Collections.emptyMap();
@@ -106,7 +108,7 @@ public class TargetUtils {
      *
      * @param psiClass to use to extract the setters
      * @param typeToUse the type in which the methods are located (needed for fluent setters)
-     * @param builderSupportPresent whether MapStruct (1.3) with builder suppot is present
+     * @param builderSupportPresent whether MapStruct (1.3) with builder support is present
      *
      * @return a stream that holds all public setters for the given {@code psiType}
      */
@@ -290,11 +292,11 @@ public class TargetUtils {
      * Find all target properties from the {@code targetClass} that can be used for mapping
      *
      * @param targetType that needs to be used
-     * @param builderSupportPresent whether MapStruct (1.3) with builder support is present
+     * @param mapStructVersion the MapStruct project version
      *
      * @return all target properties for the given {@code targetClass}
      */
-    public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, boolean builderSupportPresent) {
-        return publicWriteAccessors( targetType, builderSupportPresent ).keySet();
+    public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, MapStructVersion mapStructVersion) {
+        return publicWriteAccessors( targetType, mapStructVersion ).keySet();
     }
 }
