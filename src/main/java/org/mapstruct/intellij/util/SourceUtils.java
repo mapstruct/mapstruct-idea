@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
@@ -94,14 +94,14 @@ public class SourceUtils {
      *
      * @return a stream that holds all public read accessors for the given {@code psiType}
      */
-    public static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors(
+    public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicReadAccessors(
         @Nullable PsiType psiType) {
         PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
         if ( psiClass == null ) {
             return Collections.emptyMap();
         }
 
-        Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicReadAccessors = new HashMap<>();
+        Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicReadAccessors = new HashMap<>();
 
         publicReadAccessors.putAll( publicGetters( psiClass ) );
         publicReadAccessors.putAll( publicFields( psiClass ) );

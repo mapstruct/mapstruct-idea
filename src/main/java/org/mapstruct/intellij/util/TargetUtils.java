@@ -6,21 +6,27 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
@@ -84,7 +90,7 @@ public class TargetUtils {
      *
      * @return a stream that holds all public write accessors for the given {@code psiType}
      */
-    public static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
+    public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         MapStructVersion mapStructVersion) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
         Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
@@ -92,7 +98,7 @@ public class TargetUtils {
             return Collections.emptyMap();
         }
 
-        Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicWriteAccessors = new LinkedHashMap<>();
+        Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors = new LinkedHashMap<>();
 
         PsiClass psiClass = classAndType.getFirst();
         PsiType typeToUse = classAndType.getSecond();
@@ -100,7 +106,80 @@ public class TargetUtils {
         publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
         publicWriteAccessors.putAll( publicFields( psiClass ) );
 
+        if ( mapStructVersion.isConstructorSupported() ) {
+            publicWriteAccessors.putAll( constructorParameters( psiClass ) );
+        }
+
         return publicWriteAccessors;
+    }
+
+    private static Map<String, Pair<PsiParameter, PsiSubstitutor>> constructorParameters(@NotNull PsiClass psiClass) {
+        PsiMethod constructor = resolveMappingConstructor( psiClass );
+        if ( constructor == null || !constructor.hasParameters() ) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Pair<PsiParameter, PsiSubstitutor>> constructorParameters = new HashMap<>();
+
+        for ( PsiParameter parameter : constructor.getParameterList().getParameters() ) {
+            constructorParameters.put( parameter.getName(), Pair.create( parameter, PsiSubstitutor.EMPTY ) );
+        }
+
+        return constructorParameters;
+    }
+
+    /**
+     * Find the constructor that the code generation will use when mapping the psiClass.
+     *
+     * @param psiClass the class for which the constructor should be found
+     * @return the constructor or {@code null} is there is no constructor that the mapping will use
+     */
+    public static PsiMethod resolveMappingConstructor(@NotNull PsiClass psiClass) {
+
+        PsiMethod[] constructors = psiClass.getConstructors();
+        if ( constructors.length == 0 ) {
+            return null;
+        }
+
+        if ( constructors.length == 1 ) {
+            PsiMethod constructor = constructors[0];
+            return !constructor.hasModifier( JvmModifier.PRIVATE ) ? constructor : null;
+        }
+
+        List<PsiMethod> accessibleConstructors = new ArrayList<>(constructors.length);
+
+        for ( PsiMethod constructor : constructors ) {
+            if ( constructor.hasModifier( JvmModifier.PRIVATE ) ) {
+                // private constructors are ignored
+                continue;
+            }
+            if ( !constructor.hasParameters() ) {
+                // If there is an empty constructor then that constructor should be used
+                return constructor;
+            }
+
+            accessibleConstructors.add( constructor );
+        }
+
+        if ( accessibleConstructors.size() == 1 ) {
+            // If there is only one accessible constructor then use that one
+            return accessibleConstructors.get( 0 );
+        }
+
+        // If there are more accessible constructor then look for one annotated with @Default.
+        // Otherwise return null
+        for ( PsiMethod constructor : accessibleConstructors ) {
+            for ( PsiAnnotation annotation : constructor.getAnnotations() ) {
+                PsiJavaCodeReferenceElement nameReferenceElement = annotation.getNameReferenceElement();
+                if ( nameReferenceElement != null && "Default".equals( nameReferenceElement.getReferenceName() ) ) {
+                    // If there is a constructor annotated with an annotation named @Default
+                    // then we should use that one
+                    return constructor;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

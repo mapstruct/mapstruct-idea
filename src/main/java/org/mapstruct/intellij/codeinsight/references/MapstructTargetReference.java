@@ -15,7 +15,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteral;
-import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
+import org.mapstruct.intellij.util.TargetUtils;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
@@ -66,6 +66,17 @@ class MapstructTargetReference extends MapstructBaseReference {
 
         PsiClass psiClass = pair.getFirst();
         PsiType typeToUse = pair.getSecond();
+
+        if ( mapStructVersion.isConstructorSupported() ) {
+            PsiMethod constructor = TargetUtils.resolveMappingConstructor( psiClass );
+            if ( constructor != null && constructor.hasParameters() ) {
+                for ( PsiParameter parameter : constructor.getParameterList().getParameters() ) {
+                    if ( value.equals( parameter.getName() ) ) {
+                        return parameter;
+                    }
+                }
+            }
+        }
 
         PsiMethod[] methods = psiClass.findMethodsByName( "set" + MapstructUtil.capitalize( value ), true );
         if ( methods.length != 0 ) {
@@ -150,7 +161,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         return MapstructBaseReference.create( psiLiteral, MapstructTargetReference::new );
     }
 
-    private static PsiType memberPsiType(PsiMember psiMember) {
+    private static PsiType memberPsiType(PsiElement psiMember) {
         if ( psiMember instanceof PsiMethod ) {
             return firstParameterPsiType( (PsiMethod) psiMember );
         }

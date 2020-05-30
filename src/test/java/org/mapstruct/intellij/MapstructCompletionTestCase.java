@@ -169,6 +169,66 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertCarDtoWithConstructorAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .containsExactlyInAnyOrder(
+                createParameter( "make", "String" ),
+                createParameter( "seatCount", "int" ),
+                createParameter( "manufacturingYear", "String" ),
+                createParameter( "myDriver", "PersonDtoWithConstructor" ),
+                createParameter( "passengers", "List<PersonDtoWithConstructor>" ),
+                createParameter( "price", "Long" ),
+                createParameter( "category", "String" ),
+                createParameter( "available", "boolean" )
+            );
+    }
+
+    private void assertCarDtoWithConstructorAndSettersAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .containsExactlyInAnyOrder(
+                createParameter( "make", "String" ),
+                createParameter( "seatCount", "int" ),
+                createParameter( "manufacturingYear", "String" ),
+                createParameter( "myDriver", "PersonDtoWithConstructor" ),
+                createParameter( "passengers", "List<PersonDtoWithConstructor>" ),
+                createParameter( "price", "Long" ),
+                createVariable( "category", "String" ),
+                createVariable( "available", "boolean" )
+            );
+    }
+
     public void testCarMapperReturnTargetCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();
@@ -187,6 +247,36 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
     public void testCarMapperReturnTargetCarDtoPublic() {
         configureByTestName();
         assertCarDtoPublicAutoComplete();
+    }
+
+    public void testCarMapperReturnTargetCarDtoWithConstructor() {
+        configureByTestName();
+        assertCarDtoWithConstructorAutoComplete();
+    }
+
+    public void testCarMapperReturnTargetCarDtoWithConstructorAndSetters() {
+        configureByTestName();
+        assertCarDtoWithConstructorAndSettersAutoComplete();
+    }
+
+    public void testCarMapperReturnTargetCarDtoWithConstructorAndEmptyConstructor() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "manufacturingYear",
+                "price",
+                "category"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "manufacturingYear", "String" ),
+                createVariable( "price", "Long" ),
+                createVariable( "category", "String" )
+            );
     }
 
     public void testPersonMapperReturnTargetFluentPersonDto() {
@@ -258,6 +348,23 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
                 createVariable( "name", "String" )
+            );
+    }
+
+    public void testNestedSecondLevelAutoCompleteConstructorTargetProperty() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .containsExactlyInAnyOrder(
+                createParameter( "name", "String" )
             );
     }
 
@@ -423,6 +530,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "seatCount(int)" );
                 assertThat( method.getReturnType() ).isNotNull();
                 assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "Builder" );
+            } );
+    }
+
+    public void testCarMapperReferenceTargetPropertyInCarDtoWithConstructor() {
+        myFixture.configureByFile( "CarMapperReferenceConstructorTargetProperty.java" );
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiParameter.class, parameter -> {
+                assertThat( parameter.getName() ).isEqualTo( "seatCount" );
+                assertThat( parameter.getType().getPresentableText() ).isEqualTo( "int" );
+                PsiMethod constructor = PsiTreeUtil.getParentOfType( parameter, PsiMethod.class );
+                assertThat( constructor ).isNotNull();
+                assertThat( constructor.isConstructor() ).isTrue();
             } );
     }
 

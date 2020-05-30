@@ -14,7 +14,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteral;
-import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
@@ -134,7 +133,7 @@ class MapstructSourceReference extends MapstructBaseReference {
         return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
     }
 
-    private static PsiType memberPsiType(PsiMember psiMember) {
+    private static PsiType memberPsiType(PsiElement psiMember) {
         if ( psiMember instanceof PsiMethod ) {
             return ( (PsiMethod) psiMember ).getReturnType();
         }

@@ -25,9 +25,9 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -94,15 +94,15 @@ public final class MapstructUtil {
     private MapstructUtil() {
     }
 
-    public static LookupElement[] asLookup(Map<String, Pair<? extends PsiMember, PsiSubstitutor>> accessors,
-        Function<PsiMember, PsiType> typeMapper) {
+    public static LookupElement[] asLookup(Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors,
+        Function<PsiElement, PsiType> typeMapper) {
         if ( !accessors.isEmpty() ) {
             LookupElement[] lookupElements = new LookupElement[accessors.size()];
             int index = 0;
-            for ( Map.Entry<String, Pair<? extends PsiMember, PsiSubstitutor>> entry :
+            for ( Map.Entry<String, Pair<? extends PsiElement, PsiSubstitutor>> entry :
                 accessors.entrySet() ) {
                 String propertyName = entry.getKey();
-                Pair<? extends PsiMember, PsiSubstitutor> pair = entry.getValue();
+                Pair<? extends PsiElement, PsiSubstitutor> pair = entry.getValue();
                 lookupElements[index++] = asLookup(
                     propertyName,
                     pair,
@@ -117,9 +117,9 @@ public final class MapstructUtil {
 
     }
 
-    public static LookupElement asLookup(String propertyName, @NotNull Pair<? extends PsiMember, PsiSubstitutor> pair,
-        Function<PsiMember, PsiType> typeMapper) {
-        PsiMember member = pair.getFirst();
+    public static LookupElement asLookup(String propertyName, @NotNull Pair<? extends PsiElement, PsiSubstitutor> pair,
+        Function<PsiElement, PsiType> typeMapper) {
+        PsiElement member = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
         LookupElementBuilder builder = LookupElementBuilder.create( member, propertyName )
@@ -134,7 +134,7 @@ public final class MapstructUtil {
         return builder;
     }
 
-    private static String formatTailText(PsiMember member, PsiSubstitutor substitutor) {
+    private static String formatTailText(PsiElement member, PsiSubstitutor substitutor) {
         if ( member instanceof PsiMethod ) {
             return PsiFormatUtil.formatMethod(
                 (PsiMethod) member,
