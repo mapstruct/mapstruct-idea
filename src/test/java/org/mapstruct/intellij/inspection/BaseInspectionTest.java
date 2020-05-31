@@ -25,9 +25,9 @@ public abstract class BaseInspectionTest extends MapstructBaseCompletionTestCase
     }
 
     @NotNull
-    abstract Class<? extends LocalInspectionTool> getInspection();
+    protected abstract Class<? extends LocalInspectionTool> getInspection();
 
-    void doTest() {
+    protected void doTest() {
         String testName = getTestName( false );
         configureByFile( testName + ".java" );
         myFixture.enableInspections( getInspection() );
