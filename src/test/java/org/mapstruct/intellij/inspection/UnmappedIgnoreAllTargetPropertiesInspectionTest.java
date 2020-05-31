@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Filip Hrisafov
  */
-public class UnmappedFluentTargetPropertiesInspectionTest extends BaseInspectionTest {
+public class UnmappedIgnoreAllTargetPropertiesInspectionTest extends BaseInspectionTest {
 
     @NotNull
     @Override
@@ -27,12 +27,12 @@ public class UnmappedFluentTargetPropertiesInspectionTest extends BaseInspection
     protected void setUp() throws Exception {
         super.setUp();
         myFixture.copyFileToProject(
-            "UnmappedFluentTargetPropertiesData.java",
-            "org/example/data/UnmappedFluentTargetPropertiesData.java"
+            "UnmappedTargetPropertiesData.java",
+            "org/example/data/UnmappedTargetPropertiesData.java"
         );
     }
 
-    public void testUnmappedFluentTargetProperties() {
+    public void testUnmappedIgnoreAllTargetProperties() {
         doTest();
         String testName = getTestName( false );
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
@@ -41,25 +41,14 @@ public class UnmappedFluentTargetPropertiesInspectionTest extends BaseInspection
             .extracting( IntentionAction::getText )
             .as( "Intent Text" )
             .containsExactly(
-                "Ignore unmapped target property: 'testName'",
-                "Add unmapped target property: 'testName'",
-                "Ignore unmapped target property: 'moreTarget'",
-                "Add unmapped target property: 'moreTarget'",
                 "Ignore unmapped target property: 'moreTarget'",
                 "Add unmapped target property: 'moreTarget'",
                 "Ignore unmapped target property: 'testName'",
                 "Add unmapped target property: 'testName'",
-                "Ignore all unmapped target properties",
-                "Ignore unmapped target property: 'testName'",
-                "Add unmapped target property: 'testName'",
-                "Ignore unmapped target property: 'matching'",
-                "Add unmapped target property: 'matching'",
-                "Ignore unmapped target property: 'moreTarget'",
-                "Add unmapped target property: 'moreTarget'",
                 "Ignore all unmapped target properties"
             );
 
-        allQuickFixes.forEach( myFixture::launchAction );
+        myFixture.launchAction( allQuickFixes.get( 4 ) );
         myFixture.checkResultByFile( testName + "_after.java" );
     }
 }

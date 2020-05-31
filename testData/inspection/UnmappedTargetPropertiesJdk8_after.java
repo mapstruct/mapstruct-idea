@@ -40,6 +40,8 @@ interface SingleMappingMapper {
 @Mapper
 interface NoMappingMapper {
 
+    @Mapping(target = "testName", ignore = true)
+    @Mapping(target = "moreTarget", ignore = true)
     @Mapping(target = "testName", source = "")
     @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", source = "")
@@ -70,6 +72,8 @@ interface UpdateMapper {
 @Mapper
 interface MultiSourceUpdateMapper {
 
+    @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "matching", ignore = true)
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
     @Mapping(target = "matching", source = "")

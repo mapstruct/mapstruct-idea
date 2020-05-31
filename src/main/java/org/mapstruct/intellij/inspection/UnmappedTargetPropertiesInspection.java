@@ -5,6 +5,10 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -90,18 +94,26 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                         .sorted()
                         .collect( Collectors.joining( ", " ) )
                 );
-                UnmappedTargetPropertyFix[] quickFixes = allTargetProperties.stream()
+                List<UnmappedTargetPropertyFix> quickFixes = new ArrayList<>( missingTargetProperties * 2 + 1 );
+
+                allTargetProperties.stream()
                     .sorted()
                     .flatMap( property -> Stream.of(
                         createAddIgnoreUnmappedTargetPropertyFix( method, property ),
                         createAddUnmappedTargetPropertyFix( method, property )
                     ) )
-                    .toArray( UnmappedTargetPropertyFix[]::new );
+                    .forEach( quickFixes::add );
+
+                if ( missingTargetProperties > 1 ) {
+                    // If there is more than one add ignore all
+                    quickFixes.add( createAddIgnoreAllUnmappedTargetPropertiesFix( method, allTargetProperties ) );
+                }
+
                 //noinspection ConstantConditions
                 holder.registerProblem(
                     method.getNameIdentifier(),
                     descriptionTemplate,
-                    quickFixes
+                    quickFixes.toArray( UnmappedTargetPropertyFix.EMPTY_ARRAY )
                 );
             }
         }
@@ -137,14 +149,16 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
     private static class UnmappedTargetPropertyFix extends LocalQuickFixOnPsiElement {
 
+        private static final UnmappedTargetPropertyFix[] EMPTY_ARRAY = new UnmappedTargetPropertyFix[0];
+
         private final String myText;
         private final String myFamilyName;
-        private final Supplier<PsiAnnotation> myAnnotationSupplier;
+        private final Supplier<Collection<PsiAnnotation>> myAnnotationSupplier;
 
         private UnmappedTargetPropertyFix(@NotNull PsiMethod modifierListOwner,
             @NotNull String text,
             @NotNull String familyName,
-            @NotNull Supplier<PsiAnnotation> annotationSupplier) {
+            @NotNull Supplier<Collection<PsiAnnotation>> annotationSupplier) {
             super( modifierListOwner );
             myText = text;
             myFamilyName = familyName;
@@ -186,7 +200,9 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             @NotNull PsiElement endElement) {
             PsiMethod mappingMethod = (PsiMethod) startElement;
 
-            addMappingAnnotation( project, mappingMethod, myAnnotationSupplier.get() );
+            for ( PsiAnnotation annotation : myAnnotationSupplier.get() ) {
+                addMappingAnnotation( project, mappingMethod, annotation );
+            }
         }
 
     }
@@ -202,8 +218,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
      */
     private static UnmappedTargetPropertyFix createAddUnmappedTargetPropertyFix(PsiMethod method, String target) {
         String fqn = MapstructUtil.MAPPING_ANNOTATION_FQN;
-        Supplier<PsiAnnotation> annotationSupplier = () -> JavaPsiFacade.getElementFactory( method.getProject() )
-            .createAnnotationFromText( "@" + fqn + "(target = \"" + target + "\", source=\"\")", null );
+        Supplier<Collection<PsiAnnotation>> annotationSupplier =
+            () -> Collections.singleton( JavaPsiFacade.getElementFactory(
+            method.getProject() )
+            .createAnnotationFromText( "@" + fqn + "(target = \"" + target + "\", source=\"\")", null ) );
         String message = MapStructBundle.message( "inspection.add.unmapped.target.property", target );
         return new UnmappedTargetPropertyFix(
             method,
@@ -224,8 +242,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
      */
     private static UnmappedTargetPropertyFix createAddIgnoreUnmappedTargetPropertyFix(PsiMethod method, String target) {
         String fqn = MapstructUtil.MAPPING_ANNOTATION_FQN;
-        Supplier<PsiAnnotation> annotationSupplier = () -> JavaPsiFacade.getElementFactory( method.getProject() )
-            .createAnnotationFromText( "@" + fqn + "(target = \"" + target + "\", ignore= true)", null );
+        Supplier<Collection<PsiAnnotation>> annotationSupplier =
+            () -> Collections.singleton( JavaPsiFacade.getElementFactory(
+            method.getProject() )
+            .createAnnotationFromText( "@" + fqn + "(target = \"" + target + "\", ignore= true)", null ) );
         String message = MapStructBundle.message( "inspection.add.ignore.unmapped.target.property", target );
         return new UnmappedTargetPropertyFix(
             method,
@@ -234,4 +254,37 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             annotationSupplier
         );
     }
+
+    /**
+     * Add ignore all unmapped properties fix. Property fix that adds {@link org.mapstruct.Mapping} annotations that
+     * ignores all the given {@code targets}
+     *
+     * @param method the method to which the property needs to be added
+     * @param targetProperties the names of the target properties that should be ignored
+     *
+     * @return the Local Quick fix
+     */
+    private static UnmappedTargetPropertyFix createAddIgnoreAllUnmappedTargetPropertiesFix(PsiMethod method,
+        Collection<String> targetProperties) {
+        String fqn = MapstructUtil.MAPPING_ANNOTATION_FQN;
+        Supplier<Collection<PsiAnnotation>> annotationSupplier = () -> {
+            List<PsiAnnotation> annotations = new ArrayList<>( targetProperties.size() );
+            targetProperties.stream()
+                .sorted()
+                .forEach( targetProperty -> annotations.add( JavaPsiFacade.getElementFactory( method.getProject() )
+                    .createAnnotationFromText(
+                        "@" + fqn + "(target = \"" + targetProperty + "\", ignore= true)",
+                        null
+                    ) ) );
+            return annotations;
+        };
+        String message = MapStructBundle.message( "inspection.add.ignore.all.unmapped.target.properties" );
+        return new UnmappedTargetPropertyFix(
+            method,
+            message,
+            MapStructBundle.message( "intention.add.ignore.all.unmapped.target.properties" ),
+            annotationSupplier
+        );
+    }
+
 }

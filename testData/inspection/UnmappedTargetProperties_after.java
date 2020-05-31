@@ -57,7 +57,9 @@ interface NoMappingMapper {
             @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = ""),
             @Mapping(target = "testName", ignore = true),
-            @Mapping(target = "testName", source = "")
+            @Mapping(target = "testName", source = ""),
+            @Mapping(target = "moreTarget", ignore = true),
+            @Mapping(target = "testName", ignore = true)
     })
     Target map(Source source);
 
@@ -72,7 +74,9 @@ interface NoMappingsMapper {
             @Mapping(target = "moreTarget", ignore = true),
             @Mapping(target = "moreTarget", source = ""),
             @Mapping(target = "testName", ignore = true),
-            @Mapping(target = "testName", source = "")
+            @Mapping(target = "testName", source = ""),
+            @Mapping(target = "moreTarget", ignore = true),
+            @Mapping(target = "testName", ignore = true)
     })
     Target map(Source source);
 }
@@ -105,7 +109,9 @@ interface MultiSourceUpdateMapper {
             @Mapping(target = "matching", ignore = true),
             @Mapping(target = "matching", source = ""),
             @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "moreTarget", source = "")
+            @Mapping(target = "moreTarget", source = ""),
+            @Mapping(target = "matching", ignore = true),
+            @Mapping(target = "moreTarget", ignore = true)
     })
     void update(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
 }
