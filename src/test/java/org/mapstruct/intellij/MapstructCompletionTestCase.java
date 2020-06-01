@@ -279,6 +279,29 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testCarMapperReturnTargetCarDtoWithMultipleConstructorsAndAnnotatedWithDefault() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "price"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .containsExactlyInAnyOrder(
+                createParameter( "make", "String" ),
+                createParameter( "seatCount", "int" ),
+                createParameter( "manufacturingYear", "String" ),
+                createParameter( "price", "Long" )
+            );
+    }
+
     public void testPersonMapperReturnTargetFluentPersonDto() {
         configureByTestName();
         assertFluentPersonDtoAutoComplete();
