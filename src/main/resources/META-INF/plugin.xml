@@ -37,6 +37,7 @@
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
     <methodReferencesSearch implementation="org.mapstruct.intellij.search.MappingMethodUsagesSearcher" />
     <renameHandler implementation="org.mapstruct.intellij.rename.MapstructSourceTargetParameterRenameHandler"/>
+    <multiHostInjector implementation="org.mapstruct.intellij.expression.JavaExpressionInjector"/>
 
     <localInspection language="JAVA"
                      enabledByDefault="true"
