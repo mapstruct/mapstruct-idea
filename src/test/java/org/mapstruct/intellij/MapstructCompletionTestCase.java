@@ -542,6 +542,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             } );
     }
 
+    public void testCarMapperReferencePublicStaticFieldSourceProperty() {
+        myFixture.configureByFile( "CarMapperReferencePublicStaticFieldSourceProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    public void testCarMapperReferenceProtectedSourceProperty() {
+        myFixture.configureByFile( "CarMapperReferenceProtectedSourceProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
     public void testCarMapperReferenceTargetPropertyInCarDtoWithBuilder() {
         myFixture.configureByFile( "CarMapperReferenceBuilderTargetProperty.java" );
         PsiElement reference = myFixture.getElementAtCaret();
@@ -743,6 +757,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
 
     public void testFluentCarMapperReferenceUnknownTargetProperty() {
         myFixture.configureByFile( "FluentCarMapperReferenceUnknownTargetProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    public void testCarMapperReferencePublicStaticFieldTargetProperty() {
+        myFixture.configureByFile( "CarMapperReferencePublicStaticFieldTargetProperty.java" );
+        PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
+        assertThat( reference ).isNotNull();
+        assertThat( reference.resolve() ).isNull();
+    }
+
+    public void testCarMapperReferenceProtectedTargetProperty() {
+        myFixture.configureByFile( "CarMapperReferenceProtectedTargetProperty.java" );
         PsiReference reference = myFixture.getFile().findReferenceAt( myFixture.getCaretOffset() );
         assertThat( reference ).isNotNull();
         assertThat( reference.resolve() ).isNull();

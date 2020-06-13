@@ -12,6 +12,8 @@ import org.example.dto.PersonDto;
 
 public class CarDtoPublic {
 
+    public static final String EMPTY_STRING = "";
+
     public String make;
     public int seatCount;
     public String manufacturingYear;

@@ -100,7 +100,7 @@ public class CarDto {
     }
 
     protected void setPrivateField(String privateField) {
-        // nothing to di
+        // nothing to do
     }
 
     protected String getPrivateField() {
@@ -113,5 +113,13 @@ public class CarDto {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    public static void setStaticField(String staticField) {
+        // nothing to do
+    }
+
+    public static String getStaticField() {
+        return null;
     }
 }

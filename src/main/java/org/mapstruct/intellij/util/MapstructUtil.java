@@ -163,14 +163,17 @@ public final class MapstructUtil {
         return isPublic( method ) && method.hasModifierProperty( PsiModifier.STATIC );
     }
 
-    public static boolean isPublic(@NotNull PsiField field) {
+    public static boolean isPublicNonStatic(@NotNull PsiField field) {
+        return isPublic( field ) && !field.hasModifierProperty( PsiModifier.STATIC );
+    }
+
+    private static boolean isPublic(@NotNull PsiField field) {
         return field.hasModifierProperty( PsiModifier.PUBLIC );
     }
 
     public static boolean isPublicModifiable(@NotNull PsiField field) {
-        return isPublic( field ) &&
-               !field.hasModifierProperty( PsiModifier.FINAL ) &&
-               !field.hasModifierProperty( PsiModifier.STATIC );
+        return isPublicNonStatic( field ) &&
+               !field.hasModifierProperty( PsiModifier.FINAL );
     }
 
     public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
@@ -377,7 +380,7 @@ public final class MapstructUtil {
 
         for ( Pair<PsiField, PsiSubstitutor> fieldPair : fieldPairs ) {
             PsiField field = fieldPair.getFirst();
-            if ( MapstructUtil.isPublic( field ) ) {
+            if ( MapstructUtil.isPublicNonStatic( field ) ) {
                 publicFields.put( field.getName(), fieldPair );
             }
         }

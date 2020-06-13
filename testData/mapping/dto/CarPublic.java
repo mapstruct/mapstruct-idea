@@ -12,6 +12,8 @@ import org.example.dto.Person;
 
 public class CarPublic {
 
+    public static final String EMPTY_STRING = "";
+
     public private String make;
     public private int numberOfSeats;
     public private Date manufacturingDate;

@@ -29,6 +29,7 @@ import org.mapstruct.intellij.util.TargetUtils;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
+import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 import static org.mapstruct.intellij.util.TargetUtils.publicWriteAccessors;
 import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
@@ -79,7 +80,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         }
 
         PsiMethod[] methods = psiClass.findMethodsByName( "set" + MapstructUtil.capitalize( value ), true );
-        if ( methods.length != 0 ) {
+        if ( methods.length != 0 && isPublicNonStatic( methods[0] ) ) {
             return methods[0];
         }
 

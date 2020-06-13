@@ -95,4 +95,20 @@ public class Car {
     public void setFree(boolean free) {
         this.free = free;
     }
+
+    protected void setPrivateField(String privateField) {
+        // nothing to do
+    }
+
+    protected String getPrivateField() {
+        return null;
+    }
+
+    public static void setStaticField(String staticField) {
+        // nothing to do
+    }
+
+    public static String getStaticField() {
+        return null;
+    }
 }

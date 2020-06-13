@@ -48,6 +48,8 @@ public class UnmappedTargetPropertiesData {
 
     public static class Target {
 
+        public static final String EMPTY_STRING = "";
+
         private String testName;
         private String matching;
         private String moreTarget;

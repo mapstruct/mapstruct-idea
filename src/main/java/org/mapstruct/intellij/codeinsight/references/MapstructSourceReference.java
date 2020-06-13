@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
-import static org.mapstruct.intellij.util.MapstructUtil.isPublic;
+import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
 import static org.mapstruct.intellij.util.SourceUtils.publicReadAccessors;
 
@@ -59,12 +59,12 @@ class MapstructSourceReference extends MapstructBaseReference {
         if ( methods.length == 0 ) {
             methods = psiClass.findMethodsByName( "is" + MapstructUtil.capitalize( value ), true );
         }
-        if ( methods.length > 0 ) {
+        if ( methods.length > 0 && isPublicNonStatic( methods[0] ) ) {
             return methods[0];
         }
 
         PsiField field = psiClass.findFieldByName( value, true );
-        if ( field != null && isPublic( field ) ) {
+        if ( field != null && isPublicNonStatic( field ) ) {
             return field;
         }
         return null;
