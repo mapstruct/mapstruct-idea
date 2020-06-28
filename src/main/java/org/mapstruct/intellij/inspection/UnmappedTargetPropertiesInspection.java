@@ -77,7 +77,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion );
 
             // find and remove all defined mapping targets
-            Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method )
+            Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method, mapStructVersion )
                 .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
 

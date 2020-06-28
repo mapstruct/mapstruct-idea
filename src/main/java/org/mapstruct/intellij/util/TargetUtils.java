@@ -18,9 +18,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
@@ -311,18 +312,16 @@ public class TargetUtils {
      * Find all defined {@link org.mapstruct.Mapping#target()} for the given method
      *
      * @param method that needs to be checked
+     * @param mapStructVersion the MapStruct project version
      *
      * @return see description
      */
-    public static Stream<String> findAllDefinedMappingTargets(@NotNull PsiMethod method) {
+    public static Stream<String> findAllDefinedMappingTargets(@NotNull PsiMethod method,
+        MapStructVersion mapStructVersion) {
         //TODO cache
         PsiAnnotation mappings = findAnnotation( method, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
-        Stream<PsiAnnotation> mappingsAnnotations;
-        if ( mappings == null ) {
-            mappingsAnnotations = Stream.of( method.getModifierList().getAnnotations() )
-                .filter( TargetUtils::isMappingAnnotation );
-        }
-        else {
+        Stream<PsiAnnotation> mappingsAnnotations = Stream.empty();
+        if ( mappings != null ) {
             //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
             PsiNameValuePair mappingsValue = findDeclaredAttribute( mappings, null );
             if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiArrayInitializerMemberValue ) {
@@ -334,16 +333,24 @@ public class TargetUtils {
             else if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiAnnotation ) {
                 mappingsAnnotations = Stream.of( (PsiAnnotation) mappingsValue.getValue() );
             }
-            else {
-                mappingsAnnotations = Stream.empty();
-            }
         }
 
-        return mappingsAnnotations
-            .map( psiAnnotation -> psiAnnotation.findDeclaredAttributeValue( "target" ) )
+        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( method, mapStructVersion );
+
+        return Stream.concat( mappingAnnotations, mappingsAnnotations )
+            .map( psiAnnotation -> AnnotationUtil.getDeclaredStringAttributeValue( psiAnnotation, "target" ) )
             .filter( Objects::nonNull )
-            .map( ElementManipulators::getValueText )
             .filter( s -> !s.isEmpty() );
+    }
+
+    private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiMethod method,
+        MapStructVersion mapStructVersion) {
+        if ( mapStructVersion.isConstructorSupported() ) {
+            // Meta annotations support was added when constructor support was added
+            return MetaAnnotationUtil.findMetaAnnotations( method, Collections.singleton( MAPPING_ANNOTATION_FQN ) );
+        }
+        return Stream.of( method.getModifierList().getAnnotations() )
+            .filter( TargetUtils::isMappingAnnotation );
     }
 
     /**
