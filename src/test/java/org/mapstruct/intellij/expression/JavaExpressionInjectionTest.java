@@ -28,6 +28,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "\n" +
         "import org.mapstruct.Mapper;\n" +
         "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
         "import org.example.dto.CarDto;\n" +
         "import org.example.dto.Car;\n" +
         "\n" +
@@ -98,6 +99,43 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
 
     protected void withTargetDefinedMapper(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithTargetDefinedMapperInMappings() {
+        withTargetDefinedMapperInMappings( "expression" );
+        withTargetDefinedMapperInMappings( "defaultExpression" );
+    }
+
+    protected void withTargetDefinedMapperInMappings(String attribute) {
+        String mapping = "@Mappings(\n" +
+            "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n" +
+            ")\n";
         @Language("java")
         String mapper = String.format( CAR_MAPPER, "", mapping );
         PsiFile file = configureMapperByText( mapper );

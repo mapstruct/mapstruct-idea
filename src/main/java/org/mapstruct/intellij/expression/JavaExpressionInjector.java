@@ -31,6 +31,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.util.MapstructElementUtils;
@@ -64,8 +65,13 @@ public class JavaExpressionInjector implements MultiHostInjector {
             // PsiModifierList
             // PsiMethod
 
-            PsiAnnotationParameterList annotationParameterList = (PsiAnnotationParameterList) context.getParent()
-                .getParent();
+            PsiAnnotationParameterList annotationParameterList = PsiTreeUtil.getParentOfType(
+                context,
+                PsiAnnotationParameterList.class
+            );
+            if ( annotationParameterList == null ) {
+                return;
+            }
             PsiType targetType = null;
             for ( PsiNameValuePair attribute : annotationParameterList.getAttributes() ) {
                 if ( "target" .equals( attribute.getAttributeName() ) ) {
@@ -91,8 +97,15 @@ public class JavaExpressionInjector implements MultiHostInjector {
                 return;
             }
 
-            PsiMethod method = (PsiMethod) annotationParameterList.getParent().getParent().getParent();
-            PsiClass mapperClass = (PsiClass) method.getParent();
+            PsiMethod method = PsiTreeUtil.getParentOfType( annotationParameterList, PsiMethod.class );;
+            if ( method == null ) {
+                return;
+            }
+
+            PsiClass mapperClass = PsiTreeUtil.getParentOfType( method, PsiClass.class );
+            if ( mapperClass == null ) {
+                return;
+            }
             StringBuilder importsBuilder = new StringBuilder();
             StringBuilder prefixBuilder = new StringBuilder();
 
