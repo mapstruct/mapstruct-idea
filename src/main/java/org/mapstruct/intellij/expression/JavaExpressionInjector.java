@@ -97,7 +97,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
                 return;
             }
 
-            PsiMethod method = PsiTreeUtil.getParentOfType( annotationParameterList, PsiMethod.class );;
+            PsiMethod method = PsiTreeUtil.getParentOfType( annotationParameterList, PsiMethod.class );
             if ( method == null ) {
                 return;
             }
