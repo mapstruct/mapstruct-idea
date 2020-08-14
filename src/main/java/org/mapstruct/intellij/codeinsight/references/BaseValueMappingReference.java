@@ -7,7 +7,6 @@ package org.mapstruct.intellij.codeinsight.references;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +21,7 @@ abstract class BaseValueMappingReference extends BaseReference {
     /**
      * @param element the element for which a reference should be found
      */
-    BaseValueMappingReference(@NotNull PsiLiteral element) {
+    BaseValueMappingReference(@NotNull PsiElement element) {
         super( element );
     }
 

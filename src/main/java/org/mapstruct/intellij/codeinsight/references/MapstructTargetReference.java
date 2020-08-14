@@ -14,7 +14,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
@@ -50,7 +49,7 @@ class MapstructTargetReference extends MapstructBaseReference {
      * @param previousReference the previous reference if there is one (in nested properties for example)
      * @param rangeInElement the range that the reference represent in the {@code element}
      */
-    private MapstructTargetReference(PsiLiteral element, MapstructTargetReference previousReference,
+    private MapstructTargetReference(PsiElement element, MapstructTargetReference previousReference,
         TextRange rangeInElement) {
         super( element, previousReference, rangeInElement );
         mapStructVersion = MapstructUtil.resolveMapStructProjectVersion( element.getContainingFile()
@@ -154,12 +153,12 @@ class MapstructTargetReference extends MapstructBaseReference {
     }
 
     /**
-     * @param psiLiteral the literal for which references need to be created
+     * @param psiElement the literal for which references need to be created
      *
      * @return the references for the given {@code psiLiteral}
      */
-    static PsiReference[] create(PsiLiteral psiLiteral) {
-        return MapstructBaseReference.create( psiLiteral, MapstructTargetReference::new );
+    static PsiReference[] create(PsiElement psiElement) {
+        return MapstructBaseReference.create( psiElement, MapstructTargetReference::new );
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {

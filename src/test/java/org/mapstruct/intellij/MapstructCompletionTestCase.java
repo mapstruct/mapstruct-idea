@@ -65,6 +65,35 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertCarDtoAutoCompleteKt() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "make",
+                "seatCount",
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "make", "String" ),
+                createVariable( "seatCount", "int" ),
+                createVariable( "manufacturingYear", "String" ),
+                createVariable( "myDriver", "PersonDtoKt" ),
+                createVariable( "passengers", "List<PersonDtoKt>" ),
+                createVariable( "price", "Long" ),
+                createVariable( "category", "String" ),
+                createVariable( "available", "boolean" )
+            );
+    }
+
     private void assertCarDtoWithBuilderAutoComplete() {
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
@@ -227,6 +256,11 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
                 createVariable( "category", "String" ),
                 createVariable( "available", "boolean" )
             );
+    }
+
+    public void testCarMapperReturnTargetCarDtoKotlin() {
+        configureByFile( "/" + getTestName( false ) + ".kt" );
+        assertCarDtoAutoCompleteKt();
     }
 
     public void testCarMapperReturnTargetCarDto() {

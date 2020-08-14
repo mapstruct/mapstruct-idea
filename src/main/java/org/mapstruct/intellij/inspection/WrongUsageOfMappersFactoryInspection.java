@@ -134,7 +134,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
             return myText;
         }
 
-        @Nls(capitalization = Nls.Capitalization.Sentence)
+        @Nls
         @NotNull
         @Override
         public String getFamilyName() {

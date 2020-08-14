@@ -29,10 +29,12 @@
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
   <depends>com.intellij.modules.java</depends>
+  <depends>org.jetbrains.kotlin</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
 
+    <psi.referenceContributor language="kotlin" implementation="org.mapstruct.intellij.codeinsight.references.KtMapstructReferenceContributor" />
     <completion.contributor language="JAVA" implementationClass="org.mapstruct.intellij.codeinsight.completion.ComponentModelCompletionContributor" />
     <psi.referenceContributor language="JAVA" implementation="org.mapstruct.intellij.codeinsight.references.MapstructReferenceContributor" />
     <methodReferencesSearch implementation="org.mapstruct.intellij.search.MappingMethodUsagesSearcher" />
@@ -66,7 +68,7 @@
             implementationClass="org.mapstruct.intellij.inspection.WrongUsageOfMappersFactoryInspection"/>
 
   </extensions>
-  
+
   <actions>
     <!-- Add your actions here -->
   </actions>

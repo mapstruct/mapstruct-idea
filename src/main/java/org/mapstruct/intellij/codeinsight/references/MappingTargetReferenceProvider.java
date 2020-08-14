@@ -5,14 +5,13 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.function.Function;
-
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 /**
  * {@link PsiReferenceProvider} for references in target / source properties of {@link org.mapstruct.Mapping}.
@@ -21,18 +20,18 @@ import org.jetbrains.annotations.NotNull;
  */
 class MappingTargetReferenceProvider extends PsiReferenceProvider {
 
-    private final Function<PsiLiteral, PsiReference[]> reference;
+    private final Function<PsiElement, PsiReference[]> reference;
 
     /**
      * @param reference the function that can be used to create the references array
      */
-    MappingTargetReferenceProvider(Function<PsiLiteral, PsiReference[]> reference) {
+    MappingTargetReferenceProvider(Function<PsiElement, PsiReference[]> reference) {
         this.reference = reference;
     }
 
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        return reference.apply( (PsiLiteral) element );
+        return reference.apply( element );
     }
 }
