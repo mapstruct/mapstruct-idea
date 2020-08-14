@@ -6,10 +6,10 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiLiteral;
+import com.intellij.psi.PsiElement;
 
 /**
- * Cretor of {@link MapstructBaseReference}.
+ * Creator of {@link MapstructBaseReference}.
  *
  * @param <T> the type of the reference that would be created
  *
@@ -21,11 +21,11 @@ interface ReferenceCreator<T extends MapstructBaseReference> {
     /**
      * Create a new reference from the provided parameters.
      *
-     * @param psiLiteral the element that the reference belongs to
+     * @param psiElement the element that the reference belongs to
      * @param previousReference the previous reference if there is one (in nested properties for example)
      * @param rangeInElement the range that the reference represent in the {@code psiLiteral}
      *
      * @return a new reference created from the provided parameters
      */
-    T create(PsiLiteral psiLiteral, T previousReference, TextRange rangeInElement);
+    T create(PsiElement psiElement, T previousReference, TextRange rangeInElement);
 }

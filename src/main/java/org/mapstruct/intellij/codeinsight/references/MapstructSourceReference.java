@@ -5,15 +5,11 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
@@ -23,6 +19,9 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
@@ -43,7 +42,7 @@ class MapstructSourceReference extends MapstructBaseReference {
      * @param previousReference the previous reference if there is one (in nested properties for example)
      * @param rangeInElement the range that the reference represent in the {@code element}
      */
-    private MapstructSourceReference(PsiLiteral element, MapstructSourceReference previousReference,
+    private MapstructSourceReference(PsiElement element, MapstructSourceReference previousReference,
         TextRange rangeInElement) {
         super( element, previousReference, rangeInElement );
     }
@@ -125,12 +124,12 @@ class MapstructSourceReference extends MapstructBaseReference {
     }
 
     /**
-     * @param psiLiteral the literal for which references need to be created
+     * @param psiElement the literal for which references need to be created
      *
      * @return the references for the given {@code psiLiteral}
      */
-    static PsiReference[] create(PsiLiteral psiLiteral) {
-        return MapstructBaseReference.create( psiLiteral, MapstructSourceReference::new );
+    static PsiReference[] create(PsiElement psiElement) {
+        return MapstructBaseReference.create( psiElement, MapstructSourceReference::new );
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {

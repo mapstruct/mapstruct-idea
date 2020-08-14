@@ -12,7 +12,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiEnumConstant;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
     /**
      * @param element the element for which a reference should be found
      */
-    private ValueMappingSourceReference(@NotNull PsiLiteral element) {
+    private ValueMappingSourceReference(@NotNull PsiElement element) {
         super( element );
     }
 
@@ -69,7 +68,7 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
      *
      * @return the created references for the passed {@code psiLiteral}
      */
-    public static PsiReference[] create(PsiLiteral psiLiteral) {
+    public static PsiReference[] create(PsiElement psiLiteral) {
         return new PsiReference[] { new ValueMappingSourceReference( psiLiteral ) };
     }
 }

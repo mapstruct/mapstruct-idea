@@ -6,24 +6,24 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiLiteral;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.MapstructUtilKt;
 
 /**
  * Base Reference for MapStruct.
  *
  * @author Filip Hrisafov
  */
-abstract class BaseReference extends PsiReferenceBase<PsiLiteral> {
+abstract class BaseReference extends PsiReferenceBase<PsiElement> {
 
     /**
      * @param element the element for which a reference should be found
      */
-    BaseReference(@NotNull PsiLiteral element) {
+    BaseReference(@NotNull PsiElement element) {
         super( element );
     }
 
@@ -31,7 +31,7 @@ abstract class BaseReference extends PsiReferenceBase<PsiLiteral> {
      * @param element the element for which a reference should be found
      * @param rangeInElement the range in the element
      */
-    BaseReference(PsiLiteral element, TextRange rangeInElement) {
+    BaseReference(PsiElement element, TextRange rangeInElement) {
         super( element, rangeInElement );
     }
 
@@ -40,6 +40,6 @@ abstract class BaseReference extends PsiReferenceBase<PsiLiteral> {
      */
     @Nullable
     PsiMethod getMappingMethod() {
-        return PsiTreeUtil.getParentOfType( getElement(), PsiMethod.class );
+      return MapstructUtilKt.getPsiMethod( getElement() );
     }
 }

@@ -10,7 +10,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
@@ -37,7 +36,7 @@ abstract class MapstructBaseReference extends BaseReference {
      * @param previous the previous reference ({@code null} if there is no previous reference)
      * @param rangeInElement the range in the {@code element} for which this reference is valid
      */
-    MapstructBaseReference(@NotNull PsiLiteral element,
+    MapstructBaseReference(@NotNull PsiElement element,
         @Nullable MapstructBaseReference previous, TextRange rangeInElement) {
         super( element, rangeInElement );
         this.previous = previous;
@@ -127,7 +126,7 @@ abstract class MapstructBaseReference extends BaseReference {
     abstract PsiType resolvedType();
 
     @Override
-    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+    public PsiElement handleElementRename(@NotNull String newElementName) throws IncorrectOperationException {
         PsiElement reference = resolve();
         if ( reference instanceof PsiMethod ) {
             return super.handleElementRename( MapstructUtil.getPropertyName( newElementName ) );
@@ -137,24 +136,24 @@ abstract class MapstructBaseReference extends BaseReference {
         }
     }
 
-    private static ElementManipulator<PsiLiteral> getManipulator(PsiLiteral psiLiteral) {
-        return ElementManipulators.getNotNullManipulator( psiLiteral );
+    private static ElementManipulator<PsiElement> getManipulator(PsiElement psiElement) {
+        return ElementManipulators.getNotNullManipulator( psiElement );
     }
 
     /**
      * Create all the references for the provided {@code psiLiteral}.
      *
-     * @param psiLiteral the literal that contain
+     * @param psiElement the literal that contain
      * @param creator The creator that should be used to create new references
      * @param <T> the type of the reference that needs to be created
      *
      * @return the array of all the references
      */
-    static <T extends MapstructBaseReference> PsiReference[] create(PsiLiteral psiLiteral,
+    static <T extends MapstructBaseReference> PsiReference[] create(PsiElement psiElement,
         ReferenceCreator<T> creator) {
-        ElementManipulator<PsiLiteral> manipulator = getManipulator( psiLiteral );
-        TextRange rangeInElement = manipulator.getRangeInElement( psiLiteral );
-        String targetValue = rangeInElement.substring( psiLiteral.getText() );
+        ElementManipulator<PsiElement> manipulator = getManipulator( psiElement );
+        TextRange rangeInElement = manipulator.getRangeInElement( psiElement );
+        String targetValue = rangeInElement.substring( psiElement.getText() );
         String[] parts = targetValue.split( "\\." );
         if ( parts.length == 0 ) {
             return PsiReference.EMPTY_ARRAY;
@@ -171,7 +170,7 @@ abstract class MapstructBaseReference extends BaseReference {
                 nextStart++;
                 endOffset++;
             }
-            lastReference = creator.create( psiLiteral, lastReference, new TextRange( nextStart, endOffset ) );
+            lastReference = creator.create( psiElement, lastReference, new TextRange( nextStart, endOffset ) );
             nextStart = endOffset;
             references[i] = lastReference;
         }
