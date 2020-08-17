@@ -42,6 +42,18 @@ intellij {
     plugins = ['java', 'Kotlin', 'properties']
 }
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
 def htmlFixer = {f -> file(f).text.replace('<html>', '').replace('</html>', '')}
 

@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtNamedFunction
-import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
@@ -26,14 +25,7 @@ import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
  * @author Frank Wang
  */
 fun PsiElement.getPsiMethod(): PsiMethod? {
-    return when (this) {
-        is KtStringTemplateExpression -> {
-            // dealing with kotlin class
-            val ktFun = this.getNonStrictParentOfType(KtNamedFunction::class.java) ?: return null
-            return ktFun.toPsiMethod()
-        }
-        else -> this.getNonStrictParentOfType(PsiMethod::class.java)
-    }
+    return this.getNonStrictParentOfType() ?: this.getNonStrictParentOfType<KtNamedFunction>()?.toPsiMethod()
 }
 
 fun KtCallExpression.getFqName(): FqName? {
