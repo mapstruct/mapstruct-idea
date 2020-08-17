@@ -11,7 +11,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import kotlin.reflect.KClass
@@ -20,22 +20,30 @@ import kotlin.reflect.KClass
  * @author Frank Wang
  */
 fun String.toValueMappingPattern(): ElementPattern<out PsiElement> {
-    return this.toElementPattern(MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN)
+    return this.toElementPattern(MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN, 2)
 }
 
 fun String.toMappingElementPattern(): ElementPattern<out PsiElement> {
-    return this.toElementPattern(MapstructUtil.MAPPING_ANNOTATION_FQN)
+    return this.toElementPattern(MapstructUtil.MAPPING_ANNOTATION_FQN, 2)
 }
 
-private fun String.toElementPattern(annotationFqName: String): ElementPattern<out PsiElement> {
+fun String.toValueMappingsPattern(): ElementPattern<out PsiElement> {
+    return this.toElementPattern(MapstructUtil.VALUE_MAPPINGS_ANNOTATION_FQN, 5)
+}
+
+fun String.toMappingsElementPattern(): ElementPattern<out PsiElement> {
+    return this.toElementPattern(MapstructUtil.MAPPINGS_ANNOTATION_FQN, 5)
+}
+
+private fun String.toElementPattern(annotationFqName: String, level: Int): ElementPattern<out PsiElement> {
     val paramName = this
     return PlatformPatterns.psiElement(KtStringTemplateExpression::class.java).withParent(
         KtValueArgument::class.psiPattern { ktValueArgument, _ ->
             ktValueArgument.getArgumentName()?.text == paramName
         }.withSuperParent(
-            2,
-            KtCallExpression::class.psiPattern { ktCallExpression, _ ->
-                ktCallExpression.getFqName()?.asString() == annotationFqName
+            level,
+            KtAnnotationEntry::class.psiPattern { ktAnnotationEntry, _ ->
+                ktAnnotationEntry.getFqName()?.asString() == annotationFqName
             }
         )
     )

@@ -8,7 +8,9 @@ package org.mapstruct.intellij.codeinsight.references
 import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceRegistrar
 import org.mapstruct.intellij.util.toMappingElementPattern
+import org.mapstruct.intellij.util.toMappingsElementPattern
 import org.mapstruct.intellij.util.toValueMappingPattern
+import org.mapstruct.intellij.util.toValueMappingsPattern
 
 
 /**
@@ -25,6 +27,14 @@ class KtMapstructReferenceContributor : PsiReferenceContributor() {
             "source".toMappingElementPattern(),
             MappingTargetReferenceProvider(MapstructSourceReference::create)
         )
+        registrar.registerReferenceProvider(
+            "target".toMappingsElementPattern(),
+            MappingTargetReferenceProvider(MapstructTargetReference::create)
+        )
+        registrar.registerReferenceProvider(
+            "source".toMappingsElementPattern(),
+            MappingTargetReferenceProvider(MapstructSourceReference::create)
+        )
 
         registrar.registerReferenceProvider(
             "target".toValueMappingPattern(),
@@ -32,6 +42,14 @@ class KtMapstructReferenceContributor : PsiReferenceContributor() {
         )
         registrar.registerReferenceProvider(
             "source".toValueMappingPattern(),
+            MappingTargetReferenceProvider(ValueMappingTargetReference::create)
+        )
+        registrar.registerReferenceProvider(
+            "target".toValueMappingsPattern(),
+            MappingTargetReferenceProvider(ValueMappingSourceReference::create)
+        )
+        registrar.registerReferenceProvider(
+            "source".toValueMappingsPattern(),
             MappingTargetReferenceProvider(ValueMappingTargetReference::create)
         )
     }
