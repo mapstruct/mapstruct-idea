@@ -19,12 +19,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
@@ -34,13 +31,12 @@ import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
-import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
-import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
@@ -318,60 +314,35 @@ public class TargetUtils {
      */
     public static Stream<String> findAllDefinedMappingTargets(@NotNull PsiMethod method,
         MapStructVersion mapStructVersion) {
-        //TODO cache
-        PsiAnnotation mappings = findAnnotation( method, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
-        Stream<PsiAnnotation> mappingsAnnotations = Stream.empty();
-        if ( mappings != null ) {
-            //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
-            PsiNameValuePair mappingsValue = findDeclaredAttribute( mappings, null );
-            if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiArrayInitializerMemberValue ) {
-                mappingsAnnotations = Stream.of( ( (PsiArrayInitializerMemberValue) mappingsValue.getValue() )
-                    .getInitializers() )
-                    .filter( TargetUtils::isMappingPsiAnnotation )
-                    .map( memberValue -> (PsiAnnotation) memberValue );
-            }
-            else if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiAnnotation ) {
-                mappingsAnnotations = Stream.of( (PsiAnnotation) mappingsValue.getValue() );
-            }
-        }
-
-        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( method, mapStructVersion );
-
-        return Stream.concat( mappingAnnotations, mappingsAnnotations )
+        return findAllDefinedMappingAnnotations( method, mapStructVersion )
             .map( psiAnnotation -> AnnotationUtil.getDeclaredStringAttributeValue( psiAnnotation, "target" ) )
             .filter( Objects::nonNull )
             .filter( s -> !s.isEmpty() );
     }
 
-    private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiMethod method,
+    /**
+     * Find all implicit source properties for all targets mapping to the current target, i.e. ".".
+     *
+     * @param method that needs to be checked
+     * @param mapStructVersion the MapStruct project version
+     *
+     * @return see description
+     */
+    public static Stream<String> findAllSourcePropertiesForCurrentTarget(@NotNull PsiMethod method,
         MapStructVersion mapStructVersion) {
-        if ( mapStructVersion.isConstructorSupported() ) {
-            // Meta annotations support was added when constructor support was added
-            return MetaAnnotationUtil.findMetaAnnotations( method, Collections.singleton( MAPPING_ANNOTATION_FQN ) );
-        }
-        return Stream.of( method.getModifierList().getAnnotations() )
-            .filter( TargetUtils::isMappingAnnotation );
-    }
-
-    /**
-     * @param memberValue that needs to be checked
-     *
-     * @return {@code true} if the {@code memberValue} is the {@link org.mapstruct.Mapping} {@link PsiAnnotation},
-     * {@code false} otherwise
-     */
-    private static boolean isMappingPsiAnnotation(PsiAnnotationMemberValue memberValue) {
-        return memberValue instanceof PsiAnnotation
-            && TargetUtils.isMappingAnnotation( (PsiAnnotation) memberValue );
-    }
-
-    /**
-     * @param psiAnnotation that needs to be checked
-     *
-     * @return {@code true} if the {@code psiAnnotation} is the {@link org.mapstruct.Mapping} annotation, {@code
-     * false} otherwise
-     */
-    private static boolean isMappingAnnotation(PsiAnnotation psiAnnotation) {
-        return Objects.equals( psiAnnotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
+        return findAllDefinedMappingAnnotations( method, mapStructVersion )
+            .filter( psiAnnotation -> ".".equals( AnnotationUtil.getDeclaredStringAttributeValue(
+                psiAnnotation,
+                "target"
+            ) ) )
+            .map( psiAnnotation -> AnnotationUtil.findDeclaredAttribute( psiAnnotation, "source" ) )
+            .filter( Objects::nonNull )
+            .map( PsiNameValuePair::getValue )
+            .filter( Objects::nonNull )
+            .map( ReferenceProvidersRegistry::getReferencesFromProviders )
+            .filter( references -> references.length > 0 )
+            .map( references -> references[references.length - 1].resolve() )
+            .flatMap( element -> SourceUtils.publicReadAccessors( element ).keySet().stream() );
     }
 
     /**

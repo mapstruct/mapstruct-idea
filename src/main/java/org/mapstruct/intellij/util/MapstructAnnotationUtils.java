@@ -5,9 +5,13 @@
  */
 package org.mapstruct.intellij.util;
 
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.command.undo.UndoUtil;
 import com.intellij.openapi.module.LanguageLevelUtil;
@@ -18,6 +22,8 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
@@ -26,8 +32,11 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
+import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
+import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.addPhysicalAnnotation;
 import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.removePhysicalAnnotations;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
 
 /**
  * Utils for working with mapstruct annotation.
@@ -221,5 +230,60 @@ public class MapstructAnnotationUtils {
         return module != null
             && LanguageLevelUtil.getEffectiveLanguageLevel( module ).isAtLeast( LanguageLevel.JDK_1_8 )
             && MapstructUtil.isMapStructJdk8Present( module );
+    }
+
+    public static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiMethod method,
+        MapStructVersion mapStructVersion) {
+        //TODO cache
+        Stream<PsiAnnotation> mappingsAnnotations = Stream.empty();
+        PsiAnnotation mappings = findAnnotation( method, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
+        if ( mappings != null ) {
+            //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
+            PsiNameValuePair mappingsValue = findDeclaredAttribute( mappings, null );
+            if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiArrayInitializerMemberValue ) {
+                mappingsAnnotations = Stream.of( ( (PsiArrayInitializerMemberValue) mappingsValue.getValue() )
+                    .getInitializers() )
+                    .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
+                    .map( memberValue -> (PsiAnnotation) memberValue );
+            }
+            else if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiAnnotation ) {
+                mappingsAnnotations = Stream.of( (PsiAnnotation) mappingsValue.getValue() );
+            }
+        }
+
+        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( method, mapStructVersion );
+
+        return Stream.concat( mappingAnnotations, mappingsAnnotations );
+    }
+
+    private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiMethod method,
+        MapStructVersion mapStructVersion) {
+        if ( mapStructVersion.isConstructorSupported() ) {
+            // Meta annotations support was added when constructor support was added
+            return MetaAnnotationUtil.findMetaAnnotations( method, Collections.singleton( MAPPING_ANNOTATION_FQN ) );
+        }
+        return Stream.of( method.getModifierList().getAnnotations() )
+            .filter( MapstructAnnotationUtils::isMappingAnnotation );
+    }
+
+    /**
+     * @param memberValue that needs to be checked
+     *
+     * @return {@code true} if the {@code memberValue} is the {@link org.mapstruct.Mapping} {@link PsiAnnotation},
+     * {@code false} otherwise
+     */
+    private static boolean isMappingPsiAnnotation(PsiAnnotationMemberValue memberValue) {
+        return memberValue instanceof PsiAnnotation
+            && isMappingAnnotation( (PsiAnnotation) memberValue );
+    }
+
+    /**
+     * @param psiAnnotation that needs to be checked
+     *
+     * @return {@code true} if the {@code psiAnnotation} is the {@link org.mapstruct.Mapping} annotation, {@code
+     * false} otherwise
+     */
+    private static boolean isMappingAnnotation(PsiAnnotation psiAnnotation) {
+        return Objects.equals( psiAnnotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
     }
 }

@@ -42,6 +42,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfigur
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
+import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
 
 /**
@@ -80,6 +81,20 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method, mapStructVersion )
                 .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
+
+            if ( definedTargets.contains( "." ) ) {
+                // If there is a defined current target then we need to remove all implicit mapped properties for
+                // the target source
+
+                Set<String> currentTargetSourceProperties =
+                    findAllSourcePropertiesForCurrentTarget(
+                    method,
+                    mapStructVersion
+                )
+                    .collect( Collectors.toSet() );
+
+                allTargetProperties.removeAll( currentTargetSourceProperties );
+            }
 
             //TODO maybe we need to improve this by more granular extraction
             Set<String> sourceProperties = findAllSourceProperties( method );

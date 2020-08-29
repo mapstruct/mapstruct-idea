@@ -86,6 +86,18 @@ public class SourceUtils {
         return canDescendIntoType( parameter.getType() ) ? parameter.getType() : null;
     }
 
+    public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicReadAccessors(
+        @Nullable PsiElement psiElement) {
+        if ( psiElement instanceof PsiMethod ) {
+            return publicReadAccessors( ( (PsiMethod) psiElement ).getReturnType() );
+        }
+        else if ( psiElement instanceof PsiParameter ) {
+            return publicReadAccessors( ( (PsiParameter) psiElement ).getType() );
+        }
+
+        return Collections.emptyMap();
+    }
+
     /**
      * Extract all public read accessors (public getters and fields)
      * with their psi substitutors from the given {@code psiType}
