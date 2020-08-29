@@ -37,6 +37,8 @@ import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
 
+import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
+import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
@@ -72,6 +74,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
             PsiType targetType = getTargetType( method );
             if ( targetType == null ) {
+                return;
+            }
+
+            if ( isBeanMappingIgnoreByDefault( method ) ) {
                 return;
             }
 
@@ -132,6 +138,18 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                     quickFixes.toArray( UnmappedTargetPropertyFix.EMPTY_ARRAY )
                 );
             }
+        }
+
+        private static boolean isBeanMappingIgnoreByDefault(PsiMethod method) {
+            PsiAnnotation beanMapping = findAnnotation( method, true, MapstructUtil.BEAN_MAPPING_FQN );
+            if ( beanMapping != null ) {
+                Boolean ignoreByDefault = getBooleanAttributeValue( beanMapping, "ignoreByDefault" );
+                if ( ignoreByDefault != null ) {
+                    return ignoreByDefault;
+                }
+            }
+
+            return false;
         }
 
         /**

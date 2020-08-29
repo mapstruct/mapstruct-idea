@@ -46,6 +46,7 @@ import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
@@ -77,6 +78,8 @@ public final class MapstructUtil {
      */
     public static final String MAPPING_ANNOTATION_FQN = Mapping.class.getName();
     public static final String MAPPERS_FQN = Mappers.class.getName();
+
+    public static final String BEAN_MAPPING_FQN = BeanMapping.class.getName();
 
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
