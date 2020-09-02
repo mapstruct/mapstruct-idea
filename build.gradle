@@ -39,7 +39,9 @@ intellij {
     alternativeIdePath idePath
     updateSinceUntilBuild false
     pluginName 'MapStruct-Intellij-Plugin'
-    plugins = ['java', 'Kotlin', 'properties']
+    if ( !(version.startsWith('2018') || version.startsWith('2019.1'))) {
+        plugins = ['java', 'Kotlin', 'properties']
+    }
 }
 
 compileKotlin {
