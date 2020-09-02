@@ -41,6 +41,8 @@ intellij {
     pluginName 'MapStruct-Intellij-Plugin'
     if ( !(version.startsWith('2018') || version.startsWith('2019.1'))) {
         plugins = ['java', 'Kotlin', 'properties']
+    } else {
+        plugins = ['Kotlin', 'properties']
     }
 }
 
