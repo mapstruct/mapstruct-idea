@@ -67,7 +67,7 @@ task licenseTestData(type: LicenseCheck) {
 }
 
 task licenseFormatForKotlin(type: LicenseFormat) {
-    source = fileTree(dir: "src/main/java").include("**/*.kt")
+    source = fileTree(dir: "src/main").include("**/*.kt").include("**/*.xml")
 }
 
 license {
