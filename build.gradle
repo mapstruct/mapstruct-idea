@@ -32,13 +32,15 @@ repositories {
 }
 
 intellij {
-    version System.getenv().getOrDefault('IDEA_VERSION', '2020.1.4')
+    version System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
     type ideaType
     downloadSources Boolean.valueOf(sources)
     sameSinceUntilBuild Boolean.valueOf(isEAP)
     alternativeIdePath idePath
     updateSinceUntilBuild false
     pluginName 'MapStruct-Intellij-Plugin'
+    // The properties plugin is needed because Kotlin uses it
+    // and for some reason plugins does not transitively pull itx
     if ( !(version.startsWith('2018') || version.startsWith('2019.1'))) {
         plugins = ['java', 'Kotlin', 'properties']
     } else {

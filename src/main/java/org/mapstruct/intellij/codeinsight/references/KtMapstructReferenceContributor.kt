@@ -7,11 +7,8 @@ package org.mapstruct.intellij.codeinsight.references
 
 import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceRegistrar
-import org.mapstruct.intellij.util.toMappingElementPattern
-import org.mapstruct.intellij.util.toMappingsElementPattern
-import org.mapstruct.intellij.util.toValueMappingPattern
-import org.mapstruct.intellij.util.toValueMappingsPattern
-
+import org.mapstruct.intellij.util.MapstructKotlinElementUtils.mappingElementPattern
+import org.mapstruct.intellij.util.MapstructKotlinElementUtils.valueMappingElementPattern
 
 /**
  * @author Frank Wang
@@ -20,36 +17,19 @@ class KtMapstructReferenceContributor : PsiReferenceContributor() {
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
-            "target".toMappingElementPattern(),
+            mappingElementPattern("target"),
             MappingTargetReferenceProvider(MapstructTargetReference::create)
         )
         registrar.registerReferenceProvider(
-            "source".toMappingElementPattern(),
+            mappingElementPattern("source"),
             MappingTargetReferenceProvider(MapstructSourceReference::create)
         )
         registrar.registerReferenceProvider(
-            "target".toMappingsElementPattern(),
-            MappingTargetReferenceProvider(MapstructTargetReference::create)
-        )
-        registrar.registerReferenceProvider(
-            "source".toMappingsElementPattern(),
-            MappingTargetReferenceProvider(MapstructSourceReference::create)
-        )
-
-        registrar.registerReferenceProvider(
-            "target".toValueMappingPattern(),
+            valueMappingElementPattern("target"),
             MappingTargetReferenceProvider(ValueMappingSourceReference::create)
         )
         registrar.registerReferenceProvider(
-            "source".toValueMappingPattern(),
-            MappingTargetReferenceProvider(ValueMappingTargetReference::create)
-        )
-        registrar.registerReferenceProvider(
-            "target".toValueMappingsPattern(),
-            MappingTargetReferenceProvider(ValueMappingSourceReference::create)
-        )
-        registrar.registerReferenceProvider(
-            "source".toValueMappingsPattern(),
+            valueMappingElementPattern("source"),
             MappingTargetReferenceProvider(ValueMappingTargetReference::create)
         )
     }
