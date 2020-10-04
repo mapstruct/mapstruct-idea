@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.4.18"
+    id "org.jetbrains.intellij" version "0.4.26"
     id "com.github.hierynomus.license" version "0.14.0"
     id "de.undercouch.download" version "4.0.4"
 }
@@ -34,9 +34,7 @@ intellij {
     alternativeIdePath idePath
     updateSinceUntilBuild false
     pluginName 'MapStruct-Intellij-Plugin'
-    if ( !(version.startsWith('2018') || version.startsWith('2019.1'))) {
-        plugins 'java'
-    }
+    plugins 'java'
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
