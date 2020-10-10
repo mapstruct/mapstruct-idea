@@ -72,11 +72,7 @@ interface UpdateMapper {
 @Mapper
 interface MultiSourceUpdateMapper {
 
-    @Mapping(target = "moreTarget", ignore = true)
-    @Mapping(target = "matching", ignore = true)
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
-    @Mapping(target = "matching", source = "")
-    @Mapping(target = "matching", ignore = true)
     void update(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }

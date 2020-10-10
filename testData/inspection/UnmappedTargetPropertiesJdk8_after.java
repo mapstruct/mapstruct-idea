@@ -61,6 +61,12 @@ interface AllMappingMapper {
 }
 
 @Mapper
+interface MultiSourceMappingsMapper {
+
+    Target mapWithAllMapping(Source source, String moreTarget, String testName);
+}
+
+@Mapper
 interface UpdateMapper {
 
     @Mapping(target = "testName", source = "")
@@ -72,12 +78,8 @@ interface UpdateMapper {
 @Mapper
 interface MultiSourceUpdateMapper {
 
-    @Mapping(target = "moreTarget", ignore = true)
-    @Mapping(target = "matching", ignore = true)
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
-    @Mapping(target = "matching", source = "")
-    @Mapping(target = "matching", ignore = true)
     void update(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }
 

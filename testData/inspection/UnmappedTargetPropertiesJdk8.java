@@ -51,6 +51,12 @@ interface AllMappingMapper {
 }
 
 @Mapper
+interface MultiSourceMappingsMapper {
+
+    Target mapWithAllMapping(Source source, String moreTarget, String testName);
+}
+
+@Mapper
 interface UpdateMapper {
 
     @Mapping(target = "moreTarget", source = "moreSource")
@@ -60,7 +66,7 @@ interface UpdateMapper {
 @Mapper
 interface MultiSourceUpdateMapper {
 
-    void <warning descr="Unmapped target properties: matching, moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
+    void <warning descr="Unmapped target property: moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }
 
 @Mapper

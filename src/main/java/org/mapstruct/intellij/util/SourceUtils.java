@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.CommonClassNames;
@@ -43,7 +41,8 @@ public class SourceUtils {
 
     /**
      * Find all source properties for the given {@code method}. If the method has only one source parameter then the
-     * properties of the source class are returned. Otherwise the names of all the source parameters are returned
+     * properties of the source class are returned. Otherwise the names of all the source parameters
+     * and their properties are returned.
      *
      * @param method to be used
      *
@@ -56,9 +55,14 @@ public class SourceUtils {
             return SourceUtils.publicReadAccessors( parameterType ).keySet();
         }
 
-        return Stream.of( sourceParameters )
-            .map( PsiParameter::getName )
-            .collect( Collectors.toSet() );
+        Set<String> sourceProperties = new HashSet<>();
+        for ( PsiParameter sourceParameter : sourceParameters ) {
+            sourceProperties.add( sourceParameter.getName() );
+            PsiType parameterType = SourceUtils.getParameterType( sourceParameter );
+            sourceProperties.addAll( SourceUtils.publicReadAccessors( parameterType ).keySet() );
+        }
+
+        return sourceProperties;
     }
 
     /**
