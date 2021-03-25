@@ -7,13 +7,14 @@ package org.mapstruct.intellij.codeinsight.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mapstruct.intellij.util.MapstructUtilKt;
+import org.jetbrains.uast.ULiteralExpression;
+import org.jetbrains.uast.UMethod;
+import org.jetbrains.uast.UastContextKt;
+import org.jetbrains.uast.UastUtils;
 
 /**
  * Base Reference for MapStruct.
@@ -43,14 +44,16 @@ abstract class BaseReference extends PsiReferenceBase<PsiElement> {
     @Nullable
     PsiMethod getMappingMethod() {
         PsiElement element = getElement();
-        if ( element instanceof PsiLiteral ) {
-            return PsiTreeUtil.getParentOfType( element, PsiMethod.class );
+        ULiteralExpression expression = UastContextKt.toUElement(element, ULiteralExpression.class);
+        if (expression != null) {
+            UMethod parent = UastUtils.getParentOfType(expression, UMethod.class);
+            if (parent != null) {
+                return parent.getJavaPsi();
+            } else {
+                return null;
+            }
+        } else {
+            return null;
         }
-        else if ( "KtStringTemplateExpression".equals( element.getClass().getSimpleName() ) ) {
-            // We cannot do an instanceOf check here because the kotlin class is optional
-            return MapstructUtilKt.getPsiMethod( element );
-        }
-
-        return null;
     }
 }
