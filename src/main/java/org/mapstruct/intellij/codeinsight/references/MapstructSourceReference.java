@@ -106,7 +106,9 @@ class MapstructSourceReference extends MapstructBaseReference {
             return parameterType == null ? LookupElement.EMPTY_ARRAY : getVariantsInternal( parameterType );
         }
 
-        return sourceParameters;
+        return Stream.of( sourceParameters )
+            .map( MapstructUtil::asLookup )
+            .toArray( LookupElement[]::new );
     }
 
     @Nullable

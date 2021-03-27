@@ -17,6 +17,7 @@ import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
 
 /**
@@ -60,7 +61,8 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
 
         return Stream.of( sourceClass.getFields() )
             .filter( psiField -> psiField instanceof PsiEnumConstant )
-            .toArray( PsiField[]::new );
+            .map( psiEnumConstant -> asLookup( (PsiEnumConstant) psiEnumConstant ) )
+            .toArray( LookupElement[]::new );
     }
 
     /**

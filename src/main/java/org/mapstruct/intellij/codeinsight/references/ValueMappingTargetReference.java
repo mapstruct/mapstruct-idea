@@ -18,6 +18,8 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+
 /**
  * Reference for {@link org.mapstruct.ValueMapping#target()}.
  *
@@ -59,7 +61,8 @@ public class ValueMappingTargetReference extends BaseValueMappingReference {
 
         return Stream.of( targetClass.getFields() )
             .filter( psiField -> psiField instanceof PsiEnumConstant )
-            .toArray( PsiField[]::new );
+            .map( psiEnumConstant -> asLookup( (PsiEnumConstant) psiEnumConstant ) )
+            .toArray( LookupElement[]::new );
     }
 
     /**

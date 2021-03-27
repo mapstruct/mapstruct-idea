@@ -24,7 +24,7 @@ public final class TestUtils {
     }
 
     public static LookupElementPresentation createVariable(String lookupString, String typeText) {
-        return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, "" );
+        return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, null );
     }
 
     public static LookupElementPresentation createParameter(String lookupString, String typeText) {

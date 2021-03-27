@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.swing.Icon;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -21,11 +22,13 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.CommonClassNames;
+import com.intellij.psi.EmptySubstitutor;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiEnumConstant;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
@@ -109,7 +112,8 @@ public final class MapstructUtil {
                 lookupElements[index++] = asLookup(
                     propertyName,
                     pair,
-                    typeMapper
+                    typeMapper,
+                    PlatformIcons.VARIABLE_ICON
                 );
             }
             return lookupElements;
@@ -120,13 +124,29 @@ public final class MapstructUtil {
 
     }
 
+    public static LookupElement asLookup(PsiParameter parameter) {
+        return asLookup( parameter.getName(), parameter, PsiParameter::getType, PlatformIcons.PARAMETER_ICON );
+    }
+
+    public static LookupElement asLookup(PsiEnumConstant enumConstant) {
+        return asLookup( enumConstant.getName(), enumConstant, PsiField::getType, PlatformIcons.FIELD_ICON );
+    }
+
+    public static <T extends PsiElement> LookupElement asLookup(String propertyName, @NotNull T psiElement,
+                                                                Function<T, PsiType> typeMapper, Icon icon) {
+        //noinspection unchecked
+        return asLookup( propertyName, Pair.pair( psiElement, EmptySubstitutor.getInstance() ),
+            (Function<PsiElement, PsiType>) typeMapper, icon
+        );
+    }
+
     public static LookupElement asLookup(String propertyName, @NotNull Pair<? extends PsiElement, PsiSubstitutor> pair,
-        Function<PsiElement, PsiType> typeMapper) {
+        Function<PsiElement, PsiType> typeMapper, Icon icon) {
         PsiElement member = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
         LookupElementBuilder builder = LookupElementBuilder.create( member, propertyName )
-            .withIcon( PlatformIcons.VARIABLE_ICON )
+            .withIcon( icon )
             .withPresentableText( propertyName )
             .withTailText( formatTailText( member, substitutor ) );
         final PsiType type = typeMapper.apply( member );
@@ -138,8 +158,9 @@ public final class MapstructUtil {
     }
 
     private static String formatTailText(PsiElement member, PsiSubstitutor substitutor) {
+        String tailText;
         if ( member instanceof PsiMethod ) {
-            return PsiFormatUtil.formatMethod(
+            tailText = PsiFormatUtil.formatMethod(
                 (PsiMethod) member,
                 substitutor,
                 0,
@@ -147,11 +168,13 @@ public final class MapstructUtil {
             );
         }
         else if ( member instanceof PsiVariable ) {
-            return PsiFormatUtil.formatVariable( (PsiVariable) member, 0, substitutor );
+            tailText = PsiFormatUtil.formatVariable( (PsiVariable) member, 0, substitutor );
         }
         else {
-            return "";
+            tailText = "";
         }
+
+        return !tailText.isEmpty() ? tailText : null;
     }
 
     public static boolean isPublic(@NotNull PsiMethod method) {
