@@ -32,7 +32,7 @@ repositories {
 }
 
 intellij {
-    version System.getenv().getOrDefault('IDEA_VERSION', '2020.3.3')
+    version System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
     type ideaType
     downloadSources Boolean.valueOf(sources)
     sameSinceUntilBuild Boolean.valueOf(isEAP)
