@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
-import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.addPhysicalAnnotation;
+import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.addPhysicalAnnotationTo;
 import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.removePhysicalAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
 
@@ -98,7 +98,7 @@ public class MapstructAnnotationUtils {
                                 qualifiedName
                             ) );
 
-                        PsiAnnotation inserted = addPhysicalAnnotation(
+                        PsiAnnotation inserted = addPhysicalAnnotationTo(
                             fqn,
                             attributes,
                             mappingMethod.getModifierList()

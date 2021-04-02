@@ -25,8 +25,8 @@ import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiVariable;
+import com.intellij.psi.util.PsiUtil;
 import com.siyeh.ig.callMatcher.CallMatcher;
-import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
@@ -60,7 +60,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         @Override
         public void visitMethodCallExpression(PsiMethodCallExpression expression) {
             if ( MAPPERS_FACTORY_CALL_MATCHER.test( expression ) ) {
-                PsiExpression argument = ParenthesesUtils.stripParentheses( expression.getArgumentList()
+                PsiExpression argument = PsiUtil.skipParenthesizedExprDown( expression.getArgumentList()
                     .getExpressions()[0] );
                 if ( !( argument instanceof PsiClassObjectAccessExpression ) ) {
                     return;

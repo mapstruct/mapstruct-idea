@@ -549,7 +549,7 @@ public final class MapstructUtil {
      * {@code false} otherwise
      */
     public static boolean isInheritInverseConfiguration(PsiMethod method) {
-        return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION, false );
+        return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION, AnnotationUtil.CHECK_TYPE );
     }
 
 }
