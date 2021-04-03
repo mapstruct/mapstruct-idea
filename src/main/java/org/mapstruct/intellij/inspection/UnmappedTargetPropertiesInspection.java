@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.MapStructBundle;
+import org.mapstruct.intellij.settings.ProjectSettings;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
@@ -241,6 +242,25 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
     }
 
+    private static class UnmappedTargetPropertyFixAnnotationSupplier implements Supplier<Collection<PsiAnnotation>> {
+        private final PsiMethod method;
+        private final String target;
+
+        private UnmappedTargetPropertyFixAnnotationSupplier(PsiMethod method, String target) {
+            this.method = method;
+            this.target = target;
+        }
+
+        @Override
+        public Collection<PsiAnnotation> get() {
+            String annotationText = ProjectSettings.isPreferSourceBeforeTargetInMapping( method.getProject() ) ?
+                "@" + MapstructUtil.MAPPING_ANNOTATION_FQN + "(source = \"\", target = \"" + target + "\")" :
+                "@" + MapstructUtil.MAPPING_ANNOTATION_FQN + "(target = \"" + target + "\", source = \"\")";
+            return Collections.singleton( JavaPsiFacade.getElementFactory( method.getProject() )
+                .createAnnotationFromText( annotationText, null ) );
+        }
+    }
+
     /**
      * Add unmapped property fix. Property fix that adds a {@link org.mapstruct.Mapping} annotation with the
      * given {@code target}
@@ -251,17 +271,12 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
      * @return the Local Quick fix
      */
     private static UnmappedTargetPropertyFix createAddUnmappedTargetPropertyFix(PsiMethod method, String target) {
-        String fqn = MapstructUtil.MAPPING_ANNOTATION_FQN;
-        Supplier<Collection<PsiAnnotation>> annotationSupplier =
-            () -> Collections.singleton( JavaPsiFacade.getElementFactory(
-            method.getProject() )
-            .createAnnotationFromText( "@" + fqn + "(target = \"" + target + "\", source=\"\")", null ) );
         String message = MapStructBundle.message( "inspection.add.unmapped.target.property", target );
         return new UnmappedTargetPropertyFix(
             method,
             message,
             MapStructBundle.message( "intention.add.unmapped.target.property" ),
-            annotationSupplier
+            new UnmappedTargetPropertyFixAnnotationSupplier( method, target )
         );
     }
 

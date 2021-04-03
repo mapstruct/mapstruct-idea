@@ -40,6 +40,12 @@
     <renameHandler implementation="org.mapstruct.intellij.rename.MapstructSourceTargetParameterRenameHandler"/>
     <multiHostInjector implementation="org.mapstruct.intellij.expression.JavaExpressionInjector"/>
 
+    <projectConfigurable groupId="language"
+                         id="preferences.language.MapStruct"
+                         bundle="org.mapstruct.intellij.messages.MapStructBundle"
+                         key="plugin.settings.title"
+                         instance="org.mapstruct.intellij.settings.ProjectSettingsPage"/>
+
     <localInspection language="JAVA"
                      enabledByDefault="true"
                      level="ERROR"
