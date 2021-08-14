@@ -158,7 +158,7 @@ class MapstructTargetReference extends MapstructBaseReference {
      * @return the references for the given {@code psiLiteral}
      */
     static PsiReference[] create(PsiElement psiElement) {
-        return MapstructBaseReference.create( psiElement, MapstructTargetReference::new );
+        return MapstructBaseReference.create( psiElement, MapstructTargetReference::new, true );
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {

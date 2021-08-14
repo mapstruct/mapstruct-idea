@@ -50,6 +50,18 @@ public final class MapstructKotlinElementUtils {
         );
     }
 
+    /**
+     * @param parameterName the name of the parameter in the {@code @BeanMapping} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @BeanMapping} annotation
+     */
+    public static KotlinElementPattern.Capture<? extends PsiElement> beanMappingElementPattern(String parameterName) {
+        return elementPattern(
+            parameterName,
+            MapstructUtil.BEAN_MAPPING_FQN
+        );
+    }
+
     private static KotlinElementPattern.Capture<? extends PsiElement> elementPattern(String parameterName,
         String annotationFQN,
         String annotationHolderFQN
@@ -58,6 +70,16 @@ public final class MapstructKotlinElementUtils {
             .insideRepeatableAnnotationParam(
                 StandardPatterns.string().equalTo( annotationFQN ),
                 StandardPatterns.string().equalTo( annotationHolderFQN ),
+                parameterName
+            );
+    }
+
+    private static KotlinElementPattern.Capture<? extends PsiElement> elementPattern(String parameterName,
+        String annotationFQN
+    ) {
+        return psiElement()
+            .insideAnnotationParam(
+                StandardPatterns.string().equalTo( annotationFQN ),
                 parameterName
             );
     }

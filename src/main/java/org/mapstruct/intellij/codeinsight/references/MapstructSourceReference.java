@@ -131,7 +131,16 @@ class MapstructSourceReference extends MapstructBaseReference {
      * @return the references for the given {@code psiLiteral}
      */
     static PsiReference[] create(PsiElement psiElement) {
-        return MapstructBaseReference.create( psiElement, MapstructSourceReference::new );
+        return MapstructBaseReference.create( psiElement, MapstructSourceReference::new, true );
+    }
+
+    /**
+     * @param psiElement the literal for which references need to be created
+     *
+     * @return the references for the given {@code psiLiteral}
+     */
+    static PsiReference[] createNonNested(PsiElement psiElement) {
+        return MapstructBaseReference.create( psiElement, MapstructSourceReference::new, false );
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {
