@@ -9,6 +9,7 @@ import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import org.jetbrains.annotations.NotNull;
 
+import static org.mapstruct.intellij.util.MapstructKotlinElementUtils.beanMappingElementPattern;
 import static org.mapstruct.intellij.util.MapstructKotlinElementUtils.mappingElementPattern;
 import static org.mapstruct.intellij.util.MapstructKotlinElementUtils.valueMappingElementPattern;
 
@@ -29,6 +30,10 @@ public class MapstructKotlinReferenceContributor extends PsiReferenceContributor
         registrar.registerReferenceProvider(
             mappingElementPattern( "source" ),
             new MappingTargetReferenceProvider( MapstructSourceReference::create )
+        );
+        registrar.registerReferenceProvider(
+            beanMappingElementPattern( "ignoreUnmappedSourceProperties" ),
+            new MappingTargetReferenceProvider( MapstructSourceReference::createNonNested )
         );
         registrar.registerReferenceProvider(
             valueMappingElementPattern( "target" ),

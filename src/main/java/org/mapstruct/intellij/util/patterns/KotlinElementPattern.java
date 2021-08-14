@@ -49,6 +49,20 @@ public class KotlinElementPattern<T extends PsiElement, Self extends KotlinEleme
         );
     }
 
+    public Self insideAnnotationParam(
+        ElementPattern<String> annotationQualifiedName,
+        String parameterName) {
+
+        KtValueArgumentPattern ktValueArgumentPattern = ktValueArgument().withName( parameterName );
+        return withElementType( KtStubElementTypes.STRING_TEMPLATE ).andOr(
+            withAncestor(
+                2,
+                ktValueArgumentPattern
+                    .withSuperParent( 2, ktAnnotation().qName( annotationQualifiedName ) )
+            )
+        );
+    }
+
     public static class Capture<T extends PsiElement> extends KotlinElementPattern<T, KotlinElementPattern.Capture<T>> {
         public Capture(Class<T> aClass) {
             super( aClass );

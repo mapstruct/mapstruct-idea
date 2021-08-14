@@ -145,16 +145,17 @@ abstract class MapstructBaseReference extends BaseReference {
      *
      * @param psiElement the literal that contain
      * @param creator The creator that should be used to create new references
+     * @param supportsNested whether the target value can have nested references
      * @param <T> the type of the reference that needs to be created
      *
      * @return the array of all the references
      */
     static <T extends MapstructBaseReference> PsiReference[] create(PsiElement psiElement,
-        ReferenceCreator<T> creator) {
+        ReferenceCreator<T> creator, boolean supportsNested) {
         ElementManipulator<PsiElement> manipulator = getManipulator( psiElement );
         TextRange rangeInElement = manipulator.getRangeInElement( psiElement );
         String targetValue = rangeInElement.substring( psiElement.getText() );
-        String[] parts = targetValue.split( "\\." );
+        String[] parts = supportsNested ? targetValue.split( "\\." ) : new String[] { targetValue };
         if ( parts.length == 0 ) {
             return PsiReference.EMPTY_ARRAY;
         }

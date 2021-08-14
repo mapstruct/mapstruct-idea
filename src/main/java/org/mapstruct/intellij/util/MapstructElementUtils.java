@@ -60,6 +60,15 @@ public final class MapstructElementUtils {
         return elementPattern( parameterName, MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
     }
 
+    /**
+     * @param parameterName the name of the parameter in the {@code @BeanMapping} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @BeanMapping} annotation
+     */
+    public static PsiJavaElementPattern.Capture<PsiElement> beanMappingElementPattern(String parameterName) {
+        return elementPattern( parameterName, MapstructUtil.BEAN_MAPPING_FQN );
+    }
+
     private static PsiJavaElementPattern.Capture<PsiElement> elementPattern(String parameterName,
         String annotationFQN) {
         return psiElement()
