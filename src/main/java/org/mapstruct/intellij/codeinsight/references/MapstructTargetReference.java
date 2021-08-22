@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
+import org.mapstruct.intellij.util.TargetType;
 import org.mapstruct.intellij.util.TargetUtils;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
@@ -59,15 +60,16 @@ class MapstructTargetReference extends MapstructBaseReference {
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, PsiType> pair = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        Pair<PsiClass, TargetType> pair = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( pair == null ) {
             return null;
         }
 
         PsiClass psiClass = pair.getFirst();
-        PsiType typeToUse = pair.getSecond();
+        TargetType targetType = pair.getSecond();
+        PsiType typeToUse = targetType.type();
 
-        if ( mapStructVersion.isConstructorSupported() ) {
+        if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
             PsiMethod constructor = TargetUtils.resolveMappingConstructor( psiClass );
             if ( constructor != null && constructor.hasParameters() ) {
                 for ( PsiParameter parameter : constructor.getParameterList().getParameters() ) {
