@@ -31,6 +31,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
+import static org.mapstruct.intellij.util.TargetUtils.isBuilderEnabled;
 import static org.mapstruct.intellij.util.TargetUtils.publicWriteAccessors;
 import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
 
@@ -60,7 +61,10 @@ class MapstructTargetReference extends MapstructBaseReference {
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, TargetType> pair = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        Pair<PsiClass, TargetType> pair = resolveBuilderOrSelfClass(
+            psiType,
+            builderSupportPresent && isBuilderEnabled( getMappingMethod() )
+        );
         if ( pair == null ) {
             return null;
         }
@@ -128,7 +132,7 @@ class MapstructTargetReference extends MapstructBaseReference {
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
         return asLookup(
-            publicWriteAccessors( psiType, mapStructVersion ),
+            publicWriteAccessors( psiType, mapStructVersion, getMappingMethod() ),
             MapstructTargetReference::memberPsiType
         );
     }
