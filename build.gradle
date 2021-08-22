@@ -2,9 +2,9 @@ import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
 
 plugins {
-    id "org.jetbrains.intellij" version "0.4.21"
+    id "org.jetbrains.intellij" version "1.1.4"
     id "com.github.hierynomus.license" version "0.14.0"
-    id "de.undercouch.download" version "4.0.4"
+    id "de.undercouch.download" version "4.1.2"
     id 'org.jetbrains.kotlin.jvm' version '1.4.31'
 }
 
@@ -26,26 +26,18 @@ targetCompatibility = 1.8
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url 'https://dl.bintray.com/jetbrains/intellij-plugin-service'
-    }
 }
 
 intellij {
-    version System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
-    type ideaType
-    downloadSources Boolean.valueOf(sources)
-    sameSinceUntilBuild Boolean.valueOf(isEAP)
-    alternativeIdePath idePath
-    updateSinceUntilBuild false
-    pluginName 'MapStruct-Intellij-Plugin'
+    version = System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
+    type = ideaType
+    downloadSources = Boolean.valueOf(sources)
+    sameSinceUntilBuild = Boolean.valueOf(isEAP)
+    updateSinceUntilBuild = false
+    pluginName = 'MapStruct-Intellij-Plugin'
     // The properties plugin is needed because Kotlin uses it
     // and for some reason plugins does not transitively pull itx
-    if ( !(version.startsWith('2018') || version.startsWith('2019.1'))) {
-        plugins = ['java', 'Kotlin', 'properties']
-    } else {
-        plugins = ['Kotlin', 'properties']
-    }
+    plugins = ['java', 'Kotlin', 'properties']
 }
 
 compileKotlin {
