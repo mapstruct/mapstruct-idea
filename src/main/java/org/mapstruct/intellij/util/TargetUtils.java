@@ -90,7 +90,7 @@ public class TargetUtils {
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         MapStructVersion mapStructVersion) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( classAndType == null ) {
             return Collections.emptyMap();
         }
@@ -98,12 +98,13 @@ public class TargetUtils {
         Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors = new LinkedHashMap<>();
 
         PsiClass psiClass = classAndType.getFirst();
-        PsiType typeToUse = classAndType.getSecond();
+        TargetType targetType = classAndType.getSecond();
+        PsiType typeToUse = targetType.type();
 
         publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
         publicWriteAccessors.putAll( publicFields( psiClass ) );
 
-        if ( mapStructVersion.isConstructorSupported() ) {
+        if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
             publicWriteAccessors.putAll( constructorParameters( psiClass ) );
         }
 
@@ -195,6 +196,9 @@ public class TargetUtils {
         Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new LinkedHashMap<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
+            if ( method.isConstructor() ) {
+                continue;
+            }
             String propertyName = extractPublicSetterPropertyName( method, typeToUse, builderSupportPresent );
 
             if ( propertyName != null &&
@@ -253,26 +257,26 @@ public class TargetUtils {
      *
      * @return the pair containing the {@link PsiClass} and the corresponding {@link PsiType}
      */
-    public static Pair<PsiClass, PsiType> resolveBuilderOrSelfClass(@NotNull PsiType psiType,
+    public static Pair<PsiClass, TargetType> resolveBuilderOrSelfClass(@NotNull PsiType psiType,
         boolean builderSupportPresent) {
         PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
         if ( psiClass == null ) {
             return null;
         }
-        PsiType typeToUse = psiType;
+        TargetType targetType = TargetType.defaultType( psiType );
 
         if ( builderSupportPresent ) {
             for ( PsiMethod classMethod : psiClass.getMethods() ) {
-                if ( MapstructUtil.isPossibleBuilderCreationMethod( classMethod, typeToUse ) &&
+                if ( MapstructUtil.isPossibleBuilderCreationMethod( classMethod, targetType.type() ) &&
                     hasBuildMethod( classMethod.getReturnType(), psiType ) ) {
-                    typeToUse = classMethod.getReturnType();
+                    targetType = TargetType.builder( classMethod.getReturnType() );
                     break;
                 }
             }
         }
 
-        psiClass = PsiUtil.resolveClassInType( typeToUse );
-        return psiClass == null ? null : Pair.createNonNull( psiClass, typeToUse );
+        psiClass = PsiUtil.resolveClassInType( targetType.type() );
+        return psiClass == null ? null : Pair.createNonNull( psiClass, targetType );
     }
 
     /**

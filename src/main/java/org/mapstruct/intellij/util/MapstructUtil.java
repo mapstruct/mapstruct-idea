@@ -44,6 +44,7 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiFormatUtil;
 import com.intellij.psi.util.PsiFormatUtilBase;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.psi.util.TypeConversionUtil;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
@@ -206,7 +207,10 @@ public final class MapstructUtil {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
-            TypeConversionUtil.isAssignable( method.getReturnType(), psiType );
+            TypeConversionUtil.isAssignable(
+                PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( method.getReturnType() ),
+                psiType
+            );
     }
 
     private static boolean isAdderWithUpperCase4thCharacter(@NotNull PsiMethod method) {

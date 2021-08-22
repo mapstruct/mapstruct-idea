@@ -919,4 +919,37 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testMapperWithBuilderWithSingleConstructor() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "address",
+                "city"
+            );
+    }
+
+    public void testMapperWithBuilderWithMultipleConstructors() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "address",
+                "city"
+            );
+    }
+
+    public void testMapperWithGenericBuilder() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "address",
+                "city"
+            );
+    }
+
 }
