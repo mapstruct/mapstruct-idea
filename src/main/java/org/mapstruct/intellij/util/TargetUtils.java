@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -22,11 +23,13 @@ import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
@@ -36,6 +39,8 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
+import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
@@ -84,13 +89,17 @@ public class TargetUtils {
      *
      * @param psiType to use to extract the accessors
      * @param mapStructVersion the MapStruct project version
+     * @param mappingMethod the mapping method
      *
      * @return a stream that holds all public write accessors for the given {@code psiType}
      */
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
-        MapStructVersion mapStructVersion) {
+        MapStructVersion mapStructVersion, PsiMethod mappingMethod) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass(
+            psiType,
+            builderSupportPresent && isBuilderEnabled( mappingMethod )
+        );
         if ( classAndType == null ) {
             return Collections.emptyMap();
         }
@@ -109,6 +118,60 @@ public class TargetUtils {
         }
 
         return publicWriteAccessors;
+    }
+
+    /**
+     * Whether builder is enabled for the mapping method with the mapstruct version
+     *
+     * @param mapStructVersion the MapStruct project version
+     * @param mappingMethod the mapping method
+     *
+     * @return {@code true} if builder can be used for the mapping method
+     */
+
+    public static boolean isBuilderEnabled(MapStructVersion mapStructVersion, PsiMethod mappingMethod) {
+        if ( mapStructVersion.isBuilderSupported() ) {
+            return isBuilderEnabled( mappingMethod );
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether builder is enabled for the mapping method
+     *
+     * @param mappingMethod the mapping method
+     *
+     * @return {@code true} if builder can be used for the mapping method
+     */
+    public static boolean isBuilderEnabled(@Nullable PsiMethod mappingMethod) {
+        Optional<Boolean> disableBuilder = findDisableBuilder( mappingMethod, MapstructUtil.BEAN_MAPPING_FQN );
+
+        if ( !disableBuilder.isPresent() && mappingMethod != null ) {
+            disableBuilder = findDisableBuilder(
+                mappingMethod.getContainingClass(),
+                MapstructUtil.MAPPER_ANNOTATION_FQN
+            );
+        }
+
+        return !disableBuilder.orElse( false );
+    }
+
+    private static Optional<Boolean> findDisableBuilder(@Nullable PsiModifierListOwner listOwner,
+                                                        String annotationName) {
+        PsiAnnotation requestedAnnotation = findAnnotation( listOwner, true, annotationName );
+        if ( requestedAnnotation != null ) {
+            PsiNameValuePair builderAttribute = AnnotationUtil.findDeclaredAttribute( requestedAnnotation, "builder" );
+            if ( builderAttribute != null ) {
+                PsiAnnotationMemberValue builderValue = builderAttribute.getValue();
+                if ( builderValue instanceof PsiAnnotation ) {
+                    Boolean disableBuilder = getBooleanAttributeValue( (PsiAnnotation) builderValue, "disableBuilder" );
+                    return Optional.ofNullable( disableBuilder );
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     private static Map<String, Pair<PsiParameter, PsiSubstitutor>> constructorParameters(@NotNull PsiClass psiClass) {
@@ -253,19 +316,19 @@ public class TargetUtils {
      * Resolve the builder or self class for the {@code psiType}.
      *
      * @param psiType the type for which the {@link PsiClass} needs to be resolved
-     * @param builderSupportPresent whether MapStruct (1.3) with builder support is present
+     * @param builderEnabled whether MapStruct (1.3) with builder support is present
      *
      * @return the pair containing the {@link PsiClass} and the corresponding {@link PsiType}
      */
     public static Pair<PsiClass, TargetType> resolveBuilderOrSelfClass(@NotNull PsiType psiType,
-        boolean builderSupportPresent) {
+                                                                       boolean builderEnabled) {
         PsiClass psiClass = PsiUtil.resolveClassInType( psiType );
         if ( psiClass == null ) {
             return null;
         }
         TargetType targetType = TargetType.defaultType( psiType );
 
-        if ( builderSupportPresent ) {
+        if ( builderEnabled ) {
             for ( PsiMethod classMethod : psiClass.getMethods() ) {
                 if ( MapstructUtil.isPossibleBuilderCreationMethod( classMethod, targetType.type() ) &&
                     hasBuildMethod( classMethod.getReturnType(), psiType ) ) {
@@ -357,7 +420,8 @@ public class TargetUtils {
      *
      * @return all target properties for the given {@code targetClass}
      */
-    public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, MapStructVersion mapStructVersion) {
-        return publicWriteAccessors( targetType, mapStructVersion ).keySet();
+    public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, MapStructVersion mapStructVersion,
+                                                      PsiMethod mappingMethod) {
+        return publicWriteAccessors( targetType, mapStructVersion, mappingMethod ).keySet();
     }
 }
