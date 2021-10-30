@@ -85,7 +85,12 @@ licenseFormat.dependsOn licenseFormatForKotlin
 licenseTest.dependsOn licenseTestData
 
 checkstyle {
-//    configFile file( new File(new URL("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml").toURI( ) ) )
+    toolVersion '8.36.1'
+    config resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
+    configProperties = [
+            'checkstyle.cache.file': rootProject.buildDir.toPath().resolve('checkstyle-cachefile').toString(),
+            'basedir': 'https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config',
+    ]
 }
 
 jacoco {
