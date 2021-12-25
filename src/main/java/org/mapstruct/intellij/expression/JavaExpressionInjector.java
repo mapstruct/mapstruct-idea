@@ -254,7 +254,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
                     ).collect( Collectors.joining() ),
                     ";\n    }\n}",
                     (PsiLanguageInjectionHost) context,
-                    new TextRange( 6, context.getTextRange().getLength() - 2 )
+                    new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
                 )
                 .doneInjecting();
         }
