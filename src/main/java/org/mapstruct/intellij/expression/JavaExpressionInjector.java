@@ -12,7 +12,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.lang.injection.MultiHostInjector;
@@ -259,8 +258,8 @@ public class JavaExpressionInjector implements MultiHostInjector {
 
             registrar.startInjecting( JavaLanguage.INSTANCE )
                 .addPlace(
-                    imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining("\n", "", "\n"))
-                    + prefixBuilder,
+                    imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining( "\n", "", "\n" ) )
+                        + prefixBuilder,
                     ";\n    }\n}",
                     (PsiLanguageInjectionHost) context,
                     new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
