@@ -208,7 +208,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
             appendClassImpl( prefixBuilder, imports, mapperClass );
             prefixBuilder.append( "\n" );
             appendNesting( prefixBuilder, 1 );
-            prefixBuilder.append( "implements " );
+            prefixBuilder.append( mapperClass.isInterface() ? "implements " : "extends " );
             appendClassSimple( prefixBuilder, imports, mapperClass );
             prefixBuilder.append( " {\n\n" );
             appendNesting( prefixBuilder, 1 );
