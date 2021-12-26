@@ -24,6 +24,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiAnnotationParameterList;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
@@ -250,6 +251,14 @@ public class JavaExpressionInjector implements MultiHostInjector {
 
                             if ( importValue instanceof PsiJavaCodeReferenceElement ) {
                                 imports.add( ( (PsiJavaCodeReferenceElement) importValue ).getQualifiedName() );
+                            }
+                            else if ( importValue instanceof PsiClassObjectAccessExpression ) {
+                                PsiJavaCodeReferenceElement referenceElement =
+                                    ( (PsiClassObjectAccessExpression) importValue ).getOperand()
+                                        .getInnermostComponentReferenceElement();
+                                if ( referenceElement != null ) {
+                                    imports.add( referenceElement.getQualifiedName() );
+                                }
                             }
                         }
                     }
