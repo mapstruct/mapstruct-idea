@@ -39,6 +39,102 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "    CarDto carToCarDto(Car car);\n" +
         "}";
 
+    private static final String CAR_MAPPER_FROM_WRAPPER = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "import org.example.dto.Wrapper;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    CarDto carWrapperToCarDto(Wrapper<Car> carWrapper);\n" +
+        "}";
+
+    private static final String CAR_MAPPER_FROM_NUMBER_WRAPPER = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "import org.example.dto.NumberWrapper;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    <T extends Number> CarDto numberWrapperToCarDto(NumberWrapper<T> numberWrapper);\n" +
+        "}";
+
+    private static final String CAR_MAPPER_FROM_WRAPPER_WITH_ANNOTATION = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Context;\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "import org.example.dto.Wrapper;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    CarDto carWrapperToCarDto(@Context Wrapper<Car> carWrapper);\n" +
+        "}";
+
+    private static final String CAR_MAPPER_FROM_WRAPPER_WITH_MULTI_GENERICS = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "import org.example.dto.Wrapper;\n" +
+        "import java.util.function.BiFunction;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    CarDto carWrapperToCarDto(Wrapper<BiFunction<String, Number, Car>> carWrapper);\n" +
+        "}";
+
+    private static final String CAR_MAPPER_MULTI_SOURCE = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    CarDto carToCarDto(Car car, String make);\n" +
+        "}";
+
+    private static final String GENERIC_MAPPER = "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "\n" +
+        "@Mapper(%s)\n" +
+        "public interface CarMapper<T, R> {\n" +
+        "\n" +
+        "    %s" +
+        "    CarDto carToCarDto(Car car, String make);\n" +
+        "}";
+
     @Override
     protected String getTestDataPath() {
         return "testData/expression";
@@ -75,11 +171,11 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     }
 
     public void testExpressionWithoutJavaExpression() {
-        withoutJavaExpresion( "expression" );
-        withoutJavaExpresion( "defaultExpression" );
+        withoutJavaExpression( "expression" );
+        withoutJavaExpression( "defaultExpression" );
     }
 
-    protected void withoutJavaExpresion(String attribute) {
+    protected void withoutJavaExpression(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"car<caret>\")\n";
         @Language("java")
         String mapper = String.format( CAR_MAPPER, "", mapping );
@@ -220,6 +316,206 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         PsiReference[] references = ReferenceProvidersRegistry.getReferencesFromProviders( elementAt );
         assertThat( references ).isEmpty();
 
+    }
+
+    public void testExpressionWithMultiSourceParameters() {
+        withMultiSourceParameters( "expression" );
+        withMultiSourceParameters( "defaultExpression" );
+    }
+
+    protected void withMultiSourceParameters(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER_MULTI_SOURCE, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithGenericSourceParameters() {
+        withGenericSourceParameters( "expression" );
+        withGenericSourceParameters( "defaultExpression" );
+    }
+
+    protected void withGenericSourceParameters(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(carWrapper.getValue().<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER_FROM_WRAPPER, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithSourceParameterWithAnnotations() {
+        withExpressionWithSourceParameterWithAnnotations( "expression" );
+        withExpressionWithSourceParameterWithAnnotations( "defaultExpression" );
+    }
+
+    protected void withExpressionWithSourceParameterWithAnnotations(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(carWrapper.getValue().<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER_FROM_WRAPPER_WITH_ANNOTATION, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithSourceParameterWithMultipleGenerics() {
+        withExpressionWithSourceParameterWithMultipleGenerics( "expression" );
+        withExpressionWithSourceParameterWithMultipleGenerics( "defaultExpression" );
+    }
+
+    protected void withExpressionWithSourceParameterWithMultipleGenerics(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(carWrapper.getValue().apply(null, null).<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER_FROM_WRAPPER_WITH_MULTI_GENERICS, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithGenericMethod() {
+        withExpressionWithGenericMethod( "expression" );
+        withExpressionWithGenericMethod( "defaultExpression" );
+    }
+
+    protected void withExpressionWithGenericMethod(String attribute) {
+        String mapping = "@Mapping(target = \"seatCount\", " + attribute + " = \"java(numberWrapper.<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( CAR_MAPPER_FROM_NUMBER_WRAPPER, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getValue"
+            );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithGenericMapper() {
+        withGenericMapper( "expression" );
+        withGenericMapper( "defaultExpression" );
+    }
+
+    protected void withGenericMapper(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
+        @Language("java")
+        String mapper = String.format( GENERIC_MAPPER, "", mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
     }
 
     private PsiFile configureMapperByText(@Language("java") String text) {

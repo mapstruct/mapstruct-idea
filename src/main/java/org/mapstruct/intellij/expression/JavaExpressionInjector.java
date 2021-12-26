@@ -116,12 +116,12 @@ public class JavaExpressionInjector implements MultiHostInjector {
         if ( typeParameters.length == 0 ) {
             return false;
         }
-        sb.append( "<\n" );
+        sb.append( "<" );
         for ( int i = 0; i < typeParameters.length; ++i ) {
             if ( i != 0 ) {
-                sb.append( ",\n" );
+                sb.append( ", " );
             }
-            sb.append( "        " ).append( typeParameters[i].getName() );
+            sb.append( typeParameters[i].getName() );
             PsiClassType[] ext = typeParameters[i].getExtendsListTypes();
             if ( ext.length == 0 ) {
                 continue;
@@ -134,8 +134,14 @@ public class JavaExpressionInjector implements MultiHostInjector {
                 appendType( sb, imports, ext[j] );
             }
         }
-        sb.append( ">\n" );
+        sb.append( ">" );
         return true;
+    }
+
+    private void appendNesting(StringBuilder sb, int level) {
+        for ( int i = 0; i < level; i++ ) {
+            sb.append( "    " );
+        }
     }
 
     @Override
@@ -198,13 +204,17 @@ public class JavaExpressionInjector implements MultiHostInjector {
             SortedSet<String> imports = new TreeSet<>();
             StringBuilder prefixBuilder = new StringBuilder();
 
-            prefixBuilder.append( "\n@SuppressWarnings(\"unused\") abstract class " );
+            prefixBuilder.append( "\n@SuppressWarnings(\"unused\")" );
+            prefixBuilder.append( "\nabstract class " );
             appendClassImpl( prefixBuilder, imports, mapperClass );
-            prefixBuilder.append( "    implements " );
+            prefixBuilder.append( "\n" );
+            appendNesting( prefixBuilder, 1 );
+            prefixBuilder.append( "implements " );
             appendClassSimple( prefixBuilder, imports, mapperClass );
-            prefixBuilder.append( "\n{\n    @SuppressWarnings(\"unused\") " );
+            prefixBuilder.append( " {\n\n" );
+            appendNesting( prefixBuilder, 1 );
             if ( appendTypeParametersHard( prefixBuilder, imports, method.getTypeParameters() ) ) {
-                prefixBuilder.append( "    " );
+                prefixBuilder.append( " " );
             }
             prefixBuilder.append( "void __test__(\n" );
 
@@ -217,19 +227,20 @@ public class JavaExpressionInjector implements MultiHostInjector {
                 PsiParameter parameter = parameters[i];
                 PsiType parameterType = parameter.getType();
                 for ( PsiAnnotation a : parameter.getAnnotations() ) {
-                    if ( SuppressWarnings.class.getName().equals( a.getQualifiedName() ) ) {
-                        continue;
-                    }
-                    prefixBuilder.append( "        " ).append( a.getText() ).append( "\n" );
+                    appendNesting( prefixBuilder, 2 );
+                    prefixBuilder.append( a.getText() ).append( "\n" );
                 }
-                prefixBuilder.append( "        @SuppressWarnings(\"unused\") " );
+                appendNesting( prefixBuilder, 2 );
                 appendType( prefixBuilder, imports, parameterType );
                 prefixBuilder.append( " " ).append( parameter.getName() );
             }
 
-            prefixBuilder.append( ")\n    {\n        @SuppressWarnings(\"unused\") " );
+            prefixBuilder.append( "\n" );
+            appendNesting( prefixBuilder, 1 );
+            prefixBuilder.append( ") {\n" );
+            appendNesting( prefixBuilder, 2 );
             appendType( prefixBuilder, imports, targetType );
-            prefixBuilder.append( " __target__ =\n            " );
+            prefixBuilder.append( " __target__ = " );
 
             PsiAnnotation mapper = mapperClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
             if ( mapper != null ) {
@@ -248,10 +259,8 @@ public class JavaExpressionInjector implements MultiHostInjector {
 
             registrar.startInjecting( JavaLanguage.INSTANCE )
                 .addPlace(
-                    Stream.concat(
-                        imports.stream().map( imp -> String.format( "import %s;\n", imp ) ),
-                        Stream.of( prefixBuilder.toString() )
-                    ).collect( Collectors.joining() ),
+                    imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining("\n", "", "\n"))
+                    + prefixBuilder,
                     ";\n    }\n}",
                     (PsiLanguageInjectionHost) context,
                     new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
