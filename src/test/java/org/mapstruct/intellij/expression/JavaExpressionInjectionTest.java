@@ -5,6 +5,9 @@
  */
 package org.mapstruct.intellij.expression;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.ide.highlighter.JavaFileType;
@@ -14,20 +17,24 @@ import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiJavaToken;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.intellij.lang.annotations.Language;
 import org.mapstruct.intellij.MapstructBaseCompletionTestCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mapstruct.intellij.testutil.TestUtils.MAPPER;
-import static org.mapstruct.intellij.testutil.TestUtils.MAPPING;
-import static org.mapstruct.intellij.testutil.TestUtils.X_MAPPER_X;
-import static org.mapstruct.intellij.testutil.TestUtils.X_MAPPING_X;
-import static org.mapstruct.intellij.testutil.TestUtils.advancedFormat;
 
 /**
  * @author Filip Hrisafov
  */
 public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase {
+
+    private static final String PREFIX = "/*{";
+    private static final String SUFFIX = "}*/";
+    private static final String MAPPER_PARAM_NAME = "mapper";
+    private static final String MAPPER = PREFIX + MAPPER_PARAM_NAME + SUFFIX;
+    private static final String MAPPING_PARAM_NAME = "mapping";
+    private static final String MAPPING = PREFIX + MAPPING_PARAM_NAME + SUFFIX;
 
     @Language("java")
     private static final String CAR_MAPPER = "" +
@@ -39,10 +46,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.CarDto;\n" +
         "import org.example.dto.Car;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carToCarDto(Car car);\n" +
         "}";
 
@@ -57,10 +64,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.Car;\n" +
         "import org.example.dto.Wrapper;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carWrapperToCarDto(Wrapper<Car> carWrapper);\n" +
         "}";
 
@@ -75,10 +82,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.Car;\n" +
         "import org.example.dto.NumberWrapper;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    <T extends Number> CarDto numberWrapperToCarDto(NumberWrapper<T> numberWrapper);\n" +
         "}";
 
@@ -94,10 +101,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.Car;\n" +
         "import org.example.dto.Wrapper;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carWrapperToCarDto(@Context Wrapper<Car> carWrapper);\n" +
         "}";
 
@@ -113,10 +120,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.Wrapper;\n" +
         "import java.util.function.BiFunction;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carWrapperToCarDto(Wrapper<BiFunction<String, Number, Car>> carWrapper);\n" +
         "}";
 
@@ -130,10 +137,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.CarDto;\n" +
         "import org.example.dto.Car;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carToCarDto(Car car, String make);\n" +
         "}";
 
@@ -147,10 +154,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "import org.example.dto.CarDto;\n" +
         "import org.example.dto.Car;\n" +
         "\n" +
-        "@Mapper(" + X_MAPPER_X + ")\n" +
+        "@Mapper(" + MAPPER + ")\n" +
         "public interface CarMapper<T, R> {\n" +
         "\n" +
-        "    " + X_MAPPING_X + "\n" +
+        "    " + MAPPING + "\n" +
         "    CarDto carToCarDto(Car car, String make);\n" +
         "}";
 
@@ -174,7 +181,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void noTargetDefinedMapper(String attribute) {
         String mapping = "@Mapping(target = \"\", " + attribute + " = \"java(car.<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -197,7 +204,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withoutJavaExpression(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"car<caret>\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
@@ -215,7 +222,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withTargetDefinedMapper(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -252,7 +259,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n" +
             ")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -287,10 +294,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withMapperWithImports(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(Collections<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER,
-            MAPPER, "imports = Collections.class",
-            MAPPING, mapping
-        );
+        String mapper = formatMapper( CAR_MAPPER, mapping, "imports = Collections.class" );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -319,7 +323,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withMapperWithoutImports(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(Collections<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -348,7 +352,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withMultiSourceParameters(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER_MULTI_SOURCE, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER_MULTI_SOURCE, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -384,7 +388,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapping =
             "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(carWrapper.getValue().<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER_FROM_WRAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -420,7 +424,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapping =
             "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(carWrapper.getValue().<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER_FROM_WRAPPER_WITH_ANNOTATION, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER_WITH_ANNOTATION, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -456,7 +460,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute +
             " = \"java(carWrapper.getValue().apply(null, null).<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER_FROM_WRAPPER_WITH_MULTI_GENERICS, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER_WITH_MULTI_GENERICS, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -491,7 +495,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withExpressionWithGenericMethod(String attribute) {
         String mapping = "@Mapping(target = \"seatCount\", " + attribute + " = \"java(numberWrapper.<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( CAR_MAPPER_FROM_NUMBER_WRAPPER, MAPPING, mapping );
+        String mapper = formatMapper( CAR_MAPPER_FROM_NUMBER_WRAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -516,7 +520,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     protected void withGenericMapper(String attribute) {
         String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
         @Language("java")
-        String mapper = advancedFormat( GENERIC_MAPPER, MAPPING, mapping );
+        String mapper = formatMapper( GENERIC_MAPPER, mapping );
         PsiFile file = configureMapperByText( mapper );
 
         assertThat( myFixture.completeBasic() )
@@ -545,5 +549,16 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
 
     private PsiFile configureMapperByText(@Language("java") String text) {
         return myFixture.configureByText( JavaFileType.INSTANCE, text );
+    }
+
+    private static String formatMapper(String mapperTemplate, String mapping) {
+        return formatMapper( mapperTemplate, mapping, "" );
+    }
+
+    private static String formatMapper(String mapperTemplate, String mapping, String mapper) {
+        Map<String, String> map = new TreeMap<>();
+        map.put( MAPPING_PARAM_NAME, StringUtils.defaultIfEmpty( mapping, "" ) );
+        map.put( MAPPER_PARAM_NAME, StringUtils.defaultIfEmpty( mapper, "" ) );
+        return new StringSubstitutor( map, PREFIX, SUFFIX ).replace( mapperTemplate );
     }
 }
