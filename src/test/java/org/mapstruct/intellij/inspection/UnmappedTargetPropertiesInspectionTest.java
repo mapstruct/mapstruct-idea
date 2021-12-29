@@ -65,6 +65,8 @@ public class UnmappedTargetPropertiesInspectionTest extends BaseInspectionTest {
                 "Ignore unmapped target property: 'testName'",
                 "Add unmapped target property: 'testName'",
                 "Ignore unmapped target property: 'moreTarget'",
+                "Add unmapped target property: 'moreTarget'",
+                "Ignore unmapped target property: 'moreTarget'",
                 "Add unmapped target property: 'moreTarget'"
             );
 

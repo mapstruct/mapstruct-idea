@@ -567,6 +567,41 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "}" );
     }
 
+    public void testExpressionWithTargetUsingStaticString() {
+        withTargetUsingStaticString( "expression" );
+        withTargetUsingStaticString( "defaultExpression" );
+    }
+
+    protected void withTargetUsingStaticString(String attribute) {
+        configureMapperByText(
+            "import org.mapstruct.Mapper;\n" +
+            "import org.mapstruct.Mapping;\n" +
+            "import org.example.dto.CarDto;\n" +
+            "import org.example.dto.Car;\n" +
+            "import org.example.dto.Utils;\n" +
+            "\n" +
+            "@Mapper\n" +
+            "public abstract class CarMapper {\n" +
+            "\n" +
+            "    @Mapping( target = Utils.MANUFACTURING_YEAR, " + attribute + " = \"java(car.<caret>)\")\n" +
+            "    CarDto carToCarDto(Car car);\n" +
+            "}" );
+
+        assertJavaFragment( "import CarMapper;\n" +
+            "import org.example.dto.Car;\n" +
+            "\n" +
+            "@SuppressWarnings(\"unused\")\n" +
+            "abstract class CarMapperImpl\n" +
+            "    extends CarMapper {\n" +
+            "\n" +
+            "    void __test__(\n" +
+            "        Car car\n" +
+            "    ) {\n" +
+            "        String __target__ = car.;\n" +
+            "    }\n" +
+            "}" );
+    }
+
     private PsiFile configureMapperByText(@Language("java") String text) {
         return myFixture.configureByText( JavaFileType.INSTANCE, text );
     }
