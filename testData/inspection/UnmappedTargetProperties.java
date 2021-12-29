@@ -81,3 +81,12 @@ interface MultiSourceUpdateMapper {
 
     void <warning descr="Unmapped target property: moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
 }
+
+@Mapper
+interface SingleMappingConstantReferenceMapper {
+
+    String TEST_NAME = "testName";
+
+    @Mapping(target = TEST_NAME, source = "name")
+    Target <warning descr="Unmapped target property: moreTarget">map</warning>(Source source);
+}

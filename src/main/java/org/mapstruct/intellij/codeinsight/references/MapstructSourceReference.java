@@ -41,10 +41,11 @@ class MapstructSourceReference extends MapstructBaseReference {
      * @param element the element that the reference belongs to
      * @param previousReference the previous reference if there is one (in nested properties for example)
      * @param rangeInElement the range that the reference represent in the {@code element}
+     * @param value the matched value (useful when {@code rangeInElement} is empty)
      */
     private MapstructSourceReference(PsiElement element, MapstructSourceReference previousReference,
-        TextRange rangeInElement) {
-        super( element, previousReference, rangeInElement );
+        TextRange rangeInElement, String value) {
+        super( element, previousReference, rangeInElement, value );
     }
 
     @Override

@@ -111,3 +111,16 @@ interface MultiSourceUpdateMapper {
     })
     void update(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
 }
+
+@Mapper
+interface SingleMappingConstantReferenceMapper {
+
+    String TEST_NAME = "testName";
+
+    @Mappings({
+            @Mapping(target = TEST_NAME, source = "name"),
+            @Mapping(target = "moreTarget", ignore = true),
+            @Mapping(target = "moreTarget", source = "")
+    })
+    Target map(Source source);
+}

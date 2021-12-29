@@ -7,4 +7,6 @@ package org.example.dto;
 
 public class Utils {
 
+    public static final String MANUFACTURING_YEAR = "manufacturingYear";
+
 }

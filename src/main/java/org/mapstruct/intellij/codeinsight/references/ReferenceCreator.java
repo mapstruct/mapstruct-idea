@@ -24,8 +24,9 @@ interface ReferenceCreator<T extends MapstructBaseReference> {
      * @param psiElement the element that the reference belongs to
      * @param previousReference the previous reference if there is one (in nested properties for example)
      * @param rangeInElement the range that the reference represent in the {@code psiLiteral}
+     * @param value the value that was matched
      *
      * @return a new reference created from the provided parameters
      */
-    T create(PsiElement psiElement, T previousReference, TextRange rangeInElement);
+    T create(PsiElement psiElement, T previousReference, TextRange rangeInElement, String value);
 }

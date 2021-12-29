@@ -5,14 +5,19 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.function.Function;
+
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +33,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 abstract class MapstructBaseReference extends BaseReference {
 
     private final MapstructBaseReference previous;
+    private final String value;
 
     /**
      * Create a reference.
@@ -37,9 +43,19 @@ abstract class MapstructBaseReference extends BaseReference {
      * @param rangeInElement the range in the {@code element} for which this reference is valid
      */
     MapstructBaseReference(@NotNull PsiElement element,
-        @Nullable MapstructBaseReference previous, TextRange rangeInElement) {
+        @Nullable MapstructBaseReference previous, TextRange rangeInElement, String value) {
         super( element, rangeInElement );
         this.previous = previous;
+        this.value = value;
+    }
+
+    @Override
+    @NotNull
+    public String getValue() {
+        if ( value != null ) {
+            return value;
+        }
+        return super.getValue();
     }
 
     @Nullable
@@ -152,30 +168,74 @@ abstract class MapstructBaseReference extends BaseReference {
      */
     static <T extends MapstructBaseReference> PsiReference[] create(PsiElement psiElement,
         ReferenceCreator<T> creator, boolean supportsNested) {
-        ElementManipulator<PsiElement> manipulator = getManipulator( psiElement );
-        TextRange rangeInElement = manipulator.getRangeInElement( psiElement );
-        String targetValue = rangeInElement.substring( psiElement.getText() );
+        String targetValue;
+        Function<String, TextRange> rangeCreator;
+        if ( psiElement instanceof PsiReferenceExpression ) {
+            PsiElement resolvedPsiElement = ( (PsiReferenceExpression) psiElement ).resolve();
+
+            PsiLiteralExpression expression = PsiTreeUtil.findChildOfType(
+                resolvedPsiElement,
+                PsiLiteralExpression.class
+            );
+
+            if ( expression == null ) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+
+            ElementManipulator<PsiElement> manipulator = getManipulator( expression );
+            TextRange rangeInElement = manipulator.getRangeInElement( expression );
+            targetValue = rangeInElement.substring( expression.getText() );
+            rangeCreator = part -> TextRange.EMPTY_RANGE;
+
+        }
+        else {
+            ElementManipulator<PsiElement> manipulator = getManipulator( psiElement );
+            TextRange rangeInElement = manipulator.getRangeInElement( psiElement );
+            targetValue = rangeInElement.substring( psiElement.getText() );
+
+            rangeCreator = new RangeCreator( rangeInElement.getStartOffset() );
+
+        }
+
         String[] parts = supportsNested ? targetValue.split( "\\." ) : new String[] { targetValue };
         if ( parts.length == 0 ) {
             return PsiReference.EMPTY_ARRAY;
         }
-        int nextStart = rangeInElement.getStartOffset();
 
         PsiReference[] references = new PsiReference[parts.length];
         T lastReference = null;
 
         for ( int i = 0; i < parts.length; i++ ) {
             String part = parts[i];
-            int endOffset = nextStart + part.length();
-            if ( i != 0 ) {
-                nextStart++;
-                endOffset++;
-            }
-            lastReference = creator.create( psiElement, lastReference, new TextRange( nextStart, endOffset ) );
-            nextStart = endOffset;
+            lastReference = creator.create( psiElement, lastReference, rangeCreator.apply( part ), part );
             references[i] = lastReference;
         }
 
         return references;
+    }
+
+    private static class RangeCreator implements Function<String, TextRange> {
+
+        private int nextStart;
+        private boolean first = true;
+
+        private RangeCreator(int nextStart) {
+            this.nextStart = nextStart;
+        }
+
+        @Override
+        public TextRange apply(String part) {
+            int endOffset = nextStart + part.length();
+            if ( !first ) {
+                nextStart++;
+                endOffset++;
+            }
+            else {
+                first = false;
+            }
+            TextRange range = new TextRange( nextStart, endOffset );
+            nextStart = endOffset;
+            return range;
+        }
     }
 }

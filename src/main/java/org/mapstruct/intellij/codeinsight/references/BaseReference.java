@@ -11,7 +11,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReferenceBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.uast.ULiteralExpression;
+import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UastContextKt;
 import org.jetbrains.uast.UastUtils;
@@ -44,7 +44,7 @@ abstract class BaseReference extends PsiReferenceBase<PsiElement> {
     @Nullable
     PsiMethod getMappingMethod() {
         PsiElement element = getElement();
-        ULiteralExpression expression = UastContextKt.toUElement( element, ULiteralExpression.class );
+        UExpression expression = UastContextKt.toUElement( element, UExpression.class );
         if ( expression != null ) {
             UMethod parent = UastUtils.getParentOfType( expression, UMethod.class );
             if ( parent != null ) {
