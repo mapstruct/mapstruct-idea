@@ -223,8 +223,8 @@ public class TargetUtils {
         List<PsiMethod> accessibleConstructors = new ArrayList<>(constructors.length);
 
         for ( PsiMethod constructor : constructors ) {
-            if ( constructor.hasModifier( JvmModifier.PRIVATE ) ) {
-                // private constructors are ignored
+            if ( constructor.hasModifier( JvmModifier.PRIVATE ) || constructor.hasModifier( JvmModifier.PROTECTED ) ) {
+                // private and protected constructors are ignored
                 continue;
             }
             if ( !constructor.hasParameters() ) {

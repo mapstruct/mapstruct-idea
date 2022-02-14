@@ -21,6 +21,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
+import de.plushnikov.intellij.plugin.psi.LombokLightMethodBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapStructVersion;
@@ -86,6 +87,12 @@ class MapstructTargetReference extends MapstructBaseReference {
             if ( constructor != null && constructor.hasParameters() ) {
                 for ( PsiParameter parameter : constructor.getParameterList().getParameters() ) {
                     if ( value.equals( parameter.getName() ) ) {
+                        if ( constructor instanceof LombokLightMethodBuilder ) {
+                            PsiField field = psiClass.findFieldByName( value, true );
+                            if ( field != null ) {
+                                return field;
+                            }
+                        }
                         return parameter;
                     }
                 }
