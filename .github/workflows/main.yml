@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ideaVersion: [2020.1, 2020.2, 2020.3, 2021.1, 2021.2, LATEST-EAP-SNAPSHOT]
+        ideaVersion: [2021.2, 2021.3, LATEST-EAP-SNAPSHOT]
     name: 'IDEA ${{ matrix.ideaVersion }}'
     env:
       IDEA_VERSION: ${{ matrix.ideaVersion }}

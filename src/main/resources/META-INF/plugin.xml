@@ -24,7 +24,7 @@
   <vendor url="http://www.mapstruct.org">MapStruct</vendor>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="201"/>
+  <idea-version since-build="212"/>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
@@ -39,6 +39,7 @@
     <methodReferencesSearch implementation="org.mapstruct.intellij.search.MappingMethodUsagesSearcher" />
     <renameHandler implementation="org.mapstruct.intellij.rename.MapstructSourceTargetParameterRenameHandler"/>
     <multiHostInjector implementation="org.mapstruct.intellij.expression.JavaExpressionInjector"/>
+    <lang.jvm.ignoreAnnotationParamSupport implementation="org.mapstruct.intellij.inspection.MapStructDefaultAnnotationParamSupport"/>
 
     <projectConfigurable groupId="language"
                          id="preferences.language.MapStruct"
