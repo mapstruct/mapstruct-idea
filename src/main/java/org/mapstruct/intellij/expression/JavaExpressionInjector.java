@@ -27,6 +27,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiLiteralExpression;
@@ -180,6 +181,9 @@ public class JavaExpressionInjector implements MultiHostInjector {
                             }
                             else if ( resolved instanceof PsiParameter ) {
                                 targetType = ( (PsiParameter) resolved ).getType();
+                            }
+                            else if ( resolved instanceof PsiField) {
+                                targetType = ( (PsiField) resolved ).getType();
                             }
                         }
                     }

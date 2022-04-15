@@ -160,6 +160,23 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "    CarDto carToCarDto(Car car, String make);\n" +
         "}";
 
+    @Language("java")
+    private static final String MAPPER_TO_DTO_WITHOUT_ACCESSORS = "" +
+        "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarPlainDto;\n" +
+        "import org.example.dto.Car;\n" +
+        "\n" +
+        "@Mapper(" + MAPPER + ")\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    " + MAPPING + "\n" +
+        "    CarPlainDto carToCarPlainDto(Car car);\n" +
+        "}";
+
     @Override
     protected String getTestDataPath() {
         return "testData/expression";
@@ -600,6 +617,41 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "        String __target__ = car.;\n" +
             "    }\n" +
             "}" );
+    }
+
+    public void testExpressionWithMapperToDtoWithoutAccessors() {
+        withTargetDefinedMapper( "expression" );
+        withTargetDefinedMapper( "defaultExpression" );
+    }
+
+    protected void withMapperToDtoWithoutAccessors(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
+        @Language("java")
+        String mapper = formatMapper( MAPPER_TO_DTO_WITHOUT_ACCESSORS, mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains(
+                "getMake",
+                "setMake",
+                "getManufacturingDate",
+                "setManufacturingDate",
+                "getNumberOfSeats",
+                "setNumberOfSeats"
+            );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
     }
 
     private PsiFile configureMapperByText(@Language("java") String text) {
