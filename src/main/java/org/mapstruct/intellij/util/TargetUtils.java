@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
@@ -148,10 +149,18 @@ public class TargetUtils {
         Optional<Boolean> disableBuilder = findDisableBuilder( mappingMethod, MapstructUtil.BEAN_MAPPING_FQN );
 
         if ( !disableBuilder.isPresent() && mappingMethod != null ) {
-            disableBuilder = findDisableBuilder(
+            PsiAnnotation mapperAnnotation = findAnnotation(
                 mappingMethod.getContainingClass(),
                 MapstructUtil.MAPPER_ANNOTATION_FQN
             );
+            disableBuilder = findDisabledBuilder( mapperAnnotation );
+
+            if ( disableBuilder.isEmpty() && mapperAnnotation != null ) {
+                disableBuilder = findDisableBuilder(
+                    findMapperConfigReference( mapperAnnotation ),
+                    MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN
+                );
+            }
         }
 
         return !disableBuilder.orElse( false );
@@ -160,6 +169,10 @@ public class TargetUtils {
     private static Optional<Boolean> findDisableBuilder(@Nullable PsiModifierListOwner listOwner,
                                                         String annotationName) {
         PsiAnnotation requestedAnnotation = findAnnotation( listOwner, true, annotationName );
+        return findDisabledBuilder( requestedAnnotation );
+    }
+
+    private static Optional<Boolean> findDisabledBuilder(@Nullable PsiAnnotation requestedAnnotation) {
         if ( requestedAnnotation != null ) {
             PsiNameValuePair builderAttribute = AnnotationUtil.findDeclaredAttribute( requestedAnnotation, "builder" );
             if ( builderAttribute != null ) {

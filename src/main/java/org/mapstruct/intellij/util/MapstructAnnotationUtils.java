@@ -24,9 +24,12 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
+import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
@@ -285,5 +288,38 @@ public class MapstructAnnotationUtils {
      */
     private static boolean isMappingAnnotation(PsiAnnotation psiAnnotation) {
         return Objects.equals( psiAnnotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
+    }
+
+    /**
+     * Find the mapper config reference class or interface defined in the {@code mapperAnnotation}
+     *
+     * @param mapperAnnotation the mapper annotation in which the mapper config is defined
+     *
+     * @return the class / interface that is defined in the mapper config,
+     * or {@code null} if there isn't anything defined
+     */
+    public static PsiModifierListOwner findMapperConfigReference(PsiAnnotation mapperAnnotation) {
+        PsiNameValuePair configAttribute = findDeclaredAttribute( mapperAnnotation, "config" );
+        if ( configAttribute == null ) {
+            return null;
+        }
+
+        PsiAnnotationMemberValue configValue = configAttribute.getValue();
+        if ( !( configValue instanceof PsiClassObjectAccessExpression ) ) {
+            return null;
+        }
+
+        PsiJavaCodeReferenceElement referenceElement = ( (PsiClassObjectAccessExpression) configValue ).getOperand()
+            .getInnermostComponentReferenceElement();
+        if ( referenceElement == null ) {
+            return null;
+        }
+
+        PsiElement resolvedElement = referenceElement.resolve();
+        if ( !( resolvedElement instanceof PsiModifierListOwner ) ) {
+            return null;
+        }
+
+        return (PsiModifierListOwner) resolvedElement;
     }
 }

@@ -992,4 +992,24 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testMapperWithBuilderAndMapperConfigDisabledBuilder() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "targetValue"
+            );
+    }
+
+    public void testMapperWithBuilderAndMapperConfigDisabledBuilderAndMapperEnable() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "builderValue"
+            );
+    }
+
 }

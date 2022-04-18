@@ -51,7 +51,10 @@ public class UnmappedTargetPropertiesWithBuilderInspectionTest extends BaseInspe
                 "Add unmapped target property: 'targetTestName'",
 
                 "Ignore unmapped target property: 'builderTestName'",
-                "Add unmapped target property: 'builderTestName'"
+                "Add unmapped target property: 'builderTestName'",
+
+                "Ignore unmapped target property: 'targetTestName'",
+                "Add unmapped target property: 'targetTestName'"
             );
 
         allQuickFixes.forEach( myFixture::launchAction );
