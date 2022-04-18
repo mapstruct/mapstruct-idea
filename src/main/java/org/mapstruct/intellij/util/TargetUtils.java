@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
@@ -167,6 +168,23 @@ public class TargetUtils {
                 if ( builderValue instanceof PsiAnnotation ) {
                     Boolean disableBuilder = getBooleanAttributeValue( (PsiAnnotation) builderValue, "disableBuilder" );
                     return Optional.ofNullable( disableBuilder );
+                }
+            }
+            else {
+                PsiNameValuePair configAttribute =
+                        AnnotationUtil.findDeclaredAttribute( requestedAnnotation, "config" );
+                if ( configAttribute != null ) {
+                    PsiAnnotationMemberValue configValue = configAttribute.getValue();
+
+                    if ( configValue != null ) {
+                        PsiJavaCodeReferenceElement referenceElement =
+                                ((PsiClassObjectAccessExpression) configValue).getOperand()
+                                        .getInnermostComponentReferenceElement();
+                        if (referenceElement != null) {
+                            return findDisableBuilder( (PsiModifierListOwner) referenceElement.resolve(),
+                                    "org.mapstruct.MapperConfig" );
+                        }
+                    }
                 }
             }
         }

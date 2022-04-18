@@ -7,6 +7,7 @@
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
+import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.example.data.UnmappedTargetPropertiesData.Target;
 
@@ -41,5 +42,18 @@ interface MapperDisabledBuilderBeanMappingEnabledBuilder {
     @Mapping(target = "builderTestName", source = "")
     @Mapping(target = "builderTestName", ignore = true)
     @BeanMapping(builder = @Builder(disableBuilder = false))
+    Target map(String source);
+}
+
+@MapperConfig(builder = @Builder(disableBuilder = true))
+class DoNotUseBuilderMapperConfig {
+
+}
+
+@Mapper(config = DoNotUseBuilderMapperConfig.class)
+interface MapperConfigDisabledBuilder {
+
+    @Mapping(target = "targetTestName", source = "")
+    @Mapping(target = "targetTestName", ignore = true)
     Target map(String source);
 }
