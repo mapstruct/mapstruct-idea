@@ -106,7 +106,7 @@ jacocoTestReport {
 
 dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.4.0.Beta1'
+    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.5.2.Final'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
     testCompile group: 'org.apache.commons', name: 'commons-text', version: '1.9'
@@ -122,7 +122,7 @@ task libs(type: Sync) {
     preserve {
         include 'mapstruct-intellij-*.jar'
     }
-    rename 'mapstruct-1.4.0.Beta1.jar', 'mapstruct.jar'
+    rename 'mapstruct-1.5.2.Final.jar', 'mapstruct.jar'
 }
 
 def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mock"
