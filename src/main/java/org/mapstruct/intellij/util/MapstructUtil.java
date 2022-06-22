@@ -86,7 +86,7 @@ public final class MapstructUtil {
     public static final String BEAN_MAPPING_FQN = BeanMapping.class.getName();
 
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
-    static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
+    public static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     //TODO maybe we need to include the 1.2.0-RC1 here

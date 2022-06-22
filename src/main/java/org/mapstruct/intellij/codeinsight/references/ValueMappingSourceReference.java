@@ -5,8 +5,6 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.stream.Stream;
-
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -14,10 +12,19 @@ import com.intellij.psi.PsiEnumConstant;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.MapstructUtil;
 
-import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
+import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
 
 /**
@@ -59,9 +66,18 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
             return LookupElement.EMPTY_ARRAY;
         }
 
+        Set<String> alreadyDefinedValues = Arrays.stream( mappingMethod.getAnnotations() )
+                .filter( a -> VALUE_MAPPING_ANNOTATION_FQN.equals( a.getQualifiedName() ) )
+                .map( psiAnnotation -> findDeclaredAttribute( psiAnnotation, "source" ) )
+                .filter( Objects::nonNull ).filter( o ->  o.getValue() instanceof PsiLiteralExpressionImpl )
+                .map( o -> (PsiLiteralExpressionImpl) o.getValue() ).map( PsiLiteralExpressionImpl::getValue )
+                .filter( String.class::isInstance ).map( String.class::cast )
+                .collect( Collectors.toSet() );
+
         return Stream.of( sourceClass.getFields() )
-            .filter( psiField -> psiField instanceof PsiEnumConstant )
-            .map( psiEnumConstant -> asLookup( (PsiEnumConstant) psiEnumConstant ) )
+            .filter( PsiEnumConstant.class::isInstance ).map( PsiEnumConstant.class::cast )
+            .map( MapstructUtil::asLookup )
+            .filter( lookupElement -> !alreadyDefinedValues.contains( lookupElement.getLookupString() ) )
             .toArray( LookupElement[]::new );
     }
 
@@ -71,6 +87,6 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
      * @return the created references for the passed {@code psiLiteral}
      */
     public static PsiReference[] create(PsiElement psiLiteral) {
-        return new PsiReference[] { new ValueMappingSourceReference( psiLiteral ) };
+        return new PsiReference[] { new ValueMappingSourceReference( psiLiteral) };
     }
 }
