@@ -40,6 +40,7 @@ import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.addPhysicalAnnotationTo;
 import static com.intellij.codeInsight.intention.AddAnnotationPsiFix.removePhysicalAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN;
 
 /**
  * Utils for working with mapstruct annotation.
@@ -269,6 +270,32 @@ public class MapstructAnnotationUtils {
             .filter( MapstructAnnotationUtils::isMappingAnnotation );
     }
 
+    public static Stream<PsiAnnotation> findAllDefinedValueMappingAnnotations(@NotNull PsiMethod method) {
+        Stream<PsiAnnotation> valueMappingsAnnotations = Stream.empty();
+        PsiAnnotation valueMappings = findAnnotation( method, true, MapstructUtil.VALUE_MAPPINGS_ANNOTATION_FQN );
+        if ( valueMappings != null ) {
+            PsiNameValuePair mappingsValue = findDeclaredAttribute( valueMappings, null );
+            if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiArrayInitializerMemberValue ) {
+                valueMappingsAnnotations = Stream.of( ( (PsiArrayInitializerMemberValue) mappingsValue.getValue() )
+                        .getInitializers() )
+                    .filter( MapstructAnnotationUtils::isValueMappingPsiAnnotation )
+                    .map( memberValue -> (PsiAnnotation) memberValue );
+            }
+            else if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiAnnotation ) {
+                valueMappingsAnnotations = Stream.of( (PsiAnnotation) mappingsValue.getValue() );
+            }
+        }
+
+        Stream<PsiAnnotation> valueMappingAnnotations = findValueMappingAnnotations( method );
+
+        return Stream.concat( valueMappingAnnotations, valueMappingsAnnotations );
+    }
+
+    private static Stream<PsiAnnotation> findValueMappingAnnotations(@NotNull PsiMethod method) {
+        return Stream.of( method.getModifierList().getAnnotations() )
+            .filter( MapstructAnnotationUtils::isValueMappingAnnotation );
+    }
+
     /**
      * @param memberValue that needs to be checked
      *
@@ -278,6 +305,27 @@ public class MapstructAnnotationUtils {
     private static boolean isMappingPsiAnnotation(PsiAnnotationMemberValue memberValue) {
         return memberValue instanceof PsiAnnotation
             && isMappingAnnotation( (PsiAnnotation) memberValue );
+    }
+
+    /**
+     * @param memberValue that needs to be checked
+     *
+     * @return {@code true} if the {@code memberValue} is the {@link org.mapstruct.ValueMapping} {@link PsiAnnotation},
+     * {@code false} otherwise
+     */
+    private static boolean isValueMappingPsiAnnotation(PsiAnnotationMemberValue memberValue) {
+        return memberValue instanceof PsiAnnotation
+            && isValueMappingAnnotation( (PsiAnnotation) memberValue );
+    }
+
+    /**
+     * @param psiAnnotation that needs to be checked
+     *
+     * @return {@code true} if the {@code psiAnnotation} is the {@link org.mapstruct.ValueMapping} annotation,
+     * {@code false} otherwise
+     */
+    private static boolean isValueMappingAnnotation(PsiAnnotation psiAnnotation) {
+        return Objects.equals( psiAnnotation.getQualifiedName(), VALUE_MAPPING_ANNOTATION_FQN );
     }
 
     /**

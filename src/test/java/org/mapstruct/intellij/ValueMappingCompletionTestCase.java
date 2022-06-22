@@ -22,6 +22,33 @@ import static org.mapstruct.intellij.testutil.TestUtils.createField;
 public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestCase {
 
     @Language("JAVA")
+    private static final String SOURCE_VALUE_MAPPING_DYNAMIC = "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.ValueMapping;\n" +
+        "import org.mapstruct.example.ExternalRoofType;\n" +
+        "import org.mapstruct.example.RoofType;\n" +
+        "\n" +
+        "@Mapper\n" +
+        "public interface RoofTypeMapper {\n" +
+        "\n" +
+        "    %s" +
+        "    ExternalRoofType map(RoofType type);\n" +
+        "}";
+
+    @Language("JAVA")
+    private static final String SOURCE_VALUE_MAPPINGS_DYNAMIC = "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.ValueMapping;\n" +
+        "import org.mapstruct.ValueMappings;\n" +
+        "import org.mapstruct.example.ExternalRoofType;\n" +
+        "import org.mapstruct.example.RoofType;\n" +
+        "\n" +
+        "@Mapper\n" +
+        "public interface RoofTypeMapper {\n" +
+        "\n" +
+        "    @ValueMappings({\n%s\n})\n" +
+        "    ExternalRoofType map(RoofType type);\n" +
+        "}";
+
+    @Language("JAVA")
     private static final String SOURCE_VALUE_MAPPING = "import org.mapstruct.Mapper;\n" +
         "import org.mapstruct.ValueMapping;\n" +
         "import org.mapstruct.example.ExternalRoofType;\n" +
@@ -80,6 +107,100 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
                 createField( "GAMBREL", "RoofType" ),
                 createField( "NORMAL", "RoofType" )
             );
+    }
+
+    public void testSourceValueMappingWithExisting() {
+        String source = String.format(
+            SOURCE_VALUE_MAPPING_DYNAMIC,
+            "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
+                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+        );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "OPEN",
+                "BOX",
+                "NORMAL"
+            );
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingElementComparatorIgnoringFields( "myIcon" )
+            .containsExactlyInAnyOrder(
+                createField( "OPEN", "RoofType" ),
+                createField( "BOX", "RoofType" ),
+                createField( "NORMAL", "RoofType" )
+            );
+    }
+
+    public void testSourceValueMappingsWithExisting() {
+        String source = String.format(
+            SOURCE_VALUE_MAPPINGS_DYNAMIC,
+            "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\"),\n" +
+                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+        );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "OPEN",
+                "BOX",
+                "NORMAL"
+            );
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingElementComparatorIgnoringFields( "myIcon" )
+            .containsExactlyInAnyOrder(
+                createField( "OPEN", "RoofType" ),
+                createField( "BOX", "RoofType" ),
+                createField( "NORMAL", "RoofType" )
+            );
+    }
+
+    public void testSourceValueMappingAllValuesAlreadyMapped() {
+        String source = String.format(
+            SOURCE_VALUE_MAPPING_DYNAMIC,
+            "@ValueMapping(source = \"OPEN\", target = \"NORMAL\")\n" +
+                "@ValueMapping(source = \"BOX\", target = \"NORMAL\")\n" +
+                "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
+                "@ValueMapping(source = \"NORMAL\", target = \"NORMAL\")\n" +
+                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+        );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .isEmpty();
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingElementComparatorIgnoringFields( "myIcon" )
+            .isEmpty();
+    }
+
+    public void testSourceValueMappingsAllValuesAlreadyMapped() {
+        String source = String.format(
+            SOURCE_VALUE_MAPPINGS_DYNAMIC,
+            "@ValueMapping(source = \"OPEN\", target = \"NORMAL\"),\n" +
+                "@ValueMapping(source = \"BOX\", target = \"NORMAL\"),\n" +
+                "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\"),\n" +
+                "@ValueMapping(source = \"NORMAL\", target = \"NORMAL\"),\n" +
+                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+        );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .isEmpty();
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingElementComparatorIgnoringFields( "myIcon" )
+            .isEmpty();
     }
 
     public void testSourceValueMappingResolveToEnum() {

@@ -5,6 +5,8 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -16,8 +18,9 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.MapstructUtil;
+import org.mapstruct.intellij.util.ValueMappingUtils;
 
-import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterClass;
 
 /**
@@ -59,9 +62,14 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
             return LookupElement.EMPTY_ARRAY;
         }
 
+        Set<String> alreadyDefinedValues = ValueMappingUtils.findAllDefinedValueMappingSources( mappingMethod )
+            .collect( Collectors.toSet() );
+
         return Stream.of( sourceClass.getFields() )
-            .filter( psiField -> psiField instanceof PsiEnumConstant )
-            .map( psiEnumConstant -> asLookup( (PsiEnumConstant) psiEnumConstant ) )
+            .filter( PsiEnumConstant.class::isInstance )
+            .map( PsiEnumConstant.class::cast )
+            .filter( enumConstant -> !alreadyDefinedValues.contains( enumConstant.getName() ) )
+            .map( MapstructUtil::asLookup )
             .toArray( LookupElement[]::new );
     }
 
