@@ -10,9 +10,9 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiEnumConstant;
 import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
@@ -69,8 +69,8 @@ public class ValueMappingSourceReference extends BaseValueMappingReference {
         Set<String> alreadyDefinedValues = Arrays.stream( mappingMethod.getAnnotations() )
                 .filter( a -> VALUE_MAPPING_ANNOTATION_FQN.equals( a.getQualifiedName() ) )
                 .map( psiAnnotation -> findDeclaredAttribute( psiAnnotation, "source" ) )
-                .filter( Objects::nonNull ).filter( o ->  o.getValue() instanceof PsiLiteralExpressionImpl )
-                .map( o -> (PsiLiteralExpressionImpl) o.getValue() ).map( PsiLiteralExpressionImpl::getValue )
+                .filter( Objects::nonNull ).filter( o ->  o.getValue() instanceof PsiLiteralExpression )
+                .map( o -> (PsiLiteralExpression) o.getValue() ).map( PsiLiteralExpression::getValue )
                 .filter( String.class::isInstance ).map( String.class::cast )
                 .collect( Collectors.toSet() );
 
