@@ -82,6 +82,51 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             );
     }
 
+    public void testSourceValueMappingWithExisting() {
+        String source = String.format( SOURCE_VALUE_MAPPING, "NORMAL" );
+        source = source.replace( "ExternalRoofType",
+                "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
+                "ExternalRoofType" );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder(
+                        "OPEN",
+                        "BOX",
+                        "NORMAL"
+                );
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingElementComparatorIgnoringFields( "myIcon" )
+                .containsExactlyInAnyOrder(
+                        createField( "OPEN", "RoofType" ),
+                        createField( "BOX", "RoofType" ),
+                        createField( "NORMAL", "RoofType" )
+                );
+    }
+
+    public void testSourceValueMappingAllValuesAlreadyMapped() {
+        String source = String.format( SOURCE_VALUE_MAPPING, "NORMAL" );
+        source = source.replace( "ExternalRoofType",
+                "@ValueMapping(source = \"OPEN\", target = \"NORMAL\")\n" +
+                        "@ValueMapping(source = \"BOX\", target = \"NORMAL\")\n" +
+                        "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
+                        "@ValueMapping(source = \"NORMAL\", target = \"NORMAL\")\n" +
+                        "ExternalRoofType" );
+        myFixture.configureByText( JavaFileType.INSTANCE, source );
+        complete();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .isEmpty();
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingElementComparatorIgnoringFields( "myIcon" )
+                .isEmpty();
+    }
+
     public void testSourceValueMappingResolveToEnum() {
         myFixture.configureByText( JavaFileType.INSTANCE, String.format( SOURCE_VALUE_MAPPING, "NORMAL" ) );
 
