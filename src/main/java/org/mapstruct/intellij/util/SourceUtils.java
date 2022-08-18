@@ -5,14 +5,6 @@
  */
 package org.mapstruct.intellij.util;
 
-import java.beans.Introspector;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.PsiClass;
@@ -24,6 +16,15 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.beans.Introspector;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
@@ -170,6 +171,9 @@ public class SourceUtils {
                 return null;
             }
         }
+        else if ( isRecordGetter( method ) ) {
+            return methodName;
+        }
         else if ( methodName.startsWith( "is" ) && (
             PsiType.BOOLEAN.equals( returnType ) ||
                 returnType.equalsToText( CommonClassNames.JAVA_LANG_BOOLEAN ) )
@@ -181,5 +185,11 @@ public class SourceUtils {
             return null;
         }
 
+    }
+
+    private static boolean isRecordGetter(PsiMethod method) {
+        return Optional.ofNullable( method.getContainingClass() )
+                .map( psiClass -> psiClass.findFieldByName( method.getName(), false ) )
+                .isPresent();
     }
 }
