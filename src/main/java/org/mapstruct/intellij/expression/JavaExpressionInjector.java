@@ -216,7 +216,8 @@ public class JavaExpressionInjector implements MultiHostInjector {
             if ( appendTypeParametersHard( prefixBuilder, imports, method.getTypeParameters() ) ) {
                 prefixBuilder.append( " " );
             }
-            prefixBuilder.append( "void __test__(\n" );
+            appendType( prefixBuilder, imports, targetType );
+            prefixBuilder.append( " __test__(\n" );
 
             PsiParameter[] parameters = method.getParameterList().getParameters();
             for ( int i = 0; i < parameters.length; i++ ) {
@@ -239,8 +240,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
             appendNesting( prefixBuilder, 1 );
             prefixBuilder.append( ") {\n" );
             appendNesting( prefixBuilder, 2 );
-            appendType( prefixBuilder, imports, targetType );
-            prefixBuilder.append( " __target__ = " );
+            prefixBuilder.append( "return " );
 
             PsiAnnotation mapper = mapperClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
             if ( mapper != null ) {
