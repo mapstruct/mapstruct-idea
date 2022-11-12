@@ -9,6 +9,7 @@ import javax.swing.Icon;
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
+import com.intellij.java.analysis.JavaAnalysisBundle;
 import com.intellij.util.PlatformIcons;
 
 /**
@@ -36,5 +37,25 @@ public final class TestUtils {
             .withIcon( icon )
             .withTailText( tailText )
             .withTypeText( typeText ) );
+    }
+
+    public static String quickFixAnnotateInterfaceMessage(String interfaceName, String annotationName) {
+        return JavaAnalysisBundle
+            .message(
+                "inspection.i18n.quickfix.annotate.element.as",
+                "interface",
+                interfaceName,
+                annotationName
+            );
+    }
+
+    public static String quickFixAnnotateClassMessage(String className, String annotationName) {
+        return JavaAnalysisBundle
+            .message(
+                "inspection.i18n.quickfix.annotate.element.as",
+                "class",
+                className,
+                annotationName
+            );
     }
 }

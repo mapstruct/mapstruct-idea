@@ -11,6 +11,8 @@ import com.intellij.codeInsight.intention.IntentionAction;
 import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mapstruct.intellij.testutil.TestUtils.quickFixAnnotateClassMessage;
+import static org.mapstruct.intellij.testutil.TestUtils.quickFixAnnotateInterfaceMessage;
 
 /**
  * @author Filip Hrisafov
@@ -37,10 +39,10 @@ public class MissingMapperOrMapperConfigAnnotationInspectionTest extends BaseIns
 
         assertThat( allQuickFixes ).extracting( IntentionAction::getText )
             .containsExactly(
-                "Annotate interface 'InterfaceWithMappingAnnotations' as @Mapper",
-                "Annotate interface 'InterfaceWithMappingAnnotations' as @MapperConfig",
-                "Annotate class 'ClassWithMappingAnnotations' as @Mapper",
-                "Annotate class 'ClassWithMappingAnnotations' as @MapperConfig"
+                quickFixAnnotateInterfaceMessage( "InterfaceWithMappingAnnotations", "Mapper" ),
+                quickFixAnnotateInterfaceMessage( "InterfaceWithMappingAnnotations", "MapperConfig" ),
+                quickFixAnnotateClassMessage( "ClassWithMappingAnnotations", "Mapper" ),
+                quickFixAnnotateClassMessage( "ClassWithMappingAnnotations", "MapperConfig" )
             );
 
         myFixture.launchAction( allQuickFixes.get( 1 ) );
