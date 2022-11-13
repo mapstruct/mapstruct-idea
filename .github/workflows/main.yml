@@ -7,16 +7,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ideaVersion:
+        version:
           - { jdk: 11, idea: 2021.2 }
           - { jdk: 11, idea: 2021.3 }
           - { jdk: 11, idea: 2022.1 }
           - { jdk: 17, idea: 2022.2 }
-          - { jdk: 17, idea: 223.6646.99-EAP-SNAPSHOT }
           - { jdk: 17, idea: LATEST-EAP-SNAPSHOT }
-    name: 'IDEA ${{ matrix.ideaVersion.idea }}'
+    name: 'IDEA ${{ matrix.version.idea }}'
     env:
-      IDEA_VERSION: ${{ matrix.ideaVersion.idea }}
+      IDEA_VERSION: ${{ matrix.version.idea }}
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
@@ -24,7 +23,7 @@ jobs:
       - name: 'Set up JDK'
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.ideaVersion.jdk }}
+          java-version: ${{ matrix.version.jdk }}
       - name: 'Test'
         run: ./gradlew --warning-mode=all build
       - name: 'Generate coverage report'
