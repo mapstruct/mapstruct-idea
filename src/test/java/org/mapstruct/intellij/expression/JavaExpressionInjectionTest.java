@@ -304,10 +304,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car\n" +
             "    ) {\n" +
-            "        String __target__ = Collections;\n" +
+            "        return Collections;\n" +
             "    }\n" +
             "}" );
 
@@ -332,10 +332,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car\n" +
             "    ) {\n" +
-            "        String __target__ = Utils;\n" +
+            "        return Utils;\n" +
             "    }\n" +
             "}" );
     }
@@ -358,10 +358,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car\n" +
             "    ) {\n" +
-            "        String __target__ = Collections;\n" +
+            "        return Collections;\n" +
             "    }\n" +
             "}" );
 
@@ -385,11 +385,11 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car,\n" +
             "        String make\n" +
             "    ) {\n" +
-            "        String __target__ = car.;\n" +
+            "        return car.;\n" +
             "    }\n" +
             "}" );
     }
@@ -414,10 +414,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Wrapper<Car> carWrapper\n" +
             "    ) {\n" +
-            "        String __target__ = carWrapper.getValue().;\n" +
+            "        return carWrapper.getValue().;\n" +
             "    }\n" +
             "}" );
     }
@@ -442,11 +442,11 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        @Context\n" +
             "        Wrapper<Car> carWrapper\n" +
             "    ) {\n" +
-            "        String __target__ = carWrapper.getValue().;\n" +
+            "        return carWrapper.getValue().;\n" +
             "    }\n" +
             "}" );
     }
@@ -472,10 +472,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Wrapper<BiFunction<String, Number, Car>> carWrapper\n" +
             "    ) {\n" +
-            "        String __target__ = carWrapper.getValue().apply(null, null).;\n" +
+            "        return carWrapper.getValue().apply(null, null).;\n" +
             "    }\n" +
             "}" );
     }
@@ -498,10 +498,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    implements CarMapper {\n" +
             "\n" +
-            "    <T extends Number> void __test__(\n" +
+            "    <T extends Number> int __test__(\n" +
             "        NumberWrapper<T> numberWrapper\n" +
             "    ) {\n" +
-            "        int __target__ = numberWrapper.;\n" +
+            "        return numberWrapper.;\n" +
             "    }\n" +
             "}" );
     }
@@ -524,11 +524,11 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl<T, R>\n" +
             "    implements CarMapper<T, R> {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car,\n" +
             "        String make\n" +
             "    ) {\n" +
-            "        String __target__ = car.;\n" +
+            "        return car.;\n" +
             "    }\n" +
             "}" );
     }
@@ -559,10 +559,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    extends CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car\n" +
             "    ) {\n" +
-            "        String __target__ = car.;\n" +
+            "        return car.;\n" +
             "    }\n" +
             "}" );
     }
@@ -594,10 +594,10 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "abstract class CarMapperImpl\n" +
             "    extends CarMapper {\n" +
             "\n" +
-            "    void __test__(\n" +
+            "    String __test__(\n" +
             "        Car car\n" +
             "    ) {\n" +
-            "        String __target__ = car.;\n" +
+            "        return car.;\n" +
             "    }\n" +
             "}" );
     }
