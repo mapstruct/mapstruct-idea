@@ -37,13 +37,10 @@ import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiVariable;
 import com.intellij.psi.impl.PsiClassImplUtil;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.psi.util.PsiFormatUtil;
-import com.intellij.psi.util.PsiFormatUtilBase;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.psi.util.TypeConversionUtil;
 import com.intellij.util.PlatformIcons;
@@ -148,34 +145,13 @@ public final class MapstructUtil {
 
         LookupElementBuilder builder = LookupElementBuilder.create( member, propertyName )
             .withIcon( icon )
-            .withPresentableText( propertyName )
-            .withTailText( formatTailText( member, substitutor ) );
+            .withPresentableText( propertyName );
         final PsiType type = typeMapper.apply( member );
         if ( type != null ) {
             builder = builder.withTypeText( substitutor.substitute( type ).getPresentableText() );
         }
 
         return builder;
-    }
-
-    private static String formatTailText(PsiElement member, PsiSubstitutor substitutor) {
-        String tailText;
-        if ( member instanceof PsiMethod ) {
-            tailText = PsiFormatUtil.formatMethod(
-                (PsiMethod) member,
-                substitutor,
-                0,
-                PsiFormatUtilBase.SHOW_NAME | PsiFormatUtilBase.SHOW_TYPE
-            );
-        }
-        else if ( member instanceof PsiVariable ) {
-            tailText = PsiFormatUtil.formatVariable( (PsiVariable) member, 0, substitutor );
-        }
-        else {
-            tailText = "";
-        }
-
-        return !tailText.isEmpty() ? tailText : null;
     }
 
     public static boolean isPublic(@NotNull PsiMethod method) {

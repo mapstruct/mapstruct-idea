@@ -2,10 +2,9 @@ import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
 
 plugins {
-    id "org.jetbrains.intellij" version "1.5.2"
-    id "com.github.hierynomus.license" version "0.14.0"
+    id "org.jetbrains.intellij" version "1.9.0"
+    id "com.github.hierynomus.license" version "0.16.1"
     id "de.undercouch.download" version "4.1.2"
-    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
 }
 
 
@@ -18,10 +17,9 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'license'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
-apply plugin: 'kotlin'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenLocal()
@@ -38,18 +36,6 @@ intellij {
     // The properties plugin is needed because Kotlin uses it
     // and for some reason plugins does not transitively pull itx
     plugins = ['java', 'Kotlin', 'properties']
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
@@ -94,35 +80,34 @@ checkstyle {
 }
 
 jacoco {
-    toolVersion "0.8.2"
+    toolVersion "0.8.8"
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    compile group: 'org.mapstruct', name: 'mapstruct', version: '1.5.2.Final'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
-    testCompile group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    implementation('org.mapstruct:mapstruct:1.5.3.Final')
     testImplementation(platform('org.junit:junit-bom:5.8.2'))
-    testImplementation('org.junit.jupiter:junit-jupiter')
-    testImplementation('org.junit.jupiter:junit-jupiter')
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testImplementation('org.junit.platform:junit-platform-launcher')
+    testImplementation('org.junit.jupiter:junit-jupiter-api')
+    testImplementation('org.junit.jupiter:junit-jupiter-engine')
+    testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
+    testImplementation('org.assertj:assertj-core:3.11.1')
+    testImplementation('org.apache.commons:commons-text:1.9')
 }
 
 task libs(type: Sync) {
-    from configurations.compile
+    from configurations.runtimeClasspath
     into "$buildDir/libs"
     preserve {
         include 'mapstruct-intellij-*.jar'
     }
-    rename 'mapstruct-1.5.2.Final.jar', 'mapstruct.jar'
+    rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
 }
 
 def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mock"
@@ -161,6 +146,8 @@ task downloadMockJdk8() {
 }
 
 test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8 )
+prepareTestingSandbox.dependsOn( libs )
+prepareSandbox.dependsOn( libs )
 
 test {
     useJUnitPlatform()

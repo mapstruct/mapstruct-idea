@@ -11,6 +11,7 @@ import com.intellij.codeInsight.intention.IntentionAction;
 import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mapstruct.intellij.testutil.TestUtils.quickFixAnnotateInterfaceMessage;
 
 /**
  * @author Filip Hrisafov
@@ -32,9 +33,9 @@ public class WrongUsageOfMappersFactoryInspectionTest extends BaseInspectionTest
             .extracting( IntentionAction::getText )
             .as( "Intent Text" )
             .containsExactly(
-                "Annotate interface 'NotMapStructMapper' as @Mapper",
+                quickFixAnnotateInterfaceMessage( "NotMapStructMapper", "Mapper" ),
                 "Remove usage of Mappers factory",
-                "Annotate interface 'NotMapStructMapper2' as @Mapper",
+                quickFixAnnotateInterfaceMessage( "NotMapStructMapper2", "Mapper" ),
                 "Remove usage of Mappers factory",
                 "Remove 'spring' componentModel from 'SpringComponentModelMapper' @Mapper",
                 "Remove usage of Mappers factory",
