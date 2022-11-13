@@ -35,6 +35,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.PsiClassImplUtil;
@@ -392,6 +393,17 @@ public final class MapstructUtil {
         }
 
         return publicFields;
+    }
+
+    public static PsiRecordComponent findRecordComponent(@NotNull String componentName, @NotNull PsiClass psiClass) {
+        if ( psiClass.isRecord() ) {
+            for ( PsiRecordComponent recordComponent : psiClass.getRecordComponents() ) {
+                if ( componentName.equals( recordComponent.getName() ) ) {
+                    return recordComponent;
+                }
+            }
+        }
+        return null;
     }
 
     /**

@@ -145,7 +145,11 @@ task downloadMockJdk8() {
     downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-1.8")
 }
 
-test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8 )
+task downloadMockJdk11() {
+    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-11")
+}
+
+test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
 prepareTestingSandbox.dependsOn( libs )
 prepareSandbox.dependsOn( libs )
 
