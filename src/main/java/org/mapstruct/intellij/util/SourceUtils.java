@@ -19,6 +19,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
@@ -121,6 +122,14 @@ public class SourceUtils {
 
         publicReadAccessors.putAll( publicGetters( psiClass ) );
         publicReadAccessors.putAll( publicFields( psiClass ) );
+        if ( psiClass.isRecord() ) {
+            for ( PsiRecordComponent recordComponent : psiClass.getRecordComponents() ) {
+                publicReadAccessors.put(
+                    recordComponent.getName(),
+                    Pair.create( recordComponent, PsiSubstitutor.EMPTY )
+                );
+            }
+        }
 
         return publicReadAccessors;
     }

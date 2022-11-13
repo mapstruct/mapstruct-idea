@@ -21,6 +21,7 @@ import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
 import com.intellij.util.PathUtil;
+import com.intellij.util.lang.JavaVersion;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -59,7 +60,15 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         return new DefaultLightProjectDescriptor() {
             @Override
             public Sdk getSdk() {
-                String compilerOption = languageLevel.toJavaVersion().toString();
+                JavaVersion version = languageLevel.toJavaVersion();
+                int mockJdk;
+                if ( version.feature >= 11 ) {
+                    mockJdk = 11;
+                }
+                else {
+                    mockJdk = version.feature;
+                }
+                String compilerOption = ( mockJdk < 11 ? "1." : "" ) + mockJdk;
                 return JavaSdk.getInstance()
                     .createJdk( "java " + compilerOption, BUILD_MOCK_JDK_DIRECTORY + compilerOption, false );
             }

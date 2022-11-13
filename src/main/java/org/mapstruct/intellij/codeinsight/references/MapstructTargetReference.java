@@ -16,6 +16,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiVariable;
@@ -28,6 +29,7 @@ import org.mapstruct.intellij.util.TargetType;
 import org.mapstruct.intellij.util.TargetUtils;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+import static org.mapstruct.intellij.util.MapstructUtil.findRecordComponent;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
@@ -73,6 +75,11 @@ class MapstructTargetReference extends MapstructBaseReference {
         PsiClass psiClass = pair.getFirst();
         TargetType targetType = pair.getSecond();
         PsiType typeToUse = targetType.type();
+
+        PsiRecordComponent recordComponent = findRecordComponent( value, psiClass );
+        if ( recordComponent != null ) {
+            return recordComponent;
+        }
 
         if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
             PsiMethod constructor = TargetUtils.resolveMappingConstructor( psiClass );

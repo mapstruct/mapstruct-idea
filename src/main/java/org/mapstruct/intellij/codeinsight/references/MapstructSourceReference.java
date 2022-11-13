@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiVariable;
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
+import static org.mapstruct.intellij.util.MapstructUtil.findRecordComponent;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicNonStatic;
 import static org.mapstruct.intellij.util.SourceUtils.getParameterType;
 import static org.mapstruct.intellij.util.SourceUtils.publicReadAccessors;
@@ -54,6 +56,12 @@ class MapstructSourceReference extends MapstructBaseReference {
         if ( psiClass == null ) {
             return null;
         }
+
+        PsiRecordComponent recordComponent = findRecordComponent( value, psiClass );
+        if ( recordComponent != null ) {
+            return recordComponent;
+        }
+
         PsiMethod[] methods = psiClass.findMethodsByName( "get" + MapstructUtil.capitalize( value ), true );
 
         if ( methods.length == 0 ) {
