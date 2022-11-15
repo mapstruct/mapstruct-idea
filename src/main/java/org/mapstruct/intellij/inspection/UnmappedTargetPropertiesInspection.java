@@ -174,11 +174,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 || !( isMapper( containingClass ) || isMapperConfig( containingClass ) ) ) {
                 return null;
             }
-            PsiType targetType = TargetUtils.getRelevantType( method );
-            if ( targetType == null ) {
-                return null;
-            }
-            return targetType;
+            return TargetUtils.getRelevantType( method );
         }
     }
 
