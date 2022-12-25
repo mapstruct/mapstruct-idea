@@ -55,6 +55,7 @@ import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
 import org.mapstruct.factory.Mappers;
@@ -82,6 +83,8 @@ public final class MapstructUtil {
     public static final String MAPPERS_FQN = Mappers.class.getName();
 
     public static final String BEAN_MAPPING_FQN = BeanMapping.class.getName();
+
+    public static final String NAMED_ANNOTATION_FQN = Named.class.getName();
 
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
@@ -129,6 +132,21 @@ public final class MapstructUtil {
 
     public static LookupElement asLookup(PsiEnumConstant enumConstant) {
         return asLookup( enumConstant.getName(), enumConstant, PsiField::getType, PlatformIcons.FIELD_ICON );
+    }
+
+    public static LookupElement asLookupWithRepresentableText(PsiMethod method, String lookupString,
+                                                              String representableText, String tailText) {
+        LookupElementBuilder builder = LookupElementBuilder.create( method, lookupString )
+            .withIcon( PlatformIcons.METHOD_ICON )
+            .withPresentableText( representableText )
+            .withTailText( tailText );
+
+        final PsiType type = method.getReturnType();
+        if ( type != null ) {
+            builder = builder.withTypeText( EmptySubstitutor.getInstance().substitute( type ).getPresentableText() );
+        }
+
+        return builder;
     }
 
     public static <T extends PsiElement> LookupElement asLookup(String propertyName, @NotNull T psiElement,
@@ -317,6 +335,16 @@ public final class MapstructUtil {
             || isAnnotated( psiMethod, MAPPINGS_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE )
             || isAnnotated( psiMethod, VALUE_MAPPING_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE )
             || isAnnotated( psiMethod, VALUE_MAPPINGS_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE );
+    }
+
+    /**
+     * Checks if the method is annotated with {@code Named}.
+     *
+     * @param psiMethod to be checked
+     * @return {@code true} if the method is annotated with {@code Named}, {@code false} otherwise
+     */
+    public static boolean isNamedMethod(PsiMethod psiMethod) {
+        return isAnnotated( psiMethod, NAMED_ANNOTATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
     /**

@@ -27,6 +27,10 @@ public class MapstructReferenceContributor extends PsiReferenceContributor {
             new MappingTargetReferenceProvider( MapstructTargetReference::create )
         );
         registrar.registerReferenceProvider(
+            mappingElementPattern( "qualifiedByName" ),
+            new MappingTargetReferenceProvider( MapstructMappingQualifiedByNameReference::create )
+        );
+        registrar.registerReferenceProvider(
             mappingElementPattern( "source" ),
             new MappingTargetReferenceProvider( MapstructSourceReference::create )
         );

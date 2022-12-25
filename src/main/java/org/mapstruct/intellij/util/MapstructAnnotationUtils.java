@@ -5,9 +5,12 @@
  */
 package org.mapstruct.intellij.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
@@ -24,6 +27,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassObjectAccessExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -31,6 +35,7 @@ import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
@@ -369,5 +374,42 @@ public class MapstructAnnotationUtils {
         }
 
         return (PsiModifierListOwner) resolvedElement;
+    }
+
+    /**
+     * Find the other mapper types used by the class or interface defined in the {@code mapperAnnotation}
+     *
+     * @param mapperAnnotation the mapper annotation in which the mapper config is defined
+     *
+     * @return the classes / interfaces that are defined with the {@code uses} attribute,
+     * or {@code null} if there isn't anything defined
+     */
+    public static List<PsiClass> resolveUsesConfigClasses(PsiAnnotation mapperAnnotation) {
+        PsiNameValuePair usesAttribute = findDeclaredAttribute( mapperAnnotation, "uses" );
+        if ( usesAttribute == null ) {
+            return null;
+        }
+
+        PsiAnnotationMemberValue usesValue = usesAttribute.getValue();
+
+        List<PsiClassObjectAccessExpression> usesExpressions = new ArrayList<>();
+        if ( usesValue instanceof PsiArrayInitializerMemberValue ) {
+            usesExpressions = Stream.of( ( (PsiArrayInitializerMemberValue) usesValue )
+                    .getInitializers() )
+                .filter( PsiClassObjectAccessExpression.class::isInstance )
+                .map( PsiClassObjectAccessExpression.class::cast )
+                .collect( Collectors.toList() );
+        }
+        else if ( usesValue instanceof PsiClassObjectAccessExpression ) {
+            usesExpressions = List.of( (PsiClassObjectAccessExpression) usesValue );
+        }
+
+        return usesExpressions.stream()
+            .map( usesExpression -> usesExpression.getOperand().getInnermostComponentReferenceElement() )
+            .filter( Objects::nonNull )
+            .map( PsiReference::resolve )
+            .filter( PsiClass.class::isInstance )
+            .map( PsiClass.class::cast )
+            .collect( Collectors.toList() );
     }
 }
