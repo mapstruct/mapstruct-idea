@@ -14,11 +14,18 @@ import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.command.undo.UndoUtil;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.module.LanguageLevelUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.Strings;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -81,7 +88,10 @@ public class MapstructAnnotationUtils {
             if ( containerAnnotation != null && containerAnnotation.isPhysical() ) {
                 runWriteCommandAction(
                     project,
-                    () -> containerAnnotation.replace( newAnnotation ),
+                    () -> {
+                        PsiElement replaced = containerAnnotation.replace( newAnnotation );
+                        moveCaretToEmptySourceAttribute( project, replaced );
+                    },
                     containingFile
                 );
             }
@@ -108,11 +118,32 @@ public class MapstructAnnotationUtils {
                             mappingMethod.getModifierList()
                         );
                         JavaCodeStyleManager.getInstance( project ).shortenClassReferences( inserted );
+
+                        moveCaretToEmptySourceAttribute( project, inserted );
+
                     }, containingFile );
 
                 UndoUtil.markPsiFileForUndo( containingFile );
             }
         }
+    }
+
+    private static void moveCaretToEmptySourceAttribute(@NotNull Project project, PsiElement element) {
+
+        FileEditor selectedEditor = FileEditorManager.getInstance( project ).getSelectedEditor();
+        if ( selectedEditor instanceof TextEditor ) {
+            Editor editor = ( (TextEditor) selectedEditor ).getEditor();
+
+            TextRange textRange = element.getTextRange();
+            String textOfElement = String.valueOf( editor.getDocument()
+                .getCharsSequence()
+                .subSequence( textRange.getStartOffset(), textRange.getEndOffset() ) );
+            int indexOfEmptySourceAttribute = Strings.indexOf( textOfElement, "\"\"" ) + 1;
+
+            editor.getCaretModel().moveToOffset( textRange.getStartOffset() + indexOfEmptySourceAttribute );
+            editor.getScrollingModel().scrollToCaret( ScrollType.MAKE_VISIBLE );
+        }
+
     }
 
     /**

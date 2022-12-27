@@ -92,7 +92,7 @@ interface DefaultMapper {
 }
 
 @Mapper
-abstract class AbstrctMapperWithoutAbstractMethod {
+abstract class AbstractMapperWithoutAbstractMethod {
 
     protected Target map(Source source) {
         return null;
