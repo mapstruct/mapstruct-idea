@@ -96,12 +96,9 @@ public class TargetUtils {
      */
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         MapStructVersion mapStructVersion, PsiMethod mappingMethod) {
-        boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass(
-            psiType,
-            builderSupportPresent && isBuilderEnabled( mappingMethod )
-        );
-        if ( classAndType == null ) {
+        boolean builderSupportPresent = isBuilderEnabled( mapStructVersion, mappingMethod );
+        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
+        if (classAndType == null) {
             return Collections.emptyMap();
         }
 
