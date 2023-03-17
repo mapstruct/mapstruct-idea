@@ -29,7 +29,11 @@ public abstract class BaseInspectionTest extends MapstructBaseCompletionTestCase
 
     protected void doTest() {
         String testName = getTestName( false );
-        configureByFile( testName + ".java" );
+        doTest( testName + ".java" );
+    }
+
+    protected void doTest(String path) {
+        configureByFile( path );
         myFixture.enableInspections( getInspection() );
         // Disable info checks as there is a difference between 2018.x and 2019.x
         // Links in 2019.x have an info highlighting

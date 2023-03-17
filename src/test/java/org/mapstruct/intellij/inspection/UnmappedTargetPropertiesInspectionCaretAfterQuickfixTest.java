@@ -34,21 +34,55 @@ public class UnmappedTargetPropertiesInspectionCaretAfterQuickfixTest extends Ba
         );
     }
 
-    public void testUnmappedTargetPropertiesJdk8() {
-        doTest();
+    public void testAddUnmappedTargetProperties() {
+        doTest( "UnmappedTargetPropertiesJdk8.java" );
+
         List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
             .stream()
             .filter( i -> i.getText().startsWith( "Add unmapped target property " ) )
             .collect( Collectors.toList() );
 
-        addMissingTargetQuickfixes.forEach( this::launchAndAssertCaretPosition );
+        addMissingTargetQuickfixes.forEach( this::launchAndAssertCaretPositionInSource );
     }
 
-    private void launchAndAssertCaretPosition(IntentionAction addMissingTargetQuickFix) {
+    public void testIgnoreUnmappedTargetProperties() {
+        doTest( "UnmappedTargetPropertiesJdk8.java" );
 
-        myFixture.launchAction( addMissingTargetQuickFix );
+        List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
+            .stream()
+            .filter( i -> i.getText().startsWith( "Ignore unmapped target property" ) )
+            .collect( Collectors.toList() );
+
+        addMissingTargetQuickfixes.forEach( this::launchAndAssertUnchangedCaretPosition );
+    }
+
+    public void testIgnoreAllUnmappedTargetProperties() {
+        doTest( "UnmappedTargetPropertiesJdk8.java" );
+
+        List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
+            .stream()
+            .filter( i -> i.getText().startsWith( "Ignore all unmapped target properties" ) )
+            .collect( Collectors.toList() );
+
+        addMissingTargetQuickfixes.forEach( this::launchAndAssertUnchangedCaretPosition );
+    }
+
+    private void launchAndAssertCaretPositionInSource(IntentionAction quickFix) {
+
+        myFixture.launchAction( quickFix );
 
         assertThatCaretIsInsideOfSourceString();
+    }
+
+    private void launchAndAssertUnchangedCaretPosition(IntentionAction quickFix) {
+
+        Caret caretBefore = myFixture.getEditor().getCaretModel().getCurrentCaret();
+
+        myFixture.launchAction( quickFix );
+
+        Caret caretAfter = myFixture.getEditor().getCaretModel().getCurrentCaret();
+
+        assertThat( caretAfter ).isEqualTo( caretBefore );
     }
 
     private void assertThatCaretIsInsideOfSourceString() {

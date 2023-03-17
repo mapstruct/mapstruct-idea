@@ -69,8 +69,9 @@ public class MapstructAnnotationUtils {
      * @param mappingAnnotation the {@link org.mapstruct.Mapping} annotation
      */
     public static void addMappingAnnotation(@NotNull Project project,
-        @NotNull PsiMethod mappingMethod,
-        @NotNull PsiAnnotation mappingAnnotation) {
+                                            @NotNull PsiMethod mappingMethod,
+                                            @NotNull PsiAnnotation mappingAnnotation,
+                                            boolean moveCaretToEmptySourceAttribute) {
         Pair<PsiAnnotation, Optional<PsiAnnotation>> mappingsPair = findOrCreateMappingsAnnotation(
             project,
             mappingMethod
@@ -90,7 +91,10 @@ public class MapstructAnnotationUtils {
                     project,
                     () -> {
                         PsiElement replaced = containerAnnotation.replace( newAnnotation );
-                        moveCaretToEmptySourceAttribute( project, replaced );
+
+                        if ( moveCaretToEmptySourceAttribute ) {
+                            moveCaretToEmptySourceAttribute( project, replaced );
+                        }
                     },
                     containingFile
                 );
@@ -119,7 +123,9 @@ public class MapstructAnnotationUtils {
                         );
                         JavaCodeStyleManager.getInstance( project ).shortenClassReferences( inserted );
 
-                        moveCaretToEmptySourceAttribute( project, inserted );
+                        if ( moveCaretToEmptySourceAttribute ) {
+                            moveCaretToEmptySourceAttribute( project, inserted );
+                        }
 
                     }, containingFile );
 

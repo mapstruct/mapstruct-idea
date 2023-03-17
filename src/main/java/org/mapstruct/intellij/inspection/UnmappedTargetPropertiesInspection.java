@@ -185,15 +185,18 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
         private final String myText;
         private final String myFamilyName;
         private final Supplier<Collection<PsiAnnotation>> myAnnotationSupplier;
+        private final boolean myMoveCaretToEmptySourceAttribute;
 
         private UnmappedTargetPropertyFix(@NotNull PsiMethod modifierListOwner,
             @NotNull String text,
             @NotNull String familyName,
-            @NotNull Supplier<Collection<PsiAnnotation>> annotationSupplier) {
+            @NotNull Supplier<Collection<PsiAnnotation>> annotationSupplier,
+            boolean moveCaretToEmptySourceAttribute) {
             super( modifierListOwner );
             myText = text;
             myFamilyName = familyName;
             myAnnotationSupplier = annotationSupplier;
+            myMoveCaretToEmptySourceAttribute = moveCaretToEmptySourceAttribute;
         }
 
         @NotNull
@@ -232,7 +235,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             PsiMethod mappingMethod = (PsiMethod) startElement;
 
             for ( PsiAnnotation annotation : myAnnotationSupplier.get() ) {
-                addMappingAnnotation( project, mappingMethod, annotation );
+                addMappingAnnotation( project, mappingMethod, annotation, myMoveCaretToEmptySourceAttribute );
             }
         }
 
@@ -272,7 +275,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             method,
             message,
             MapStructBundle.message( "intention.add.unmapped.target.property" ),
-            new UnmappedTargetPropertyFixAnnotationSupplier( method, target )
+            new UnmappedTargetPropertyFixAnnotationSupplier( method, target ),
+            true
         );
     }
 
@@ -296,7 +300,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             method,
             message,
             MapStructBundle.message( "intention.add.ignore.unmapped.target.property" ),
-            annotationSupplier
+            annotationSupplier,
+            false
         );
     }
 
@@ -328,7 +333,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             method,
             message,
             MapStructBundle.message( "intention.add.ignore.all.unmapped.target.properties" ),
-            annotationSupplier
+            annotationSupplier,
+            false
         );
     }
 
