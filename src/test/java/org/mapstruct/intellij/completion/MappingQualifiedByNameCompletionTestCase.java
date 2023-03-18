@@ -41,8 +41,8 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                createMethod( "numberToZero", "Long", " CarMapper#setToZero(...)" ),
-                createMethod( "doubleSeatCount", "int", " CarMapper#multiplyByTwo(...)" )
+                createMethod( "numberToZero", "Long", " CarMapper#setToZero(int)" ),
+                createMethod( "doubleSeatCount", "int", " CarMapper#multiplyByFactor(Double, int)" )
             );
     }
 
@@ -54,15 +54,19 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
     private void assertQualifiedByNameLocalAndExternalReferenceAutoComplete() {
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder( "numberToZero", "doubleSeatCount", "trimString" );
+            .containsExactlyInAnyOrder( "numberToZero", "doubleSeatCount", "trimString", "unwrapOptional" );
 
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                createMethod( "numberToZero", "Long", " CarMapper#setToZero(...)" ),
-                createMethod( "doubleSeatCount", "int", " CarMapper#multiplyByTwo(...)" ),
-                createMethod( "trimString", "String", " StringMapper#trim(...)" )
+                // local methods
+                createMethod( "numberToZero", "Long", " CarMapper#setToZero(int)" ),
+                createMethod( "doubleSeatCount", "int", " CarMapper#multiplyByFactor(Double, int)" ),
+                // methods of mappers from @Mapper(uses = ...)
+                createMethod( "trimString", "String", " StringMapper#trim(String)" ),
+                // methods of mappers from referenced @MapperConfig(uses = ...)
+                createMethod( "unwrapOptional", "T", " OptionalMapper#unwrapOptional(Optional<T>)" )
             );
     }
 

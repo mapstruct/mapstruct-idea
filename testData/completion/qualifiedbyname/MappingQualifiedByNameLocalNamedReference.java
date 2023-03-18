@@ -5,8 +5,6 @@
  */
 package org.mapstruct.ap.test.complex;
 
-import java.util.List;
-
 import org.example.dto.Car;
 import org.example.dto.CarDto;
 import org.mapstruct.Mapper;
@@ -21,8 +19,8 @@ public interface CarMapper {
     CarDto carToCarDto(Car car);
 
     @Named("doubleSeatCount")
-    default int multiplyByTwo(int input) {
-        return input * 2;
+    default int multiplyByFactor(Double input, int factor) {
+        return (int) (input * 2);
     }
 
     @Named("numberToZero")

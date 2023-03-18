@@ -5,16 +5,16 @@
  */
 package org.mapstruct.ap.test.complex;
 
-import java.util.List;
-
 import org.example.dto.Car;
 import org.example.dto.CarDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.helper.qualifiedbyname.StringMapper;
+import org.mapstruct.helper.qualifiedbyname.OptionalMapper;
 
-@Mapper(uses = StringMapper.class)
+@Mapper(config = MapperConfigUsingOptionalMapper.class, uses = StringMapper.class)
 public interface CarMapper {
 
     @Mapping(source = "numberOfSeats", target = "seatCount", qualifiedByName = "<caret>")
@@ -22,8 +22,8 @@ public interface CarMapper {
     CarDto carToCarDto(Car car);
 
     @Named("doubleSeatCount")
-    default int multiplyByTwo(int input) {
-        return input * 2;
+    default int multiplyByFactor(Double input, int factor) {
+        return (int) (input * 2);
     }
 
     @Named("numberToZero")
@@ -36,5 +36,10 @@ public interface CarMapper {
     default void someNamedAfterMapping(CarDto target) {
         target.setMake("...");
     }
+
+}
+
+@MapperConfig(uses = OptionalMapper.class)
+public class MapperConfigUsingOptionalMapper {
 
 }

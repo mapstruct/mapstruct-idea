@@ -380,14 +380,23 @@ public class MapstructAnnotationUtils {
      * Find the other mapper types used by the class or interface defined in the {@code mapperAnnotation}
      *
      * @param mapperAnnotation the mapper annotation in which the mapper config is defined
-     *
-     * @return the classes / interfaces that are defined with the {@code uses} attribute,
-     * or {@code null} if there isn't anything defined
+     * @return the classes / interfaces that are defined with the {@code uses} attribute of the current
+     * {@code mapperAnnotation} or referenced @MappingConfig, or and empty stream if there isn't anything defined
      */
-    public static List<PsiClass> resolveUsesConfigClasses(PsiAnnotation mapperAnnotation) {
+    public static Stream<PsiClass> findReferencedMapperClasses(PsiAnnotation mapperAnnotation) {
+
+        Stream<PsiClass> localUsesReferences = findReferencedMappers( mapperAnnotation );
+
+        Stream<PsiClass> mapperConfigUsesReferences = findReferencedMappersOfMapperConfig( mapperAnnotation );
+
+        return Stream.concat( localUsesReferences, mapperConfigUsesReferences );
+    }
+
+    @NotNull
+    private static Stream<PsiClass> findReferencedMappers(PsiAnnotation mapperAnnotation) {
         PsiNameValuePair usesAttribute = findDeclaredAttribute( mapperAnnotation, "uses" );
         if ( usesAttribute == null ) {
-            return null;
+            return Stream.empty();
         }
 
         PsiAnnotationMemberValue usesValue = usesAttribute.getValue();
@@ -409,7 +418,24 @@ public class MapstructAnnotationUtils {
             .filter( Objects::nonNull )
             .map( PsiReference::resolve )
             .filter( PsiClass.class::isInstance )
-            .map( PsiClass.class::cast )
-            .collect( Collectors.toList() );
+            .map( PsiClass.class::cast );
     }
+
+    private static Stream<PsiClass> findReferencedMappersOfMapperConfig(PsiAnnotation mapperAnnotation) {
+
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference( mapperAnnotation );
+
+        if ( mapperConfigReference == null ) {
+            return Stream.empty();
+        }
+
+        PsiAnnotation mapperConfigAnnotation = findAnnotation(
+            mapperConfigReference,
+            true,
+            MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN
+        );
+
+        return findReferencedMappers( mapperConfigAnnotation );
+    }
+
 }
