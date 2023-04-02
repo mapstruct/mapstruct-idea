@@ -28,6 +28,10 @@ public final class TestUtils {
         return create( lookupString, typeText, PlatformIcons.VARIABLE_ICON, null );
     }
 
+    public static LookupElementPresentation createMethod(String lookupString, String typeText, String tailText) {
+        return create( lookupString, typeText, PlatformIcons.METHOD_ICON, tailText );
+    }
+
     public static LookupElementPresentation createParameter(String lookupString, String typeText) {
         return create( lookupString, typeText, PlatformIcons.PARAMETER_ICON, null );
     }
