@@ -5,10 +5,8 @@
  */
 package org.mapstruct.helper.qualifiedbyname;
 
-import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
-@Mapper
 public interface StringMapper {
 
     @Named("trimString")

@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -57,8 +58,7 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     @Override
     PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod) {
 
-        return findAllMethodsFromThisAndReferencedMappers( mappingMethod )
-            .filter( m -> findAnnotation( m, true, MapstructUtil.NAMED_ANNOTATION_FQN ) != null )
+        return findAllNamedMethodsFromThisAndReferencedMappers( mappingMethod )
             .filter( a -> Objects.equals( getNamedValue( a ), value ) )
             .findAny()
             .orElse( null );
@@ -86,8 +86,9 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     @Override
     Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
 
-        return findAllMethodsFromThisAndReferencedMappers( mappingMethod )
+        return findAllNamedMethodsFromThisAndReferencedMappers( mappingMethod )
             .map( this::methodAsLookup )
+            .filter( Objects::nonNull )
             .toArray();
     }
 
@@ -96,19 +97,19 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     }
 
     @NotNull
-    private Stream<PsiMethod> findAllMethodsFromThisAndReferencedMappers(@NotNull PsiMethod mappingMethod) {
+    private Stream<PsiMethod> findAllNamedMethodsFromThisAndReferencedMappers(@NotNull PsiMethod mappingMethod) {
 
         PsiClass containingClass = mappingMethod.getContainingClass();
         if ( containingClass == null ) {
             return Stream.empty();
         }
 
-        Stream<PsiMethod> internalMethods = Stream.of( containingClass.getMethods() );
+        Stream<PsiMethod> internalMethods = Stream.of( containingClass.getMethods() )
+            .filter( MapstructUtil::isNamedMethod );
 
         Stream<PsiMethod> externalMethods = findNamedMethodsInUsedMappers( containingClass );
 
         return Stream.concat( internalMethods, externalMethods )
-            .filter( MapstructUtil::isNamedMethod )
             .filter( this::methodHasReturnType );
     }
 
@@ -125,11 +126,15 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
         }
 
         return findReferencedMapperClasses( mapperAnnotation )
-            .flatMap( psiClass -> Arrays.stream( psiClass.getMethods() ) );
+            .flatMap( psiClass -> Arrays.stream( psiClass.getMethods() ) )
+            .filter(MapstructUtil::isNamedMethod);
     }
 
     private LookupElement methodAsLookup(@NotNull PsiMethod method) {
         String lookupString = getNamedValue( method );
+        if ( StringUtil.isEmpty( lookupString ) ) {
+            return null;
+        }
 
         return asLookupWithRepresentableText(
             method,

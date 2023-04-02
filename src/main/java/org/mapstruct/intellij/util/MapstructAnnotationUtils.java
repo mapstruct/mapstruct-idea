@@ -435,6 +435,10 @@ public class MapstructAnnotationUtils {
             MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN
         );
 
+        if ( mapperConfigAnnotation == null ) {
+            return Stream.empty();
+        }
+
         return findReferencedMappers( mapperConfigAnnotation );
     }
 
