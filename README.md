@@ -35,7 +35,7 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
 
 ## Requirements
 
-The MapStruct plugin requires Java 1.8 or later
+The MapStruct plugin requires Java 11 or later
 
 ## Building from Source
 
