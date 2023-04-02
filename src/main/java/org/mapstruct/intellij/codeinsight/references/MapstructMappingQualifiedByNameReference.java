@@ -127,7 +127,7 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
 
         return findReferencedMapperClasses( mapperAnnotation )
             .flatMap( psiClass -> Arrays.stream( psiClass.getMethods() ) )
-            .filter(MapstructUtil::isNamedMethod);
+            .filter( MapstructUtil::isNamedMethod );
     }
 
     private LookupElement methodAsLookup(@NotNull PsiMethod method) {
