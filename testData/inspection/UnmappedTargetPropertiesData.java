@@ -79,4 +79,16 @@ public class UnmappedTargetPropertiesData {
         }
     }
 
+    public static class TargetWithInnerObject {
+        private Target testTarget;
+
+        public Target getTestTarget() {
+            return testTarget;
+        }
+
+        public void setTestTarget(Target testTarget) {
+            this.testTarget = testTarget;
+        }
+    }
+
 }
