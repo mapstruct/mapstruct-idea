@@ -100,6 +100,7 @@ dependencies {
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
     testImplementation('org.assertj:assertj-core:3.11.1')
     testImplementation('org.apache.commons:commons-text:1.10.0')
+	testRuntimeOnly('org.immutables:value:2.5.6')
 }
 
 task libs(type: Sync) {
@@ -109,6 +110,12 @@ task libs(type: Sync) {
         include 'mapstruct-intellij-*.jar'
     }
     rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
+}
+
+task testLibs(type: Sync) {
+    from configurations.testRuntimeClasspath
+    into "$buildDir/test-libs"
+    rename 'value-2.5.6.jar', 'immutables.jar'
 }
 
 def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mock"
@@ -150,8 +157,8 @@ task downloadMockJdk11() {
     downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-11")
 }
 
-test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
-prepareTestingSandbox.dependsOn( libs )
+test.dependsOn( libs, testLibs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
+prepareTestingSandbox.dependsOn( libs, testLibs )
 prepareSandbox.dependsOn( libs )
 
 test {
