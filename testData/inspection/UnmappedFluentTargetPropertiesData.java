@@ -78,6 +78,10 @@ public class UnmappedFluentTargetPropertiesData {
             this.moreTarget = moreTarget;
             return this;
         }
+
+        public Object getValue(String testName) {
+            return null;
+        }
     }
 
 }

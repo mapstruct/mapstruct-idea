@@ -110,4 +110,8 @@ public class FluentCarDto {
         this.available = available;
         return this;
     }
+
+    public Object getValue(String name) {
+        return null;
+    }
 }

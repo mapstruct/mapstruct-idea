@@ -203,8 +203,8 @@ public final class MapstructUtil {
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
             TypeConversionUtil.isAssignable(
-                PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( method.getReturnType() ),
-                psiType
+                psiType,
+                PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( method.getReturnType() )
             );
     }
 
