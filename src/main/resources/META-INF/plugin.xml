@@ -30,7 +30,6 @@
        on how to target different products -->
   <depends>com.intellij.modules.java</depends>
   <depends optional="true" config-file="org.mapstruct.intellij-withKotlin.xml">org.jetbrains.kotlin</depends>
-  <depends optional="true" config-file="org.mapstruct.intellij-withLombok.xml">Lombook Plugin</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
