@@ -49,6 +49,10 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.BeanMapping;
+import org.mapstruct.Builder;
+import org.mapstruct.Context;
+import org.mapstruct.EnumMapping;
+import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
@@ -90,11 +94,10 @@ public final class MapstructUtil {
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
-    //TODO maybe we need to include the 1.2.0-RC1 here
-    private static final String CONTEXT_ANNOTATION_FQN = "org.mapstruct.Context";
-    private static final String INHERIT_INVERSE_CONFIGURATION = InheritInverseConfiguration.class.getName();
-    private static final String BUILDER_ANNOTATION_FQN = "org.mapstruct.Builder";
-    private static final String ENUM_MAPPING_ANNOTATION_FQN = "org.mapstruct.EnumMapping";
+    private static final String CONTEXT_ANNOTATION_FQN = Context.class.getName();
+    private static final String INHERIT_INVERSE_CONFIGURATION_FQN = InheritInverseConfiguration.class.getName();
+    private static final String BUILDER_ANNOTATION_FQN = Builder.class.getName();
+    private static final String ENUM_MAPPING_ANNOTATION_FQN = EnumMapping.class.getName();
 
     /**
      * Hide constructor.
@@ -569,7 +572,7 @@ public final class MapstructUtil {
      * {@code false} otherwise
      */
     public static boolean isInheritInverseConfiguration(PsiMethod method) {
-        return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION, AnnotationUtil.CHECK_TYPE );
+        return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
 }

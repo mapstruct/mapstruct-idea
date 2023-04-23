@@ -40,15 +40,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
+import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
- * Utils for working with target properties (extracting targets  for MapStruct).
+ * Utils for working with target properties (extracting targets for MapStruct).
  *
  * @author Filip Hrisafov
  */
@@ -148,10 +150,10 @@ public class TargetUtils {
     public static boolean isBuilderEnabled(@Nullable PsiMethod mappingMethod) {
         Optional<Boolean> disableBuilder = findDisableBuilder( mappingMethod, MapstructUtil.BEAN_MAPPING_FQN );
 
-        if ( !disableBuilder.isPresent() && mappingMethod != null ) {
+        if ( disableBuilder.isEmpty() && mappingMethod != null ) {
             PsiAnnotation mapperAnnotation = findAnnotation(
                 mappingMethod.getContainingClass(),
-                MapstructUtil.MAPPER_ANNOTATION_FQN
+                MAPPER_ANNOTATION_FQN
             );
             disableBuilder = findDisabledBuilder( mapperAnnotation );
 
@@ -174,7 +176,7 @@ public class TargetUtils {
 
     private static Optional<Boolean> findDisabledBuilder(@Nullable PsiAnnotation requestedAnnotation) {
         if ( requestedAnnotation != null ) {
-            PsiNameValuePair builderAttribute = AnnotationUtil.findDeclaredAttribute( requestedAnnotation, "builder" );
+            PsiNameValuePair builderAttribute = findDeclaredAttribute( requestedAnnotation, "builder" );
             if ( builderAttribute != null ) {
                 PsiAnnotationMemberValue builderValue = builderAttribute.getValue();
                 if ( builderValue instanceof PsiAnnotation ) {
@@ -220,7 +222,7 @@ public class TargetUtils {
             return !constructor.hasModifier( JvmModifier.PRIVATE ) ? constructor : null;
         }
 
-        List<PsiMethod> accessibleConstructors = new ArrayList<>(constructors.length);
+        List<PsiMethod> accessibleConstructors = new ArrayList<>( constructors.length );
 
         for ( PsiMethod constructor : constructors ) {
             if ( constructor.hasModifier( JvmModifier.PRIVATE ) ) {
@@ -415,7 +417,7 @@ public class TargetUtils {
                 psiAnnotation,
                 "target"
             ) ) )
-            .map( psiAnnotation -> AnnotationUtil.findDeclaredAttribute( psiAnnotation, "source" ) )
+            .map( psiAnnotation -> findDeclaredAttribute( psiAnnotation, "source" ) )
             .filter( Objects::nonNull )
             .map( PsiNameValuePair::getValue )
             .filter( Objects::nonNull )
