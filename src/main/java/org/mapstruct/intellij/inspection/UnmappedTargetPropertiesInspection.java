@@ -86,7 +86,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
             // find and remove all defined mapping targets
             Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method, mapStructVersion )
-                .collect( Collectors.toSet() );
+                    .map( MyJavaElementVisitor::getBaseTarget )
+                    .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
 
             if ( definedTargets.contains( "." ) ) {
@@ -139,6 +140,15 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                     quickFixes.toArray( UnmappedTargetPropertyFix.EMPTY_ARRAY )
                 );
             }
+        }
+
+        @NotNull
+        private static String getBaseTarget(@NotNull String target) {
+            int dotIndex = target.indexOf( "." );
+            if ( dotIndex > 0 ) {
+                return target.substring( 0, dotIndex );
+            }
+            return target;
         }
 
         private static boolean isBeanMappingIgnoreByDefault(PsiMethod method) {
