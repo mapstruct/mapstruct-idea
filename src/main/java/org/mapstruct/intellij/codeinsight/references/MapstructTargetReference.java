@@ -163,6 +163,9 @@ class MapstructTargetReference extends MapstructBaseReference {
         else if ( element instanceof PsiParameter ) {
             return ( (PsiParameter) element ).getType();
         }
+        else if ( element instanceof PsiRecordComponent ) {
+            return ( (PsiRecordComponent) element ).getType();
+        }
         return null;
     }
 

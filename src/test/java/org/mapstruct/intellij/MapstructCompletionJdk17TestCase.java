@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecordComponent;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mapstruct.intellij.testutil.TestUtils.createParameter;
 import static org.mapstruct.intellij.testutil.TestUtils.createVariable;
 
 /**
@@ -57,7 +58,7 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
                 createVariable( "manufacturingYear", "String" ),
-                createVariable( "myDriver", "PersonDto" ),
+                createVariable( "myDriver", "PersonDtoRecord" ),
                 createVariable( "passengers", "List<PersonDto>" ),
                 createVariable( "price", "Long" ),
                 createVariable( "category", "String" ),
@@ -96,12 +97,14 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
 
     public void testCarMapperReturnTargetCarDtoRecord() {
         myFixture.copyFileToProject( "CarDtoRecord.java", "org/example/dto/CarDtoRecord.java" );
+        myFixture.copyFileToProject( "PersonDtoRecord.java", "org/example/dto/PersonDtoRecord.java" );
         configureByTestName();
         assertCarDtoRecordAutoComplete();
     }
 
     public void testTargetPropertyReferencesRecordComponent() {
         myFixture.copyFileToProject( "CarDtoRecord.java", "org/example/dto/CarDtoRecord.java" );
+        myFixture.copyFileToProject( "PersonDtoRecord.java", "org/example/dto/PersonDtoRecord.java" );
         myFixture.configureByFile( "CarMapperReferenceRecordTargetProperty.java" );
         PsiElement reference = myFixture.getElementAtCaret();
         assertThat( reference )
@@ -110,6 +113,25 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
                 assertThat( recordComponent.getType() ).isNotNull();
                 assertThat( recordComponent.getType().getPresentableText() ).isEqualTo( "int" );
             } );
+    }
+
+    public void testNestedSecondLevelAutoCompleteRecordTargetProperty() {
+        myFixture.copyFileToProject( "CarDtoRecord.java", "org/example/dto/CarDtoRecord.java" );
+        myFixture.copyFileToProject( "PersonDtoRecord.java", "org/example/dto/PersonDtoRecord.java" );
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .containsExactlyInAnyOrder(
+                createParameter( "name", "String" )
+            );
     }
 
     public void testCarMapperSimpleSingleSourceCarRecord() {
@@ -128,5 +150,23 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
                 assertThat( recordComponent.getType() ).isNotNull();
                 assertThat( recordComponent.getType().getPresentableText() ).isEqualTo( "int" );
             } );
+    }
+
+    public void testNestedSecondLevelAutoCompleteRecordSourceProperty() {
+        myFixture.copyFileToProject( "CarDtoRecord.java", "org/example/dto/CarDtoRecord.java" );
+        myFixture.copyFileToProject( "PersonDtoRecord.java", "org/example/dto/PersonDtoRecord.java" );
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "name", "String" )
+            );
     }
 }

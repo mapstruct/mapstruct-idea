@@ -8,8 +8,8 @@ package org.example.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.example.dto.PersonDto;
+import org.example.dto.PersonDtoRecord;
 
-public record CarDtoRecord(String make, int seatCount, String manufacturingYear, PersonDto myDriver,
+public record CarDtoRecord(String make, int seatCount, String manufacturingYear, PersonDtoRecord myDriver,
         List<PersonDto> passengers, Long price, String category, boolean available) {
 }
