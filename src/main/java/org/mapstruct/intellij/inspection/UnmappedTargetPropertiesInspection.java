@@ -36,7 +36,6 @@ import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.settings.ProjectSettings;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
-import org.mapstruct.intellij.util.TargetUtils;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
@@ -45,6 +44,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfigur
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
+import static org.mapstruct.intellij.util.TargetUtils.*;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
 
@@ -85,10 +85,16 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
 
             // find and remove all defined mapping targets
-            Set<String> definedTargets = TargetUtils.findAllDefinedMappingTargets( method, mapStructVersion )
+            Set<String> definedTargets = findAllDefinedMappingTargets( method, mapStructVersion )
                     .map( MyJavaElementVisitor::getBaseTarget )
                     .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
+
+            // find and remove all inherited target properties
+            Set<String> inheritedTargetProperties = findInheritedTargetProperties( method, mapStructVersion )
+                .map( MyJavaElementVisitor::getBaseTarget )
+                .collect( Collectors.toSet() );
+            allTargetProperties.removeAll( inheritedTargetProperties );
 
             if ( definedTargets.contains( "." ) ) {
                 // If there is a defined current target then we need to remove all implicit mapped properties for
@@ -184,7 +190,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 || !( isMapper( containingClass ) || isMapperConfig( containingClass ) ) ) {
                 return null;
             }
-            return TargetUtils.getRelevantType( method );
+            return getRelevantType( method );
         }
     }
 

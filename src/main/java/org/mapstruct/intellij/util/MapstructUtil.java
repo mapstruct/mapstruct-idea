@@ -90,6 +90,8 @@ public final class MapstructUtil {
 
     public static final String NAMED_ANNOTATION_FQN = Named.class.getName();
 
+    public static final String INHERIT_CONFIGURATION_FQN = InheritConfiguration.class.getName();
+
     static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();

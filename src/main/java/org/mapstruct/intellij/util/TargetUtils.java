@@ -42,8 +42,10 @@ import org.jetbrains.annotations.Nullable;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
+import static org.mapstruct.intellij.util.InheritConfigurationUtils.*;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
+import static org.mapstruct.intellij.util.MapstructUtil.INHERIT_CONFIGURATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
@@ -432,6 +434,7 @@ public class TargetUtils {
      *
      * @param targetType that needs to be used
      * @param mapStructVersion the MapStruct project version
+     * @param mappingMethod that needs to be checked
      *
      * @return all target properties for the given {@code targetClass}
      */
@@ -439,4 +442,43 @@ public class TargetUtils {
                                                       PsiMethod mappingMethod) {
         return publicWriteAccessors( targetType, mapStructVersion, mappingMethod ).keySet();
     }
+
+    /**
+     * Find all target properties from an inherited mapping method when annotated with
+     * {@link org.mapstruct.InheritConfiguration} but only if there is a single matching candidate found
+     *
+     * @param mappingMethod that needs to be checked
+     * @param mapStructVersion the MapStruct project version
+     *
+     * @return all inherited target properties
+     */
+    public static Stream<String> findInheritedTargetProperties(@NotNull PsiMethod mappingMethod,
+                                                               MapStructVersion mapStructVersion) {
+
+        PsiClass containingClass = mappingMethod.getContainingClass();
+        PsiAnnotation inheritConfigurationAnnotation = findAnnotation( mappingMethod, INHERIT_CONFIGURATION_FQN );
+
+        if ( containingClass == null || inheritConfigurationAnnotation == null ) {
+            return Stream.empty();
+        }
+
+        PsiAnnotation mapperAnnotation = findAnnotation( containingClass, MAPPER_ANNOTATION_FQN );
+
+        if ( mapperAnnotation == null ) {
+            return Stream.empty();
+        }
+
+        Stream<PsiMethod> candidates = findMappingMethodsFromInheritScope( containingClass, mapperAnnotation );
+
+        Optional<PsiMethod> inheritMappingMethod = findInheritMappingMethod(
+            mappingMethod,
+            candidates,
+            inheritConfigurationAnnotation
+        );
+
+        return inheritMappingMethod
+            .map( candidate -> TargetUtils.findAllDefinedMappingTargets( candidate, mapStructVersion ) )
+            .orElse( Stream.empty() );
+    }
+
 }
