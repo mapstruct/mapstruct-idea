@@ -44,9 +44,11 @@ import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfigur
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
-import static org.mapstruct.intellij.util.TargetUtils.*;
+import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
+import static org.mapstruct.intellij.util.TargetUtils.findInheritedTargetProperties;
+import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 
 /**
  * Inspection that checks if there are unmapped target properties.
@@ -86,8 +88,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
             // find and remove all defined mapping targets
             Set<String> definedTargets = findAllDefinedMappingTargets( method, mapStructVersion )
-                    .map( MyJavaElementVisitor::getBaseTarget )
-                    .collect( Collectors.toSet() );
+                .map( MyJavaElementVisitor::getBaseTarget )
+                .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
 
             // find and remove all inherited target properties

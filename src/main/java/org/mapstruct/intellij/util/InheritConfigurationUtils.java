@@ -1,3 +1,8 @@
+/*
+ * Copyright MapStruct Authors.
+ *
+ * Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
+ */
 package org.mapstruct.intellij.util;
 
 import java.util.ArrayList;
@@ -28,6 +33,9 @@ import static org.mapstruct.intellij.util.MapstructUtil.isMappingTarget;
  * Utils for working with inherited configurations based on {@link org.mapstruct.InheritConfiguration}
  */
 public class InheritConfigurationUtils {
+
+    private InheritConfigurationUtils() {
+    }
 
     /**
      * Find all mapping methods (regardless of their type and parameter) that are in the scope to be inherited from:
@@ -86,15 +94,16 @@ public class InheritConfigurationUtils {
      * @param inheritConfigurationAnnotation the {@link org.mapstruct.InheritConfiguration} annotation
      * @return a mapping method to inherit from, only if it is the only possible one found.
      */
-    public static Optional<PsiMethod> findInheritMappingMethod(@NotNull PsiMethod mappingMethod,
-                                                               @NotNull Stream<PsiMethod> candidates,
-                                                               @NotNull PsiAnnotation inheritConfigurationAnnotation) {
+    public static Optional<PsiMethod> findSingleMatchingInheritMappingMethod(
+        @NotNull PsiMethod mappingMethod,
+        @NotNull Stream<PsiMethod> candidates,
+        @NotNull PsiAnnotation inheritConfigurationAnnotation) {
 
         String inheritConfigurationName = getStringAttributeValue( inheritConfigurationAnnotation, "name" );
 
         List<PsiMethod> matchingCandidates = candidates
             .filter( candidate -> isNotTheSameMethod( mappingMethod, candidate ) )
-            .filter( candidate -> matchesNameWhenSet( inheritConfigurationName, candidate ) )
+            .filter( candidate -> matchesNameWhenNameIsDefined( inheritConfigurationName, candidate ) )
             .filter( candidate -> canInheritFrom( mappingMethod, candidate ) )
             .collect( Collectors.toList() );
 
@@ -110,7 +119,7 @@ public class InheritConfigurationUtils {
         return !( mappingMethod.equals( candidate ) );
     }
 
-    private static boolean matchesNameWhenSet(String inheritConfigurationName, PsiMethod candidate) {
+    private static boolean matchesNameWhenNameIsDefined(String inheritConfigurationName, PsiMethod candidate) {
 
         if ( inheritConfigurationName == null || inheritConfigurationName.isEmpty() ) {
             return true;
@@ -120,7 +129,7 @@ public class InheritConfigurationUtils {
     }
 
     /**
-     * simplified version of org.mapstruct.ap.internal.model.source.SourceMethod#canInheritFrom
+     * simplified version of <code>org.mapstruct.ap.internal.model.source.SourceMethod#canInheritFrom</code>
      */
     public static boolean canInheritFrom(PsiMethod mappingMethod, PsiMethod candidate) {
 
@@ -166,7 +175,7 @@ public class InheritConfigurationUtils {
     }
 
     /**
-     * this is a psi-modified copy of org.mapstruct.ap.internal.model.source.SourceMethod#allParametersAreAssignable
+     * psi-modified copy of <code>org.mapstruct.ap.internal.model.source.SourceMethod#allParametersAreAssignable</code>
      */
     private static boolean allParametersAreAssignable(List<PsiParameter> fromParams, List<PsiParameter> toParams) {
         if ( fromParams.size() == toParams.size() ) {

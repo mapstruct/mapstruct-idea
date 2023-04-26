@@ -42,7 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
-import static org.mapstruct.intellij.util.InheritConfigurationUtils.*;
+import static org.mapstruct.intellij.util.InheritConfigurationUtils.findMappingMethodsFromInheritScope;
+import static org.mapstruct.intellij.util.InheritConfigurationUtils.findSingleMatchingInheritMappingMethod;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
 import static org.mapstruct.intellij.util.MapstructUtil.INHERIT_CONFIGURATION_FQN;
@@ -470,7 +471,7 @@ public class TargetUtils {
 
         Stream<PsiMethod> candidates = findMappingMethodsFromInheritScope( containingClass, mapperAnnotation );
 
-        Optional<PsiMethod> inheritMappingMethod = findInheritMappingMethod(
+        Optional<PsiMethod> inheritMappingMethod = findSingleMatchingInheritMappingMethod(
             mappingMethod,
             candidates,
             inheritConfigurationAnnotation
