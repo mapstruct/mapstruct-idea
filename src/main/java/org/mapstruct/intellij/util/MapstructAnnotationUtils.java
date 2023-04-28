@@ -45,7 +45,10 @@ import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.mapstruct.ReportingPolicy;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
@@ -477,6 +480,80 @@ public class MapstructAnnotationUtils {
         }
 
         return findReferencedMappers( mapperConfigAnnotation );
+    }
+
+    @NotNull
+    public static ReportingPolicy getReportingPolicyFromMethode( @NotNull PsiMethod method,
+                                                                 @Nullable @NonNls String attributeName,
+                                                                 @NotNull ReportingPolicy fallback ) {
+        PsiClass containingClass = method.getContainingClass();
+        if (containingClass == null) {
+            return fallback;
+        }
+        return getReportingPolicyFromClass( containingClass, attributeName, fallback );
+    }
+
+    @NotNull
+    public static ReportingPolicy getReportingPolicyFromClass( @NotNull PsiClass containingClass,
+                                                               @NonNls @Nullable String attributeName,
+                                                               @NotNull ReportingPolicy fallback ) {
+        PsiAnnotation mapperAnnotation = containingClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
+        if (mapperAnnotation == null) {
+            return fallback;
+        }
+
+        PsiAnnotationMemberValue classAnnotationOverwrite = mapperAnnotation.findDeclaredAttributeValue(
+                attributeName );
+        if (classAnnotationOverwrite != null) {
+            return getReportingPolicyFromAnnotation( classAnnotationOverwrite, fallback );
+        }
+        return getReportingPolicyFromMapperConfig( mapperAnnotation, fallback );
+    }
+
+    @NotNull
+    private static ReportingPolicy getReportingPolicyFromMapperConfig( @NotNull PsiAnnotation mapperAnnotation,
+                                                                       @NotNull ReportingPolicy fallback) {
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference(  mapperAnnotation );
+        if ( mapperConfigReference == null ) {
+            return fallback;
+        }
+        PsiAnnotation mapperConfigAnnotation = mapperConfigReference.getAnnotation(
+                MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
+
+        if (mapperConfigAnnotation == null) {
+            return fallback;
+        }
+        PsiAnnotationMemberValue configValue =
+                mapperConfigAnnotation.findDeclaredAttributeValue( "unmappedTargetPolicy" );
+        if (configValue == null) {
+            return fallback;
+        }
+        return getReportingPolicyFromAnnotation( configValue, fallback );
+    }
+
+
+    /**
+     * Converts the configValue to ReportingPolicy enum. If no matching ReportingPolicy found, returns fallback.
+     * @param configValue The annotation value to convert to ReportingPolicy enum
+     * @param fallback the fallback value if no matching ReportingPolicy found
+     * @return the mapped ReportingPolicy enum
+     */
+    @NotNull
+    public static ReportingPolicy getReportingPolicyFromAnnotation( @NotNull PsiAnnotationMemberValue configValue,
+                                                                    @NotNull ReportingPolicy fallback) {
+        switch (configValue.getText()) {
+            case "IGNORE":
+            case "ReportingPolicy.IGNORE":
+                return ReportingPolicy.IGNORE;
+            case "ERROR":
+            case "ReportingPolicy.ERROR":
+                return ReportingPolicy.ERROR;
+            case "WARN":
+            case "ReportingPolicy.WARN":
+                return ReportingPolicy.WARN;
+            default:
+                return fallback;
+        }
     }
 
 }
