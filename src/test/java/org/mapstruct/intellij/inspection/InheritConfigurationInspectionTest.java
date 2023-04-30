@@ -66,4 +66,12 @@ public class InheritConfigurationInspectionTest extends BaseInspectionTest {
         doTest();
     }
 
+    public void testInheritConfigurationInSameClassOfUpdateMethodMapper() {
+        doTest();
+    }
+
+    public void testInheritConfigurationInSameClassWithContextMapper() {
+        doTest();
+    }
+
 }

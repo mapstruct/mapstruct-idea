@@ -5,7 +5,6 @@
  */
 package org.mapstruct.intellij.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findReferencedMapperClasses;
-import static org.mapstruct.intellij.util.MapstructUtil.isMappingTarget;
 
 /**
  * Utils for working with inherited configurations based on {@link org.mapstruct.InheritConfiguration}
@@ -54,7 +52,7 @@ public class InheritConfigurationUtils {
     public static Stream<PsiMethod> findMappingMethodsFromInheritScope(@NotNull PsiClass containingClass,
                                                                        @NotNull PsiAnnotation mapperAnnotation) {
 
-        Stream<PsiMethod> localAndParentMethods = findLocalAndParentMethods( containingClass ).stream();
+        Stream<PsiMethod> localAndParentMethods = Arrays.stream( containingClass.getAllMethods() );
 
         Stream<PsiMethod> referencedMethods = findReferencedMapperClasses( mapperAnnotation )
             .flatMap( c -> Arrays.stream( c.getMethods() ) );
@@ -62,17 +60,6 @@ public class InheritConfigurationUtils {
         Stream<PsiMethod> mapperConfigMethods = findMapperConfigMethods( mapperAnnotation );
 
         return Stream.concat( Stream.concat( localAndParentMethods, referencedMethods ), mapperConfigMethods );
-    }
-
-    private static List<PsiMethod> findLocalAndParentMethods(PsiClass containingClass) {
-
-        List<PsiMethod> result = new ArrayList<>( List.of( containingClass.getMethods() ) );
-
-        for ( PsiClass anInterface : containingClass.getInterfaces() ) {
-            result.addAll( findLocalAndParentMethods( anInterface ) );
-        }
-
-        return result;
     }
 
     private static Stream<PsiMethod> findMapperConfigMethods(@NotNull PsiAnnotation mapperAnnotation) {
@@ -101,17 +88,20 @@ public class InheritConfigurationUtils {
 
         String inheritConfigurationName = getStringAttributeValue( inheritConfigurationAnnotation, "name" );
 
+        PsiType targetType = findTargetTypeOfMappingMethod( mappingMethod );
+
         List<PsiMethod> matchingCandidates = candidates
             .filter( candidate -> isNotTheSameMethod( mappingMethod, candidate ) )
             .filter( candidate -> matchesNameWhenNameIsDefined( inheritConfigurationName, candidate ) )
-            .filter( candidate -> canInheritFrom( mappingMethod, candidate ) )
+            .filter( candidate -> canInheritFrom( mappingMethod, targetType, candidate ) )
             .collect( Collectors.toList() );
 
-        if ( matchingCandidates.size() != 1 ) {
-            return Optional.empty();
+        if ( matchingCandidates.size() == 1 ) {
+            return Optional.of( matchingCandidates.get( 0 ) );
         }
 
-        return matchingCandidates.stream().findFirst();
+        return Optional.empty();
+
     }
 
     private static boolean isNotTheSameMethod(PsiMethod mappingMethod, PsiMethod candidate) {
@@ -131,13 +121,14 @@ public class InheritConfigurationUtils {
     /**
      * simplified version of <code>org.mapstruct.ap.internal.model.source.SourceMethod#canInheritFrom</code>
      */
-    public static boolean canInheritFrom(PsiMethod mappingMethod, PsiMethod candidate) {
+    public static boolean canInheritFrom(PsiMethod mappingMethod, PsiType targetType, PsiMethod candidate) {
 
-        PsiType targetType = findTargetTypeOfMappingMethod( mappingMethod );
+        PsiType targetTypeOfCandidate = findTargetTypeOfMappingMethod( candidate );
 
-        return targetType != null &&
-            candidate.getBody() == null &&
-            candidate.getReturnType() != null && candidate.getReturnType().isAssignableFrom( targetType )
+        return targetType != null
+            && candidate.getBody() == null
+            && targetTypeOfCandidate != null
+            && targetTypeOfCandidate.isAssignableFrom( targetType )
             && allParametersAreAssignable( mappingMethod.getParameterList(), candidate.getParameterList() );
     }
 
@@ -166,10 +157,12 @@ public class InheritConfigurationUtils {
         }
 
         List<PsiParameter> fromParams = Arrays.stream( inheritParameters.getParameters() )
-            .filter( p -> !isMappingTarget( p ) )
+            .filter( MapstructUtil::isValidSourceParameter )
             .collect( Collectors.toList() );
 
-        List<PsiParameter> toParams = Arrays.asList( candidateParameters.getParameters() );
+        List<PsiParameter> toParams = Arrays.stream( candidateParameters.getParameters() )
+            .filter( MapstructUtil::isValidSourceParameter )
+            .collect( Collectors.toList() );
 
         return allParametersAreAssignable( fromParams, toParams );
     }
