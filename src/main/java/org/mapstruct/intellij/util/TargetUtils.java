@@ -40,15 +40,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
+import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
+import static org.mapstruct.intellij.util.InheritConfigurationUtils.findMappingMethodsFromInheritScope;
+import static org.mapstruct.intellij.util.InheritConfigurationUtils.findSingleMatchingInheritMappingMethod;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperConfigReference;
+import static org.mapstruct.intellij.util.MapstructUtil.INHERIT_CONFIGURATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
- * Utils for working with target properties (extracting targets  for MapStruct).
+ * Utils for working with target properties (extracting targets for MapStruct).
  *
  * @author Filip Hrisafov
  */
@@ -148,10 +153,10 @@ public class TargetUtils {
     public static boolean isBuilderEnabled(@Nullable PsiMethod mappingMethod) {
         Optional<Boolean> disableBuilder = findDisableBuilder( mappingMethod, MapstructUtil.BEAN_MAPPING_FQN );
 
-        if ( !disableBuilder.isPresent() && mappingMethod != null ) {
+        if ( disableBuilder.isEmpty() && mappingMethod != null ) {
             PsiAnnotation mapperAnnotation = findAnnotation(
                 mappingMethod.getContainingClass(),
-                MapstructUtil.MAPPER_ANNOTATION_FQN
+                MAPPER_ANNOTATION_FQN
             );
             disableBuilder = findDisabledBuilder( mapperAnnotation );
 
@@ -174,7 +179,7 @@ public class TargetUtils {
 
     private static Optional<Boolean> findDisabledBuilder(@Nullable PsiAnnotation requestedAnnotation) {
         if ( requestedAnnotation != null ) {
-            PsiNameValuePair builderAttribute = AnnotationUtil.findDeclaredAttribute( requestedAnnotation, "builder" );
+            PsiNameValuePair builderAttribute = findDeclaredAttribute( requestedAnnotation, "builder" );
             if ( builderAttribute != null ) {
                 PsiAnnotationMemberValue builderValue = builderAttribute.getValue();
                 if ( builderValue instanceof PsiAnnotation ) {
@@ -220,7 +225,7 @@ public class TargetUtils {
             return !constructor.hasModifier( JvmModifier.PRIVATE ) ? constructor : null;
         }
 
-        List<PsiMethod> accessibleConstructors = new ArrayList<>(constructors.length);
+        List<PsiMethod> accessibleConstructors = new ArrayList<>( constructors.length );
 
         for ( PsiMethod constructor : constructors ) {
             if ( constructor.hasModifier( JvmModifier.PRIVATE ) ) {
@@ -415,7 +420,7 @@ public class TargetUtils {
                 psiAnnotation,
                 "target"
             ) ) )
-            .map( psiAnnotation -> AnnotationUtil.findDeclaredAttribute( psiAnnotation, "source" ) )
+            .map( psiAnnotation -> findDeclaredAttribute( psiAnnotation, "source" ) )
             .filter( Objects::nonNull )
             .map( PsiNameValuePair::getValue )
             .filter( Objects::nonNull )
@@ -430,6 +435,7 @@ public class TargetUtils {
      *
      * @param targetType that needs to be used
      * @param mapStructVersion the MapStruct project version
+     * @param mappingMethod that needs to be checked
      *
      * @return all target properties for the given {@code targetClass}
      */
@@ -437,4 +443,43 @@ public class TargetUtils {
                                                       PsiMethod mappingMethod) {
         return publicWriteAccessors( targetType, mapStructVersion, mappingMethod ).keySet();
     }
+
+    /**
+     * Find all target properties from an inherited mapping method when annotated with
+     * {@link org.mapstruct.InheritConfiguration} but only if there is a single matching candidate found
+     *
+     * @param mappingMethod that needs to be checked
+     * @param mapStructVersion the MapStruct project version
+     *
+     * @return all inherited target properties
+     */
+    public static Stream<String> findInheritedTargetProperties(@NotNull PsiMethod mappingMethod,
+                                                               MapStructVersion mapStructVersion) {
+
+        PsiClass containingClass = mappingMethod.getContainingClass();
+        PsiAnnotation inheritConfigurationAnnotation = findAnnotation( mappingMethod, INHERIT_CONFIGURATION_FQN );
+
+        if ( containingClass == null || inheritConfigurationAnnotation == null ) {
+            return Stream.empty();
+        }
+
+        PsiAnnotation mapperAnnotation = findAnnotation( containingClass, MAPPER_ANNOTATION_FQN );
+
+        if ( mapperAnnotation == null ) {
+            return Stream.empty();
+        }
+
+        Stream<PsiMethod> candidates = findMappingMethodsFromInheritScope( containingClass, mapperAnnotation );
+
+        Optional<PsiMethod> inheritMappingMethod = findSingleMatchingInheritMappingMethod(
+            mappingMethod,
+            candidates,
+            inheritConfigurationAnnotation
+        );
+
+        return inheritMappingMethod
+            .map( candidate -> TargetUtils.findAllDefinedMappingTargets( candidate, mapStructVersion ) )
+            .orElse( Stream.empty() );
+    }
+
 }
