@@ -74,7 +74,6 @@ public class UnmappedTargetPropertiesInspectionUnmappedTargetPolicyTest extends 
         checkQuickFixes();
     }
 
-
     /**
      * Tests if unmappedTargetPolicy set to ERROR, results in reported errors instead of warnings.
      */
