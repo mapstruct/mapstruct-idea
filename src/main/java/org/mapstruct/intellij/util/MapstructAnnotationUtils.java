@@ -6,15 +6,17 @@
 package org.mapstruct.intellij.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.command.undo.UndoUtil;
 import com.intellij.openapi.editor.Editor;
@@ -40,11 +42,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.ReportingPolicy;
 
@@ -281,17 +285,27 @@ public class MapstructAnnotationUtils {
             && MapstructUtil.isMapStructJdk8Present( module );
     }
 
-    public static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiMethod method,
-        MapStructVersion mapStructVersion) {
+    public static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiModifierListOwner owner,
+                                                                         MapStructVersion mapStructVersion) {
+
+        // Meta annotations support was added when constructor support was added
+        boolean includeMetaAnnotations = mapStructVersion.isConstructorSupported();
+
+        return findAllDefinedMappingAnnotations( owner, includeMetaAnnotations );
+    }
+
+    @NotNull
+    private static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiModifierListOwner owner,
+                                                                          boolean includeMetaAnnotations) {
         //TODO cache
         Stream<PsiAnnotation> mappingsAnnotations = Stream.empty();
-        PsiAnnotation mappings = findAnnotation( method, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
+        PsiAnnotation mappings = findAnnotation( owner, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
         if ( mappings != null ) {
             //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
             PsiNameValuePair mappingsValue = findDeclaredAttribute( mappings, null );
             if ( mappingsValue != null && mappingsValue.getValue() instanceof PsiArrayInitializerMemberValue ) {
                 mappingsAnnotations = Stream.of( ( (PsiArrayInitializerMemberValue) mappingsValue.getValue() )
-                    .getInitializers() )
+                        .getInitializers() )
                     .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
                     .map( memberValue -> (PsiAnnotation) memberValue );
             }
@@ -300,19 +314,61 @@ public class MapstructAnnotationUtils {
             }
         }
 
-        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( method, mapStructVersion );
+        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
         return Stream.concat( mappingAnnotations, mappingsAnnotations );
     }
 
-    private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiMethod method,
-        MapStructVersion mapStructVersion) {
-        if ( mapStructVersion.isConstructorSupported() ) {
-            // Meta annotations support was added when constructor support was added
-            return MetaAnnotationUtil.findMetaAnnotations( method, Collections.singleton( MAPPING_ANNOTATION_FQN ) );
+    private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiModifierListOwner method,
+                                                                boolean includeMetaAnnotations) {
+
+        Stream<PsiAnnotation> metaAnnotations = Stream.empty();
+
+        if ( includeMetaAnnotations ) {
+            // do not use MetaAnnotationUtil#findMetaAnnotations since it only finds the first @Mapping annotation
+            metaAnnotations = findMetaAnnotations( method, new HashSet<>() ).stream();
         }
-        return Stream.of( method.getModifierList().getAnnotations() )
+
+        Stream<PsiAnnotation> directAnnotations = Stream.of( method.getModifierList() )
+            .filter( Objects::nonNull )
+            .flatMap( psiModifierList -> Arrays.stream( psiModifierList.getAnnotations() ) )
             .filter( MapstructAnnotationUtils::isMappingAnnotation );
+
+        return Stream.concat( directAnnotations, metaAnnotations );
+    }
+
+    @NotNull
+    private static Set<PsiAnnotation> findMetaAnnotations(@NotNull PsiModifierListOwner owner,
+                                                          Set<? super PsiClass> visited) {
+
+        Set<PsiAnnotation> result = new HashSet<>();
+
+        // to avoid infinite loops, do not include meta annotations at this point
+        findAllDefinedMappingAnnotations( owner, false ).forEach( result::add );
+
+        List<PsiClass> annotationClasses = getResolvedClassesInAnnotationsList( owner );
+
+        for ( PsiClass annotationClass : annotationClasses ) {
+            if ( visited.add( annotationClass ) ) {
+                result.addAll( findMetaAnnotations( annotationClass, visited ) );
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * copy of private method <code>MetaAnnotationUtil#getResolvedClassesInAnnotationsList(PsiModifierListOwner)</code>
+     */
+    private static List<PsiClass> getResolvedClassesInAnnotationsList(PsiModifierListOwner owner) {
+        PsiModifierList modifierList = owner.getModifierList();
+        if ( modifierList != null ) {
+            return ContainerUtil.mapNotNull(
+                modifierList.getApplicableAnnotations(),
+                PsiAnnotation::resolveAnnotationType
+            );
+        }
+        return Collections.emptyList();
     }
 
     public static Stream<PsiAnnotation> findAllDefinedValueMappingAnnotations(@NotNull PsiMethod method) {
@@ -483,52 +539,52 @@ public class MapstructAnnotationUtils {
     }
 
     @NotNull
-    public static ReportingPolicy getUnmappedTargetPolicy( @NotNull PsiMethod method ) {
+    public static ReportingPolicy getUnmappedTargetPolicy(@NotNull PsiMethod method) {
         PsiAnnotation beanMapping = method.getAnnotation( MapstructUtil.BEAN_MAPPING_FQN );
-        if (beanMapping != null) {
+        if ( beanMapping != null ) {
             PsiAnnotationMemberValue beanAnnotationOverwrite =
-                    beanMapping.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
-            if (beanAnnotationOverwrite != null) {
+                beanMapping.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
+            if ( beanAnnotationOverwrite != null ) {
                 return getUnmappedTargetPolicyPolicyFromAnnotation( beanAnnotationOverwrite );
             }
         }
         PsiClass containingClass = method.getContainingClass();
-        if (containingClass == null) {
+        if ( containingClass == null ) {
             return ReportingPolicy.WARN;
         }
         return getUnmappedTargetPolicyFromClass( containingClass );
     }
 
     @NotNull
-    private static ReportingPolicy getUnmappedTargetPolicyFromClass( @NotNull PsiClass containingClass ) {
+    private static ReportingPolicy getUnmappedTargetPolicyFromClass(@NotNull PsiClass containingClass) {
         PsiAnnotation mapperAnnotation = containingClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
-        if (mapperAnnotation == null) {
+        if ( mapperAnnotation == null ) {
             return ReportingPolicy.WARN;
         }
 
         PsiAnnotationMemberValue classAnnotationOverwrite = mapperAnnotation.findDeclaredAttributeValue(
-                UNMAPPED_TARGET_POLICY );
-        if (classAnnotationOverwrite != null) {
+            UNMAPPED_TARGET_POLICY );
+        if ( classAnnotationOverwrite != null ) {
             return getUnmappedTargetPolicyPolicyFromAnnotation( classAnnotationOverwrite );
         }
         return getUnmappedTargetPolicyFromMapperConfig( mapperAnnotation );
     }
 
     @NotNull
-    private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig( @NotNull PsiAnnotation mapperAnnotation ) {
-        PsiModifierListOwner mapperConfigReference = findMapperConfigReference(  mapperAnnotation );
+    private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig(@NotNull PsiAnnotation mapperAnnotation) {
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference( mapperAnnotation );
         if ( mapperConfigReference == null ) {
             return ReportingPolicy.WARN;
         }
         PsiAnnotation mapperConfigAnnotation = mapperConfigReference.getAnnotation(
-                MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
+            MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
 
-        if (mapperConfigAnnotation == null) {
+        if ( mapperConfigAnnotation == null ) {
             return ReportingPolicy.WARN;
         }
         PsiAnnotationMemberValue configValue =
-                mapperConfigAnnotation.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
-        if (configValue == null) {
+            mapperConfigAnnotation.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
+        if ( configValue == null ) {
             return ReportingPolicy.WARN;
         }
         return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
@@ -544,8 +600,8 @@ public class MapstructAnnotationUtils {
      */
     @NotNull
     private static ReportingPolicy getUnmappedTargetPolicyPolicyFromAnnotation(
-            @NotNull PsiAnnotationMemberValue configValue ) {
-        switch (configValue.getText()) {
+        @NotNull PsiAnnotationMemberValue configValue) {
+        switch ( configValue.getText() ) {
             case "IGNORE":
             case "ReportingPolicy.IGNORE":
                 return ReportingPolicy.IGNORE;
