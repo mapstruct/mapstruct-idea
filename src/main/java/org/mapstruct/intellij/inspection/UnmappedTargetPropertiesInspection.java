@@ -5,6 +5,15 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -30,15 +39,6 @@ import org.mapstruct.intellij.settings.ProjectSettings;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
