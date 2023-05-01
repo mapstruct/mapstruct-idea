@@ -19,11 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class UnmappedTargetPropertiesInspectionReportPolicyClassLevelFirstTest extends BaseInspectionTest {
 
-    @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_1_7;
-    }
-
     @NotNull
     @Override
     protected Class<UnmappedTargetPropertiesInspection> getInspection() {
