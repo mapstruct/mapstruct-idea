@@ -6,7 +6,6 @@
 package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.pom.java.LanguageLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
