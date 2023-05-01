@@ -486,6 +486,13 @@ public class MapstructAnnotationUtils {
     public static ReportingPolicy getReportingPolicyFromMethode( @NotNull PsiMethod method,
                                                                  @Nullable @NonNls String attributeName,
                                                                  @NotNull ReportingPolicy fallback ) {
+        PsiAnnotation beanMapping = method.getAnnotation( MapstructUtil.BEAN_MAPPING_FQN );
+        if (beanMapping != null) {
+            PsiAnnotationMemberValue beanAnnotationOverwrite = beanMapping.findDeclaredAttributeValue( attributeName );
+            if (beanAnnotationOverwrite != null) {
+                return getReportingPolicyFromAnnotation( beanAnnotationOverwrite, fallback );
+            }
+        }
         PsiClass containingClass = method.getContainingClass();
         if (containingClass == null) {
             return fallback;
@@ -494,7 +501,7 @@ public class MapstructAnnotationUtils {
     }
 
     @NotNull
-    public static ReportingPolicy getReportingPolicyFromClass( @NotNull PsiClass containingClass,
+    private static ReportingPolicy getReportingPolicyFromClass( @NotNull PsiClass containingClass,
                                                                @NonNls @Nullable String attributeName,
                                                                @NotNull ReportingPolicy fallback ) {
         PsiAnnotation mapperAnnotation = containingClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
@@ -539,7 +546,7 @@ public class MapstructAnnotationUtils {
      * @return the mapped ReportingPolicy enum
      */
     @NotNull
-    public static ReportingPolicy getReportingPolicyFromAnnotation( @NotNull PsiAnnotationMemberValue configValue,
+    private static ReportingPolicy getReportingPolicyFromAnnotation( @NotNull PsiAnnotationMemberValue configValue,
                                                                     @NotNull ReportingPolicy fallback) {
         switch (configValue.getText()) {
             case "IGNORE":
