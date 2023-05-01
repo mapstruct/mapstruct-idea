@@ -1,4 +1,4 @@
-package inspection;/*
+/*
  * Copyright MapStruct Authors.
  *
  * Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
@@ -8,11 +8,6 @@ import org.example.data.UnmappedTargetPropertiesData.Source;
 import org.example.data.UnmappedTargetPropertiesData.Target;
 import org.mapstruct.*;
 
-interface NotMapStructMapper {
-
-    Target map(Source source);
-}
-
 @Mapper(config = AllMappingsMapperConfig.class)
 interface SingleMappingMapper {
 
@@ -21,38 +16,12 @@ interface SingleMappingMapper {
 }
 
 @Mapper(config = AllMappingsMapperConfig.class)
-interface SingleMappingsMapper {
-
-    @Mappings({
-        @Mapping(target = "moreTarget", source = "moreSource")
-    })
-    Target map(Source source);
-}
-
-@Mapper(config = AllMappingsMapperConfig.class)
-interface SingleMappingsNoBracesMapper {
-
-    @Mappings(
-        @Mapping(target = "moreTarget", source = "moreSource")
-    )
-    Target map(Source source);
-}
-
-@Mapper(config = AllMappingsMapperConfig.class)
 interface NoMappingMapper {
 
     Target map(Source source);
 
-    @org.mapstruct.InheritInverseConfiguration
+    @InheritInverseConfiguration
     Source reverse(Target target);
-}
-
-@Mapper(config = AllMappingsMapperConfig.class)
-interface NoMappingsMapper {
-
-    @Mappings({
-    })
-    Target map(Source source);
 }
 
 @MapperConfig(unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -75,14 +44,5 @@ interface UpdateMapper {
 @Mapper(config = AllMappingsMapperConfig.class)
 interface MultiSourceUpdateMapper {
 
-    void update(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
-}
-
-@Mapper(config = AllMappingsMapperConfig.class)
-interface SingleMappingConstantReferenceMapper {
-
-    String TEST_NAME = "testName";
-
-    @Mapping(target = TEST_NAME, source = "name")
-    Target map(Source source);
+    void update(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }

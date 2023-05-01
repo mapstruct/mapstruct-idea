@@ -8,11 +8,6 @@ import org.example.data.UnmappedTargetPropertiesData.Source;
 import org.example.data.UnmappedTargetPropertiesData.Target;
 import org.mapstruct.*;
 
-interface NotMapStructMapper {
-
-    Target map(Source source);
-}
-
 @Mapper
 interface SingleMappingMapper {
 
@@ -22,42 +17,13 @@ interface SingleMappingMapper {
 }
 
 @Mapper
-interface SingleMappingsMapper {
-
-    @Mappings({
-        @Mapping(target = "moreTarget", source = "moreSource")
-    })
-    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
-    Target <error descr="Unmapped target property: testName">map</error>(Source source);
-}
-
-@Mapper
-interface SingleMappingsNoBracesMapper {
-
-    @Mappings(
-        @Mapping(target = "moreTarget", source = "moreSource")
-    )
-    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
-    Target <error descr="Unmapped target property: testName">map</error>(Source source);
-}
-
-@Mapper
 interface NoMappingMapper {
 
     @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
     Target <error descr="Unmapped target properties: moreTarget, testName">map</error>(Source source);
 
-    @org.mapstruct.InheritInverseConfiguration
+    @InheritInverseConfiguration
     Source reverse(Target target);
-}
-
-@Mapper
-interface NoMappingsMapper {
-
-    @Mappings({
-    })
-    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
-    Target <error descr="Unmapped target properties: moreTarget, testName">map</error>(Source source);
 }
 
 @MapperConfig
@@ -83,15 +49,5 @@ interface UpdateMapper {
 interface MultiSourceUpdateMapper {
 
     @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
-    void <error descr="Unmapped target property: moreTarget">update</error>(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
-}
-
-@Mapper
-interface SingleMappingConstantReferenceMapper {
-
-    String TEST_NAME = "testName";
-
-    @Mapping(target = TEST_NAME, source = "name")
-    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.ERROR)
-    Target <error descr="Unmapped target property: moreTarget">map</error>(Source source);
+    void <error descr="Unmapped target property: moreTarget">update</error>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }
