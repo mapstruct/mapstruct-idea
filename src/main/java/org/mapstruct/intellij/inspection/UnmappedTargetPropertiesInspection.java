@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
-import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getReportingPolicyFromMethode;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
@@ -84,8 +84,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             if ( isBeanMappingIgnoreByDefault( method ) ) {
                 return;
             }
-            ReportingPolicy reportingPolicy =
-                    getReportingPolicyFromMethode( method, "unmappedTargetPolicy", ReportingPolicy.WARN );
+            ReportingPolicy reportingPolicy = getUnmappedTargetPolicy( method );
             if (reportingPolicy == ReportingPolicy.IGNORE) {
                 return;
             }

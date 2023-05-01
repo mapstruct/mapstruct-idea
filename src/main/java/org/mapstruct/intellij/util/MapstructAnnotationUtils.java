@@ -45,9 +45,7 @@ import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.mapstruct.ReportingPolicy;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
@@ -63,6 +61,8 @@ import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPING_ANNOTATION
  * @author Filip Hrisafov
  */
 public class MapstructAnnotationUtils {
+
+    private static final String UNMAPPED_TARGET_POLICY = "unmappedTargetPolicy";
 
     private MapstructAnnotationUtils() {
     }
@@ -483,71 +483,68 @@ public class MapstructAnnotationUtils {
     }
 
     @NotNull
-    public static ReportingPolicy getReportingPolicyFromMethode( @NotNull PsiMethod method,
-                                                                 @Nullable @NonNls String attributeName,
-                                                                 @NotNull ReportingPolicy fallback ) {
+    public static ReportingPolicy getUnmappedTargetPolicy( @NotNull PsiMethod method ) {
         PsiAnnotation beanMapping = method.getAnnotation( MapstructUtil.BEAN_MAPPING_FQN );
         if (beanMapping != null) {
-            PsiAnnotationMemberValue beanAnnotationOverwrite = beanMapping.findDeclaredAttributeValue( attributeName );
+            PsiAnnotationMemberValue beanAnnotationOverwrite =
+                    beanMapping.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
             if (beanAnnotationOverwrite != null) {
-                return getReportingPolicyFromAnnotation( beanAnnotationOverwrite, fallback );
+                return getUnmappedTargetPolicyPolicyFromAnnotation( beanAnnotationOverwrite );
             }
         }
         PsiClass containingClass = method.getContainingClass();
         if (containingClass == null) {
-            return fallback;
+            return ReportingPolicy.WARN;
         }
-        return getReportingPolicyFromClass( containingClass, attributeName, fallback );
+        return getUnmappedTargetPolicyFromClass( containingClass );
     }
 
     @NotNull
-    private static ReportingPolicy getReportingPolicyFromClass( @NotNull PsiClass containingClass,
-                                                               @NonNls @Nullable String attributeName,
-                                                               @NotNull ReportingPolicy fallback ) {
+    private static ReportingPolicy getUnmappedTargetPolicyFromClass( @NotNull PsiClass containingClass ) {
         PsiAnnotation mapperAnnotation = containingClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
         if (mapperAnnotation == null) {
-            return fallback;
+            return ReportingPolicy.WARN;
         }
 
         PsiAnnotationMemberValue classAnnotationOverwrite = mapperAnnotation.findDeclaredAttributeValue(
-                attributeName );
+                UNMAPPED_TARGET_POLICY );
         if (classAnnotationOverwrite != null) {
-            return getReportingPolicyFromAnnotation( classAnnotationOverwrite, fallback );
+            return getUnmappedTargetPolicyPolicyFromAnnotation( classAnnotationOverwrite );
         }
-        return getReportingPolicyFromMapperConfig( mapperAnnotation, fallback );
+        return getUnmappedTargetPolicyFromMapperConfig( mapperAnnotation );
     }
 
     @NotNull
-    private static ReportingPolicy getReportingPolicyFromMapperConfig( @NotNull PsiAnnotation mapperAnnotation,
-                                                                       @NotNull ReportingPolicy fallback) {
+    private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig( @NotNull PsiAnnotation mapperAnnotation ) {
         PsiModifierListOwner mapperConfigReference = findMapperConfigReference(  mapperAnnotation );
         if ( mapperConfigReference == null ) {
-            return fallback;
+            return ReportingPolicy.WARN;
         }
         PsiAnnotation mapperConfigAnnotation = mapperConfigReference.getAnnotation(
                 MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
 
         if (mapperConfigAnnotation == null) {
-            return fallback;
+            return ReportingPolicy.WARN;
         }
         PsiAnnotationMemberValue configValue =
-                mapperConfigAnnotation.findDeclaredAttributeValue( "unmappedTargetPolicy" );
+                mapperConfigAnnotation.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
         if (configValue == null) {
-            return fallback;
+            return ReportingPolicy.WARN;
         }
-        return getReportingPolicyFromAnnotation( configValue, fallback );
+        return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
     }
 
 
     /**
-     * Converts the configValue to ReportingPolicy enum. If no matching ReportingPolicy found, returns fallback.
+     * Converts the configValue to ReportingPolicy enum. If no matching ReportingPolicy found,
+     * returns ReportingPolicy.WARN.
+     *
      * @param configValue The annotation value to convert to ReportingPolicy enum
-     * @param fallback the fallback value if no matching ReportingPolicy found
      * @return the mapped ReportingPolicy enum
      */
     @NotNull
-    private static ReportingPolicy getReportingPolicyFromAnnotation( @NotNull PsiAnnotationMemberValue configValue,
-                                                                    @NotNull ReportingPolicy fallback) {
+    private static ReportingPolicy getUnmappedTargetPolicyPolicyFromAnnotation(
+            @NotNull PsiAnnotationMemberValue configValue ) {
         switch (configValue.getText()) {
             case "IGNORE":
             case "ReportingPolicy.IGNORE":
@@ -557,9 +554,8 @@ public class MapstructAnnotationUtils {
                 return ReportingPolicy.ERROR;
             case "WARN":
             case "ReportingPolicy.WARN":
-                return ReportingPolicy.WARN;
             default:
-                return fallback;
+                return ReportingPolicy.WARN;
         }
     }
 
