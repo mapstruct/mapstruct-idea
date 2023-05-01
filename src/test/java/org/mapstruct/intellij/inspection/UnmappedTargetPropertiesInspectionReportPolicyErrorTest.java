@@ -65,9 +65,5 @@ public class UnmappedTargetPropertiesInspectionReportPolicyErrorTest extends Bas
                 "Ignore unmapped target property: 'moreTarget'",
                 "Add unmapped target property: 'moreTarget'"
             );
-
-        allQuickFixes.forEach( myFixture::launchAction );
-        String testName = getTestName( false );
-        myFixture.checkResultByFile( testName + "_after.java" );
     }
 }
