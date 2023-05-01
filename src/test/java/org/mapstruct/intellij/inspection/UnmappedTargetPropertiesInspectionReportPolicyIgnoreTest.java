@@ -33,7 +33,21 @@ public class UnmappedTargetPropertiesInspectionReportPolicyIgnoreTest extends Ba
         );
     }
 
-    public void testUnmappedTargetPropertiesReportPolicyIgnore() {
+    public void testUnmappedTargetPropertiesReportPolicyIgnoreBeanMapping() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+
+        assertThat( allQuickFixes ).isEmpty();
+    }
+
+    public void testUnmappedTargetPropertiesReportPolicyIgnoreClassAnnotation() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+
+        assertThat( allQuickFixes ).isEmpty();
+    }
+
+    public void testUnmappedTargetPropertiesReportPolicyIgnoreConfigClass() {
         doTest();
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
 
