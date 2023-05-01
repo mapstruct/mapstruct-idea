@@ -13,7 +13,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests if unmappedTargetPolicy is read from methode first. Methode level annotation should overwrite class values.
+ * Tests if unmappedTargetPolicy is read from class annotation first. Class level annotation should overwrite config
+ * class values.
  * @author hduelme
  */
 public class UnmappedTargetPropertiesInspectionReportPolicyClassLevelBeforeConfigClassTest extends BaseInspectionTest {

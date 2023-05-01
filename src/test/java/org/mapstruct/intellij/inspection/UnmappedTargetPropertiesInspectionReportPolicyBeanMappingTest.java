@@ -13,7 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests if unmappedTargetPolicy could be read from mapper config class.
+ * Tests if unmappedTargetPolicy could be read from @BeanMapping annotation.
  * @author hduelme
  */
 public class UnmappedTargetPropertiesInspectionReportPolicyBeanMappingTest extends BaseInspectionTest {
