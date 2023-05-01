@@ -46,6 +46,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
+import org.mapstruct.ReportingPolicy;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
@@ -60,6 +61,8 @@ import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPING_ANNOTATION
  * @author Filip Hrisafov
  */
 public class MapstructAnnotationUtils {
+
+    private static final String UNMAPPED_TARGET_POLICY = "unmappedTargetPolicy";
 
     private MapstructAnnotationUtils() {
     }
@@ -477,6 +480,83 @@ public class MapstructAnnotationUtils {
         }
 
         return findReferencedMappers( mapperConfigAnnotation );
+    }
+
+    @NotNull
+    public static ReportingPolicy getUnmappedTargetPolicy( @NotNull PsiMethod method ) {
+        PsiAnnotation beanMapping = method.getAnnotation( MapstructUtil.BEAN_MAPPING_FQN );
+        if (beanMapping != null) {
+            PsiAnnotationMemberValue beanAnnotationOverwrite =
+                    beanMapping.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
+            if (beanAnnotationOverwrite != null) {
+                return getUnmappedTargetPolicyPolicyFromAnnotation( beanAnnotationOverwrite );
+            }
+        }
+        PsiClass containingClass = method.getContainingClass();
+        if (containingClass == null) {
+            return ReportingPolicy.WARN;
+        }
+        return getUnmappedTargetPolicyFromClass( containingClass );
+    }
+
+    @NotNull
+    private static ReportingPolicy getUnmappedTargetPolicyFromClass( @NotNull PsiClass containingClass ) {
+        PsiAnnotation mapperAnnotation = containingClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
+        if (mapperAnnotation == null) {
+            return ReportingPolicy.WARN;
+        }
+
+        PsiAnnotationMemberValue classAnnotationOverwrite = mapperAnnotation.findDeclaredAttributeValue(
+                UNMAPPED_TARGET_POLICY );
+        if (classAnnotationOverwrite != null) {
+            return getUnmappedTargetPolicyPolicyFromAnnotation( classAnnotationOverwrite );
+        }
+        return getUnmappedTargetPolicyFromMapperConfig( mapperAnnotation );
+    }
+
+    @NotNull
+    private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig( @NotNull PsiAnnotation mapperAnnotation ) {
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference(  mapperAnnotation );
+        if ( mapperConfigReference == null ) {
+            return ReportingPolicy.WARN;
+        }
+        PsiAnnotation mapperConfigAnnotation = mapperConfigReference.getAnnotation(
+                MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
+
+        if (mapperConfigAnnotation == null) {
+            return ReportingPolicy.WARN;
+        }
+        PsiAnnotationMemberValue configValue =
+                mapperConfigAnnotation.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
+        if (configValue == null) {
+            return ReportingPolicy.WARN;
+        }
+        return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
+    }
+
+
+    /**
+     * Converts the configValue to ReportingPolicy enum. If no matching ReportingPolicy found,
+     * returns ReportingPolicy.WARN.
+     *
+     * @param configValue The annotation value to convert to ReportingPolicy enum
+     * @return the mapped ReportingPolicy enum
+     */
+    @NotNull
+    private static ReportingPolicy getUnmappedTargetPolicyPolicyFromAnnotation(
+            @NotNull PsiAnnotationMemberValue configValue ) {
+        switch (configValue.getText()) {
+            case "IGNORE":
+            case "ReportingPolicy.IGNORE":
+                return ReportingPolicy.IGNORE;
+            case "ERROR":
+            case "ReportingPolicy.ERROR":
+                return ReportingPolicy.ERROR;
+            case "WARN":
+            case "ReportingPolicy.WARN":
+            default:
+                return ReportingPolicy.WARN;
+        }
     }
 
 }

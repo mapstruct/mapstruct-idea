@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaElementVisitor;
@@ -32,6 +33,7 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.settings.ProjectSettings;
 import org.mapstruct.intellij.util.MapStructVersion;
@@ -40,6 +42,7 @@ import org.mapstruct.intellij.util.MapstructUtil;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
@@ -83,6 +86,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             if ( isBeanMappingIgnoreByDefault( method ) ) {
                 return;
             }
+            ReportingPolicy reportingPolicy = getUnmappedTargetPolicy( method );
+            if (reportingPolicy == ReportingPolicy.IGNORE) {
+                return;
+            }
+
 
             Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
 
@@ -145,6 +153,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 holder.registerProblem(
                     method.getNameIdentifier(),
                     descriptionTemplate,
+                        (ReportingPolicy.ERROR == reportingPolicy ? ProblemHighlightType.ERROR :
+                    ProblemHighlightType.WARNING),
                     quickFixes.toArray( UnmappedTargetPropertyFix.EMPTY_ARRAY )
                 );
             }
