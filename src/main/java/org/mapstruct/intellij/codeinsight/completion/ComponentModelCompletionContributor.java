@@ -5,8 +5,6 @@
  */
 package org.mapstruct.intellij.codeinsight.completion;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
@@ -45,15 +43,10 @@ public class ComponentModelCompletionContributor extends CompletionContributor {
 
         //TODO If we can somehow get access to all the AnnotationBasedComponentModelProcessor and extract
         // their getComponentModelIdentifier then we can use those. I don't know how to do this within the plugin
-        private static final List<String> COMPONENT_MODEL_TYPES = Collections.unmodifiableList( Arrays.asList(
-            "default",
-            "cdi",
-            "spring",
-            "jsr330"
-        ) );
+        private static final List<String> COMPONENT_MODEL_TYPES = List.of( "default", "cdi", "spring", "jsr330" );
 
         @Override
-        protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context,
+        protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context,
             @NotNull CompletionResultSet result) {
             PsiElement position = parameters.getPosition();
 
