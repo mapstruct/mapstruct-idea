@@ -7,6 +7,7 @@ package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +28,9 @@ import org.mapstruct.intellij.util.MapstructUtil;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findReferencedMapperClasses;
+import static org.mapstruct.intellij.util.MapstructUtil.NAMED_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.asLookupWithRepresentableText;
 
 /**
@@ -67,13 +71,13 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     @Nullable
     private String getNamedValue(PsiMethod method) {
 
-        PsiAnnotation annotation = findAnnotation( method, true, MapstructUtil.NAMED_ANNOTATION_FQN );
+        PsiAnnotation namedAnnotation = findAnnotation( method, true, NAMED_ANNOTATION_FQN );
 
-        if ( annotation == null ) {
+        if ( namedAnnotation == null ) {
             return null;
         }
 
-        return getStringAttributeValue( annotation, "value" );
+        return getStringAttributeValue( namedAnnotation, "value" );
     }
 
     @NotNull
@@ -116,16 +120,15 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     @NotNull
     private Stream<PsiMethod> findNamedMethodsInUsedMappers(@Nullable PsiClass containingClass) {
 
-        PsiAnnotation mapperAnnotation = findAnnotation(
-            containingClass,
-            MapstructUtil.MAPPER_ANNOTATION_FQN
-        );
+        PsiAnnotation mapperOrMapperConfigAnnotation =
+            Optional.ofNullable( findAnnotation( containingClass, MAPPER_ANNOTATION_FQN ) )
+                .orElseGet( () -> findAnnotation( containingClass, MAPPER_CONFIG_ANNOTATION_FQN ) );
 
-        if ( mapperAnnotation == null ) {
+        if ( mapperOrMapperConfigAnnotation == null ) {
             return Stream.empty();
         }
 
-        return findReferencedMapperClasses( mapperAnnotation )
+        return findReferencedMapperClasses( mapperOrMapperConfigAnnotation )
             .flatMap( psiClass -> Arrays.stream( psiClass.getMethods() ) )
             .filter( MapstructUtil::isNamedMethod );
     }

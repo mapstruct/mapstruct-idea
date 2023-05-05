@@ -70,4 +70,23 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
             );
     }
 
+    public void testMappingQualifiedByNameInsideMapperConfigCompletion() {
+        configureByTestName();
+        assertQualifiedByNameInsideMapperConfigAutoComplete();
+    }
+
+    private void assertQualifiedByNameInsideMapperConfigAutoComplete() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsOnly( "unwrapOptional" );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsOnly(
+                // methods of mappers from @MapperConfig(uses = ...)
+                createMethod( "unwrapOptional", "T", " OptionalMapper#unwrapOptional(Optional<T>)" )
+            );
+    }
+
 }
