@@ -99,7 +99,7 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter-engine')
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
     testImplementation('org.assertj:assertj-core:3.11.1')
-    testImplementation('org.apache.commons:commons-text:1.9')
+    testImplementation('org.apache.commons:commons-text:1.10.0')
 }
 
 task libs(type: Sync) {
