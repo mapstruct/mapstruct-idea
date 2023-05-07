@@ -182,7 +182,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
                             else if ( resolved instanceof PsiParameter ) {
                                 targetType = ( (PsiParameter) resolved ).getType();
                             }
-                            else if ( resolved instanceof PsiField) {
+                            else if ( resolved instanceof PsiField ) {
                                 targetType = ( (PsiField) resolved ).getType();
                             }
                         }

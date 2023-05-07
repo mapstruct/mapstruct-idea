@@ -41,7 +41,7 @@ The MapStruct plugin requires Java 11 or later
 
 ## Building from Source
 
-Since the project has been migrated to the Gradle and [Gradle IntelliJ plugin][gradle-intellij-plugin],
+Since the project has been migrated to the Gradle and [Gradle IntelliJ plugin](https://github.com/JetBrains/gradle-intellij-plugin),
 the build process is much simpler. The only thing to build the plugin is to run:
 
     ./gradlew build

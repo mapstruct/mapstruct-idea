@@ -19,6 +19,7 @@ import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.util.LombokUtil;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import java.util.Objects;
@@ -68,7 +69,7 @@ class MapstructSourceReference extends MapstructBaseReference {
             methods = psiClass.findMethodsByName( "is" + MapstructUtil.capitalize( value ), true );
         }
         if ( methods.length > 0 && isPublicNonStatic( methods[0] ) ) {
-            return methods[0];
+            return LombokUtil.resolvePsiElementForMethod( methods[0], value, psiClass );
         }
 
         PsiField field = psiClass.findFieldByName( value, true );
