@@ -24,10 +24,12 @@ If you want to discuss specific topics, then ping me (@filiphr) in the MapStruct
         <li>Completion of <code>target</code> and <code>source</code> properties in <code>@Mapping</code> annotation (nested properties also work)</li>
         <li>Completion of <code>target</code> and <code>source</code> properties in <code>@ValueMapping</code> annotation</li>
         <li>Completion of <code>componentModel</code> in <code>@Mapper</code> and <code>@MapperConfig</code> annotations</li>
+        <li>Completion of <code>qualifiedByName</code> in <code>@Mapping</code> annotation</li>
     </ul>
     </li>
     <li>Go To Declaration for properties in <code>target</code> and <code>source</code> to setters / getters</li>
     <li>Find usages of properties in <code>target</code> and <code>source</code> and find usages of setters / getters in <code>@Mapping</code> annotations</li>
+    <li>Go To Declaration for <code>Mapping#qualifiedByName</code></li>
     <li>Highlighting properties in <code>target</code> and <code>source</code></li>
     <li>Refactoring support for properties and methods renaming</li>
     <li>Errors and Quick Fixes:</li>
@@ -35,7 +37,7 @@ If you want to discuss specific topics, then ping me (@filiphr) in the MapStruct
     <ul>
         <li><code>@Mapper</code> or <code>@MapperConfig</code> annotation missing</li>
         <li>Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property.
-            NB: <code>unmappedTargetPolicy</code> is not yet considered</li>
+            Uses <code>unmappedTargetPolicy</code> to determine the severity that should be used</li>
     </ul>
     </li>
 </ul>
