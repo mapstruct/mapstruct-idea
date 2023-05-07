@@ -30,7 +30,6 @@ import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
-import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
@@ -40,7 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
-import static com.intellij.codeInsight.AnnotationUtil.findDeclaredAttribute;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.util.InheritConfigurationUtils.findMappingMethodsFromInheritScope;
 import static org.mapstruct.intellij.util.InheritConfigurationUtils.findSingleMatchingInheritMappingMethod;
@@ -179,13 +177,10 @@ public class TargetUtils {
 
     private static Optional<Boolean> findDisabledBuilder(@Nullable PsiAnnotation requestedAnnotation) {
         if ( requestedAnnotation != null ) {
-            PsiNameValuePair builderAttribute = findDeclaredAttribute( requestedAnnotation, "builder" );
-            if ( builderAttribute != null ) {
-                PsiAnnotationMemberValue builderValue = builderAttribute.getValue();
-                if ( builderValue instanceof PsiAnnotation ) {
-                    Boolean disableBuilder = getBooleanAttributeValue( (PsiAnnotation) builderValue, "disableBuilder" );
-                    return Optional.ofNullable( disableBuilder );
-                }
+            PsiAnnotationMemberValue builderValue = requestedAnnotation.findDeclaredAttributeValue( "builder" );
+            if ( builderValue instanceof PsiAnnotation ) {
+                Boolean disableBuilder = getBooleanAttributeValue( (PsiAnnotation) builderValue, "disableBuilder" );
+                return Optional.ofNullable( disableBuilder );
             }
         }
 
@@ -420,9 +415,7 @@ public class TargetUtils {
                 psiAnnotation,
                 "target"
             ) ) )
-            .map( psiAnnotation -> findDeclaredAttribute( psiAnnotation, "source" ) )
-            .filter( Objects::nonNull )
-            .map( PsiNameValuePair::getValue )
+            .map( psiAnnotation -> psiAnnotation.findDeclaredAttributeValue(  "source" ) )
             .filter( Objects::nonNull )
             .map( ReferenceProvidersRegistry::getReferencesFromProviders )
             .filter( references -> references.length > 0 )
