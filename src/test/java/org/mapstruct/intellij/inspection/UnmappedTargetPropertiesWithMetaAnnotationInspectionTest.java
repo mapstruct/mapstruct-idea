@@ -35,6 +35,16 @@ public class UnmappedTargetPropertiesWithMetaAnnotationInspectionTest extends Ba
             "MetaMappingIgnoreTestName.java",
             "org/example/data/IgnoreTestName.java"
         );
+
+        myFixture.copyFileToProject(
+            "MetaMappingMetaAnnotationChained.java",
+            "org/example/data/AnnotationChained.java"
+        );
+
+        myFixture.copyFileToProject(
+            "MetaMappingMetaAnnotationChainTarget.java",
+            "org/example/data/AnnotationChainTarget.java"
+        );
     }
 
     public void testUnmappedTargetPropertiesWithMetaAnnotation() {
@@ -52,5 +62,13 @@ public class UnmappedTargetPropertiesWithMetaAnnotationInspectionTest extends Ba
 
         allQuickFixes.forEach( myFixture::launchAction );
         myFixture.checkResultByFile( testName + "_after.java" );
+    }
+
+    public void testUnmappedTargetPropertiesWithMetaAnnotationChained() {
+        doTest();
+    }
+
+    public void testUnmappedTargetPropertiesWithMetaAnnotationAndMapping() {
+        doTest();
     }
 }
