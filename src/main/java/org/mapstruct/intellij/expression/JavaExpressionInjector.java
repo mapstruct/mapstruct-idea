@@ -177,7 +177,11 @@ public class JavaExpressionInjector implements MultiHostInjector {
                         if ( references.length > 0 ) {
                             PsiElement resolved = references[0].resolve();
                             if ( resolved instanceof PsiMethod ) {
-                                targetType = ( (PsiMethod) resolved ).getParameterList().getParameters()[0].getType();
+                                PsiParameter[] psiParameters =
+                                        ((PsiMethod) resolved).getParameterList().getParameters();
+                                if ( psiParameters.length > 0) {
+                                    targetType = psiParameters[0].getType();
+                                }
                             }
                             else if ( resolved instanceof PsiParameter ) {
                                 targetType = ( (PsiParameter) resolved ).getType();

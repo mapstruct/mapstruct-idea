@@ -199,6 +199,10 @@ class MapstructTargetReference extends MapstructBaseReference {
      * @return the type of the first parameter of the method
      */
     private static PsiType firstParameterPsiType(PsiMethod psiMethod) {
-        return psiMethod.getParameterList().getParameters()[0].getType();
+        PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
+        if ( psiParameters.length == 0) {
+            return null;
+        }
+        return psiParameters[0].getType();
     }
 }
