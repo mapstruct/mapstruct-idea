@@ -22,7 +22,7 @@ public class MethodeWithNoParametersTest extends MapstructBaseCompletionTestCase
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        myFixture.copyFileToProject( "TargetNoPropertyMethode.java",
+        myFixture.copyFileToProject( "TargetNoPropertyMethods.java",
                 "org/example/TargetNoPropertyMethode.java" );
     }
 

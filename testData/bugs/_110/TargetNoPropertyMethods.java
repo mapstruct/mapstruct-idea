@@ -5,7 +5,7 @@
  */
 package org.example;
 
-public class TargetNoPropertyMethode {
+public class TargetNoPropertyMethods {
 
     public void setActive() {
 
