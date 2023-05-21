@@ -31,7 +31,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
-    private static final String BUILD_LIBS_DIRECTORY = "build/libs";
+    protected static final String BUILD_LIBS_DIRECTORY = "build/libs";
+    protected static final String BUILD_TEST_LIBS_DIRECTORY = "build/test-libs";
     private static final String BUILD_MOCK_JDK_DIRECTORY = "build/mockJDK-";
 
     @Override

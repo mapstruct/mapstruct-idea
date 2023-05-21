@@ -100,7 +100,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         if ( builderSupportPresent ) {
             for ( PsiMethod method : psiClass.findMethodsByName( value, true ) ) {
                 if ( method.getParameterList().getParametersCount() == 1 &&
-                    MapstructUtil.isFluentSetter( method, typeToUse ) ) {
+                    mapstructUtil.isFluentSetter( method, typeToUse ) ) {
                     return method;
                 }
             }
@@ -140,7 +140,7 @@ class MapstructTargetReference extends MapstructBaseReference {
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
         return asLookup(
-            publicWriteAccessors( psiType, mapStructVersion, getMappingMethod() ),
+            publicWriteAccessors( psiType, mapStructVersion, mapstructUtil, getMappingMethod() ),
             MapstructTargetReference::memberPsiType
         );
     }
