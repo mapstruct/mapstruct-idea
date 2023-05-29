@@ -46,9 +46,8 @@ public class ProjectSettingsPage implements Configurable {
 
     @Override
     public boolean isModified() {
-        boolean modified = settingsComponent.getPreferSourceBeforeTargetInMapping() !=
+        return settingsComponent.getPreferSourceBeforeTargetInMapping() !=
             isPreferSourceBeforeTargetInMapping( myProject );
-        return modified;
     }
 
     @Override
