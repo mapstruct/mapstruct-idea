@@ -14,5 +14,6 @@ import org.mapstruct.Mapping;
 public interface CarMapper {
 
     @Mapping(source = "driver.name", target = "<caret>myDriver.name")
+    @Mapping(source = "manufacturingDate", target = "manufacturingYear")
     CarDto carToCarDto(Car car);
 }

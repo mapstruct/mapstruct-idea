@@ -15,5 +15,6 @@ import org.mapstruct.MappingTarget;
 public interface CarMapper {
 
     @Mapping(source = "source.free", target = "target.<caret>available")
+    @Mapping(source = "manufacturingDate", target = "manufacturingYear")
     void update(@MappingTarget CarDto target, Car source);
 }

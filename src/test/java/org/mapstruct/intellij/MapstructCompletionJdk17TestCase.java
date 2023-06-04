@@ -43,7 +43,6 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -57,7 +56,6 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
             .containsExactlyInAnyOrder(
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "myDriver", "PersonDtoRecord" ),
                 createVariable( "passengers", "List<PersonDto>" ),
                 createVariable( "price", "Long" ),
