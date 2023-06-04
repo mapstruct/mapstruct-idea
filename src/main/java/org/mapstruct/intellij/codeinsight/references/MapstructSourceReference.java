@@ -124,6 +124,7 @@ class MapstructSourceReference extends MapstructBaseReference {
     @Override
     PsiType resolvedType() {
         PsiElement element = resolve();
+
         if ( element instanceof PsiMethod ) {
             return ( (PsiMethod) element ).getReturnType();
         }
@@ -132,6 +133,9 @@ class MapstructSourceReference extends MapstructBaseReference {
         }
         else if ( element instanceof PsiRecordComponent ) {
             return ( (PsiRecordComponent) element ).getType();
+        }
+        else if ( element instanceof PsiField ) {
+            return ( (PsiField) element ).getType();
         }
 
         return null;
