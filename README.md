@@ -32,8 +32,8 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
 * Highlighting properties in `target` and `source`
 * Errors and Quick fixes:
   * `@Mapper` or `@MapperConfig` annotation missing
-  * Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property. 
-  NB: `unmappedTargetPolicy` is not yet considered  
+  * Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property.
+    Uses `unmappedTargetPolicy` to determine the severity that should be used
 
 ## Requirements
 
