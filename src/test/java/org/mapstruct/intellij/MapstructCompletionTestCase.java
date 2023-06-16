@@ -246,6 +246,21 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    private void assertNestedSecondLevelAutoCompleteProperty() {
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "name"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "name", "String" )
+            );
+    }
+
     public void testCarMapperReturnTargetCarDtoKotlin() {
         configureByFile( "/" + getTestName( false ) + ".kt" );
         assertCarDtoAutoCompleteKt();
@@ -362,34 +377,17 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
 
     public void testNestedSecondLevelAutoCompleteTargetProperty() {
         configureByTestName();
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "name"
-            );
+        assertNestedSecondLevelAutoCompleteProperty();
+    }
 
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                createVariable( "name", "String" )
-            );
+    public void testNestedSecondLevelAutoCompleteTargetPublicProperty() {
+        configureByTestName();
+        assertNestedSecondLevelAutoCompleteProperty();
     }
 
     public void testNestedSecondLevelAutoCompleteBuilderTargetProperty() {
         configureByTestName();
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "name"
-            );
-
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                createVariable( "name", "String" )
-            );
+        assertNestedSecondLevelAutoCompleteProperty();
     }
 
     public void testNestedSecondLevelAutoCompleteConstructorTargetProperty() {
@@ -463,18 +461,12 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
 
     public void testNestedSecondLevelAutoCompleteSourceProperty() {
         configureByTestName();
-        assertThat( myItems )
-            .extracting( LookupElement::getLookupString )
-            .containsExactlyInAnyOrder(
-                "name"
-            );
+        assertNestedSecondLevelAutoCompleteProperty();
+    }
 
-        assertThat( myItems )
-            .extracting( LookupElementPresentation::renderElement )
-            .usingRecursiveFieldByFieldElementComparator()
-            .containsExactlyInAnyOrder(
-                createVariable( "name", "String" )
-            );
+    public void testNestedSecondLevelAutoCompleteSourcePublicProperty() {
+        configureByTestName();
+        assertNestedSecondLevelAutoCompleteProperty();
     }
 
     public void testFluentGenericTargetMapper() {
