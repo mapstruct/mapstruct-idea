@@ -42,7 +42,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -56,7 +55,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "myDriver", "PersonDto" ),
                 createVariable( "passengers", "List<PersonDto>" ),
                 createVariable( "price", "Long" ),
@@ -71,7 +69,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -85,7 +82,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "myDriver", "PersonDtoKt" ),
                 createVariable( "passengers", "List<PersonDtoKt>" ),
                 createVariable( "price", "Long" ),
@@ -100,7 +96,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -114,7 +109,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "myDriver", "PersonDtoWithBuilder" ),
                 createVariable( "passengers", "List<PersonDtoWithBuilder>" ),
                 createVariable( "price", "Long" ),
@@ -129,7 +123,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -143,7 +136,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createVariable( "make", "String" ),
                 createVariable( "seatCount", "int" ),
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "myDriver", "PersonDto" ),
                 createVariable( "passengers", "List<PersonDto>" ),
                 createVariable( "price", "Long" ),
@@ -204,7 +196,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -219,7 +210,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
-                createParameter( "manufacturingYear", "String" ),
                 createParameter( "myDriver", "PersonDtoWithConstructor" ),
                 createParameter( "passengers", "List<PersonDtoWithConstructor>" ),
                 createParameter( "price", "Long" ),
@@ -234,7 +224,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "myDriver",
                 "passengers",
                 "price",
@@ -249,7 +238,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
-                createParameter( "manufacturingYear", "String" ),
                 createParameter( "myDriver", "PersonDtoWithConstructor" ),
                 createParameter( "passengers", "List<PersonDtoWithConstructor>" ),
                 createParameter( "price", "Long" ),
@@ -298,7 +286,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElement::getLookupString )
             .containsExactlyInAnyOrder(
-                "manufacturingYear",
                 "price",
                 "category"
             );
@@ -307,7 +294,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                createVariable( "manufacturingYear", "String" ),
                 createVariable( "price", "Long" ),
                 createVariable( "category", "String" )
             );
@@ -320,7 +306,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 "make",
                 "seatCount",
-                "manufacturingYear",
                 "price"
             );
 
@@ -331,7 +316,6 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
-                createParameter( "manufacturingYear", "String" ),
                 createParameter( "price", "Long" )
             );
     }

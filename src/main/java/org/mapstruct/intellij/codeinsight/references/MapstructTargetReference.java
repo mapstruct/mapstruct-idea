@@ -5,9 +5,11 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
@@ -18,16 +20,19 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.Mapping;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetType;
 import org.mapstruct.intellij.util.TargetUtils;
 
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.findRecordComponent;
 import static org.mapstruct.intellij.util.MapstructUtil.isPublicModifiable;
@@ -139,10 +144,38 @@ class MapstructTargetReference extends MapstructBaseReference {
     @NotNull
     @Override
     Object[] getVariantsInternal(@NotNull PsiType psiType) {
+
+        PsiMethod mappingMethod = getMappingMethod();
+
+        Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors = publicWriteAccessors(
+            psiType,
+            mapStructVersion,
+            mappingMethod
+        );
+
+        if (mappingMethod != null) {
+            Stream<String> allDefinedMappingTargets = findAllDefinedMappingTargets( mappingMethod );
+            allDefinedMappingTargets.forEach( accessors::remove );
+        }
+
         return asLookup(
-            publicWriteAccessors( psiType, mapStructVersion, getMappingMethod() ),
+            accessors,
             MapstructTargetReference::memberPsiType
         );
+    }
+
+    /**
+     * Find all defined {@link Mapping#target()} for the given method
+     *
+     * @param method that needs to be checked
+     *
+     * @return see description
+     */
+    private Stream<String> findAllDefinedMappingTargets(@NotNull PsiMethod method) {
+        return findAllDefinedMappingAnnotations( method, mapStructVersion )
+            .map( psiAnnotation -> AnnotationUtil.getDeclaredStringAttributeValue( psiAnnotation, "target" ) )
+            .filter( Objects::nonNull )
+            .filter( s -> !s.isEmpty() );
     }
 
     @NotNull
