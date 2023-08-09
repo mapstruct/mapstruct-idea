@@ -291,38 +291,37 @@ public class TargetUtils {
     @Nullable
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
         boolean builderSupportPresent) {
-        if ( method.getParameterList().getParametersCount() != 1 || !MapstructUtil.isPublicNonStatic( method ) ) {
-            // If the method does not have 1 parameter or is not public then there is no property
+        if (!MapstructUtil.isPublicNonStatic( method )) {
+            // If the method is not public then there is no property
+            return null;
+        }
+        String methodName = method.getName();
+        int parametersCount = method.getParameterList().getParametersCount();
+        PsiType returnType = method.getReturnType();
+        if (parametersCount == 0 && methodName.startsWith( "get" ) && returnType != null &&
+                returnType.isConvertibleFrom( PsiType.getTypeByName( "java.util.Collection",
+                        method.getProject(), method.getResolveScope() ) )) {
+            // If the methode returns a collection
+            return Introspector.decapitalize( methodName.substring( 3 ) );
+        }
+        if (parametersCount != 1) {
+            // If the method does not have 1 parameter
             return null;
         }
 
         // This logic is aligned with the DefaultAccessorNamingStrategy
-        String methodName = method.getName();
-        if ( builderSupportPresent ) {
-            if ( isFluentSetter( method, typeToUse ) ) {
-                if ( methodName.startsWith( "set" )
-                    && methodName.length() > 3
-                    && Character.isUpperCase( methodName.charAt( 3 ) ) ) {
-                    return Introspector.decapitalize( methodName.substring( 3 ) );
-                }
-                else {
-                    return methodName;
-                }
-            }
-            else if ( methodName.startsWith( "set" ) ) {
+        if ( builderSupportPresent && isFluentSetter( method, typeToUse )) {
+            if ( methodName.startsWith( "set" )
+                && methodName.length() > 3
+                && Character.isUpperCase( methodName.charAt( 3 ) ) ) {
                 return Introspector.decapitalize( methodName.substring( 3 ) );
             }
-            else {
-                return null;
-            }
+            return methodName;
         }
-        else if ( methodName.startsWith( "set" ) ) {
+        if ( methodName.startsWith( "set" ) ) {
             return Introspector.decapitalize( methodName.substring( 3 ) );
         }
-        else {
-            return null;
-        }
-
+        return null;
     }
 
     /**
