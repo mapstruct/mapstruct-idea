@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.lang.jvm.JvmModifier;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -98,7 +99,7 @@ public class TargetUtils {
      * @return a stream that holds all public write accessors for the given {@code psiType}
      */
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
-        MapStructVersion mapStructVersion, PsiMethod mappingMethod) {
+        MapStructVersion mapStructVersion, PsiMethod mappingMethod, boolean ignoreWither) {
         boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
         Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass(
             psiType,
@@ -114,7 +115,7 @@ public class TargetUtils {
         TargetType targetType = classAndType.getSecond();
         PsiType typeToUse = targetType.type();
 
-        publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, builderSupportPresent ) );
+        publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, builderSupportPresent, ignoreWither ) );
         publicWriteAccessors.putAll( publicFields( psiClass ) );
 
         if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
@@ -267,7 +268,8 @@ public class TargetUtils {
      */
     private static Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicSetters(@NotNull PsiClass psiClass,
         @NotNull PsiType typeToUse,
-        boolean builderSupportPresent) {
+        boolean builderSupportPresent, boolean ignoreWither
+    ) {
         Set<PsiMethod> overriddenMethods = new HashSet<>();
         Map<String, Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new LinkedHashMap<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
@@ -275,7 +277,7 @@ public class TargetUtils {
             if ( method.isConstructor() ) {
                 continue;
             }
-            String propertyName = extractPublicSetterPropertyName( method, typeToUse, builderSupportPresent );
+            String propertyName = extractPublicSetterPropertyName( method, typeToUse, builderSupportPresent, ignoreWither );
 
             if ( propertyName != null &&
                 !overriddenMethods.contains( method ) ) {
@@ -290,7 +292,7 @@ public class TargetUtils {
 
     @Nullable
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
-        boolean builderSupportPresent) {
+                                                          boolean builderSupportPresent, boolean ignoreWither) {
         if (!MapstructUtil.isPublicNonStatic( method )) {
             // If the method is not public then there is no property
             return null;
@@ -315,6 +317,9 @@ public class TargetUtils {
                 && methodName.length() > 3
                 && Character.isUpperCase( methodName.charAt( 3 ) ) ) {
                 return Introspector.decapitalize( methodName.substring( 3 ) );
+            }
+            if (ignoreWither) {
+                return null;
             }
             return methodName;
         }
@@ -343,7 +348,7 @@ public class TargetUtils {
         if ( builderEnabled ) {
             for ( PsiMethod classMethod : psiClass.getMethods() ) {
                 if ( MapstructUtil.isPossibleBuilderCreationMethod( classMethod, targetType.type() ) &&
-                    hasBuildMethod( classMethod.getReturnType(), psiType ) ) {
+                    hasBuildMethod( classMethod.getReturnType(), psiType) ) {
                     targetType = TargetType.builder( classMethod.getReturnType() );
                     break;
                 }
@@ -375,7 +380,7 @@ public class TargetUtils {
         }
 
         for ( PsiMethod buildMethod : builderClass.getAllMethods() ) {
-            if ( MapstructUtil.isBuildMethod( buildMethod, type ) ) {
+            if ( MapstructUtil.isBuildMethod( buildMethod, type) ) {
                 return true;
             }
         }
@@ -432,8 +437,8 @@ public class TargetUtils {
      * @return all target properties for the given {@code targetClass}
      */
     public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, MapStructVersion mapStructVersion,
-                                                      PsiMethod mappingMethod) {
-        return publicWriteAccessors( targetType, mapStructVersion, mappingMethod ).keySet();
+                                                      PsiMethod mappingMethod, boolean ignoreWither) {
+        return publicWriteAccessors( targetType, mapStructVersion, mappingMethod, ignoreWither ).keySet();
     }
 
     /**

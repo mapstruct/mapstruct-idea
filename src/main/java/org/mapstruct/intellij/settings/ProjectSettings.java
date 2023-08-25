@@ -19,6 +19,8 @@ public interface ProjectSettings {
     String PREFER_SOURCE_BEFORE_TARGET_IN_MAPPING =
         PREFIX + "PREFER_SOURCE_BEFORE_TARGET_IN_MAPPING";
 
+    String IGNORE_WITHER_IN_MAPPING = PREFIX + "IGNORE_WITHER_IN_MAPPING";
+
     static boolean isPreferSourceBeforeTargetInMapping(@NotNull Project project) {
         return PropertiesComponent.getInstance( project ).getBoolean( PREFER_SOURCE_BEFORE_TARGET_IN_MAPPING, false );
     }
@@ -26,5 +28,14 @@ public interface ProjectSettings {
     static void setPreferSourceBeforeTargetInMapping(@NotNull Project project, boolean value) {
         PropertiesComponent.getInstance( project )
             .setValue( PREFER_SOURCE_BEFORE_TARGET_IN_MAPPING, String.valueOf( value ), "false" );
+    }
+
+    static boolean isIgnoreWitherInMapping(@NotNull Project project) {
+        return PropertiesComponent.getInstance( project ).getBoolean( IGNORE_WITHER_IN_MAPPING, false );
+    }
+
+    static void setIgnoreWitherInMapping(@NotNull Project project, boolean value) {
+        PropertiesComponent.getInstance( project )
+          .setValue( IGNORE_WITHER_IN_MAPPING, String.valueOf( value ), "false" );
     }
 }

@@ -5,12 +5,9 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
@@ -27,10 +24,15 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.Mapping;
+import org.mapstruct.intellij.settings.ProjectSettings;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetType;
 import org.mapstruct.intellij.util.TargetUtils;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
@@ -50,6 +52,7 @@ import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
 class MapstructTargetReference extends MapstructBaseReference {
 
     private final MapStructVersion mapStructVersion;
+    private final boolean ignoreWither;
 
     /**
      * Create a new {@link MapstructTargetReference} with the provided parameters
@@ -64,6 +67,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         super( element, previousReference, rangeInElement, value );
         mapStructVersion = MapstructUtil.resolveMapStructProjectVersion( element.getContainingFile()
             .getOriginalFile() );
+        ignoreWither = ProjectSettings.isIgnoreWitherInMapping(element.getContainingFile().getOriginalFile().getProject());
     }
 
     @Override
@@ -104,7 +108,7 @@ class MapstructTargetReference extends MapstructBaseReference {
 
         if ( builderSupportPresent ) {
             for ( PsiMethod method : psiClass.findMethodsByName( value, true ) ) {
-                if ( method.getParameterList().getParametersCount() == 1 &&
+                if ( method.getParameterList().getParametersCount() == 1 && // !ignoreWither &&
                     MapstructUtil.isFluentSetter( method, typeToUse ) ) {
                     return method;
                 }
@@ -150,7 +154,8 @@ class MapstructTargetReference extends MapstructBaseReference {
         Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors = publicWriteAccessors(
             psiType,
             mapStructVersion,
-            mappingMethod
+            mappingMethod,
+            ignoreWither
         );
 
         if (mappingMethod != null) {
@@ -212,7 +217,7 @@ class MapstructTargetReference extends MapstructBaseReference {
      * @return the references for the given {@code psiLiteral}
      */
     static PsiReference[] create(PsiElement psiElement) {
-        return MapstructBaseReference.create( psiElement, MapstructTargetReference::new, true );
+        return MapstructBaseReference.create( psiElement, MapstructTargetReference::new, true);
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {
