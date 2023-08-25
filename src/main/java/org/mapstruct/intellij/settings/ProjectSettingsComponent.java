@@ -21,15 +21,19 @@ public class ProjectSettingsComponent {
 
     private final JPanel mainPanel;
     private final JBCheckBox preferSourceBeforeTargetInMapping;
+    private final JBCheckBox ignoreWitherInMapping;
 
     public ProjectSettingsComponent() {
         this.preferSourceBeforeTargetInMapping = new JBCheckBox( MapStructBundle.message(
             "plugin.settings.quickFix.preferSourceBeforeTargetInMapping" ), false );
+        this.ignoreWitherInMapping = new JBCheckBox( MapStructBundle.message(
+            "plugin.settings.quickFix.ignoreWitherInMapping" ), false );
         JPanel quickFixProperties = new JPanel( new BorderLayout() );
         quickFixProperties.setBorder( IdeBorderFactory.createTitledBorder( MapStructBundle.message(
             "plugin.settings.quickFix.title" ), false ) );
 
         quickFixProperties.add( this.preferSourceBeforeTargetInMapping, BorderLayout.NORTH );
+        quickFixProperties.add( this.ignoreWitherInMapping, BorderLayout.SOUTH );
         this.mainPanel = FormBuilder.createFormBuilder()
             .addComponent( quickFixProperties )
             .addComponentFillVertically( new JPanel(), 0 )
@@ -50,6 +54,14 @@ public class ProjectSettingsComponent {
 
     public void setPreferSourceBeforeTargetInMapping(boolean newState) {
         preferSourceBeforeTargetInMapping.setSelected( newState );
+    }
+
+    public boolean getIgnoreWitherInMapping() {
+        return ignoreWitherInMapping.isSelected();
+    }
+
+    public void setIgnoreWitherInMapping(boolean newState) {
+        ignoreWitherInMapping.setSelected( newState );
     }
 
 }

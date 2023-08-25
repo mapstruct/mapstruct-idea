@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
 import org.mapstruct.intellij.MapStructBundle;
 
+import static org.mapstruct.intellij.settings.ProjectSettings.isIgnoreWitherInMapping;
 import static org.mapstruct.intellij.settings.ProjectSettings.isPreferSourceBeforeTargetInMapping;
 
 /**
@@ -47,7 +48,8 @@ public class ProjectSettingsPage implements Configurable {
     @Override
     public boolean isModified() {
         return settingsComponent.getPreferSourceBeforeTargetInMapping() !=
-            isPreferSourceBeforeTargetInMapping( myProject );
+            isPreferSourceBeforeTargetInMapping( myProject ) ||
+          settingsComponent.getIgnoreWitherInMapping() != isIgnoreWitherInMapping(myProject);
     }
 
     @Override
@@ -56,11 +58,13 @@ public class ProjectSettingsPage implements Configurable {
             myProject,
             settingsComponent.getPreferSourceBeforeTargetInMapping()
         );
+        ProjectSettings.setIgnoreWitherInMapping(myProject, settingsComponent.getIgnoreWitherInMapping());
     }
 
     @Override
     public void reset() {
         settingsComponent.setPreferSourceBeforeTargetInMapping( isPreferSourceBeforeTargetInMapping( myProject ) );
+        settingsComponent.setIgnoreWitherInMapping( isIgnoreWitherInMapping( myProject ) );
     }
 
     @Override
