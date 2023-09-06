@@ -58,6 +58,10 @@ public class InheritConfigurationInspectionTest extends BaseInspectionTest {
             .containsOnly( "carDtoToCarIgnoringSeatCount" );
     }
 
+    public void testInheritConfigurationNotInheritedByUsedMapper() {
+        doTest();
+    }
+
     public void testInheritConfigurationBySuperMapperMapper() {
         doTest();
     }

@@ -314,7 +314,7 @@ public class MapstructAnnotationUtils {
 
         Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
-        return Stream.concat( mappingAnnotations, mappingsAnnotations );
+        return Stream.concat( mappingAnnotations, mappingsAnnotations ).distinct();
     }
 
     private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiModifierListOwner method,
@@ -464,6 +464,17 @@ public class MapstructAnnotationUtils {
         }
 
         return (PsiModifierListOwner) resolvedElement;
+    }
+
+    public static Optional<PsiClass> findMapperConfigClass(@NotNull PsiAnnotation mapperAnnotation) {
+
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference( mapperAnnotation );
+
+        if ( !( mapperConfigReference instanceof PsiClass ) ) {
+            return Optional.empty();
+        }
+
+        return Optional.of( (PsiClass) mapperConfigReference );
     }
 
     /**

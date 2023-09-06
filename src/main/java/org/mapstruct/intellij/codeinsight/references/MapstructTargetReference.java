@@ -41,6 +41,7 @@ import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 import static org.mapstruct.intellij.util.TargetUtils.isBuilderEnabled;
 import static org.mapstruct.intellij.util.TargetUtils.publicWriteAccessors;
 import static org.mapstruct.intellij.util.TargetUtils.resolveBuilderOrSelfClass;
+import static org.mapstruct.intellij.util.TypeUtils.firstParameterPsiType;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#target()}.
@@ -226,20 +227,5 @@ class MapstructTargetReference extends MapstructBaseReference {
             return null;
         }
 
-    }
-
-    /**
-     * Util function for extracting the type of the first parameter of a method.
-     *
-     * @param psiMethod the method to extract the parameter from
-     *
-     * @return the type of the first parameter of the method
-     */
-    private static PsiType firstParameterPsiType(PsiMethod psiMethod) {
-        PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
-        if ( psiParameters.length == 0) {
-            return null;
-        }
-        return psiParameters[0].getType();
     }
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -41,8 +42,10 @@ import org.mapstruct.intellij.util.MapstructUtil;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
+import static org.mapstruct.intellij.inspection.inheritance.InheritConfigurationUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
+import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
@@ -50,7 +53,6 @@ import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
-import static org.mapstruct.intellij.util.TargetUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 
 /**
@@ -86,8 +88,15 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             if ( isBeanMappingIgnoreByDefault( method ) ) {
                 return;
             }
+
             ReportingPolicy reportingPolicy = getUnmappedTargetPolicy( method );
             if (reportingPolicy == ReportingPolicy.IGNORE) {
+                return;
+            }
+
+            if ( isPrototypeMethod( method )) {
+                // prototype methods can be incomplete and therefore should not provide errors or warnings
+                // that cannot be solved with quick fixes
                 return;
             }
 
@@ -179,6 +188,14 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
 
             return false;
+        }
+
+        private static boolean isPrototypeMethod(@NotNull PsiMethod method) {
+
+            return Optional.ofNullable( method.getContainingClass() )
+                .map( containingClass -> findAnnotation( containingClass, MAPPER_CONFIG_ANNOTATION_FQN ) )
+                .stream().findFirst()
+                .isPresent();
         }
 
         /**
