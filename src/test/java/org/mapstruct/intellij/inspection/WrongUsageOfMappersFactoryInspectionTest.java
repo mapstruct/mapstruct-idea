@@ -51,6 +51,8 @@ public class WrongUsageOfMappersFactoryInspectionTest extends BaseInspectionTest
         myFixture.launchAction( allQuickFixes.get( 6 ) ); // Remove jsr330 componentModel
         myFixture.launchAction( allQuickFixes.get( 8 ) ); // Remove custom componentModel
 
+        assertThat( myFixture.getAllQuickFixes() ).isEmpty();
+
         myFixture.checkResultByFile( testName + "_after.java" );
     }
 }
