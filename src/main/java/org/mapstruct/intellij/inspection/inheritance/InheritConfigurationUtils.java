@@ -25,7 +25,6 @@ import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.MappingInheritanceStrategy;
 import org.mapstruct.intellij.util.MapStructVersion;
-import org.mapstruct.intellij.util.SourceUtils;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
@@ -34,6 +33,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.INHERIT_CONFIGURATION_FQ
 import static org.mapstruct.intellij.util.MapstructUtil.INHERIT_INVERSE_CONFIGURATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.SourceUtils.findAllDefinedMappingSources;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 
@@ -134,7 +134,7 @@ public class InheritConfigurationUtils {
                 .forEach( ctx.mappedTargets::add );
         }
         if ( inverseTemplateMethod != null ) {
-            SourceUtils.findAllDefinedMappingSources( inverseTemplateMethod.method, ctx.mapStructVersion )
+            findAllDefinedMappingSources( inverseTemplateMethod.method, ctx.mapStructVersion )
                 .forEach( ctx.mappedTargets::add );
         }
 
@@ -156,7 +156,7 @@ public class InheritConfigurationUtils {
                 ctx.inheritanceStrategy == MappingInheritanceStrategy.AUTO_INHERIT_REVERSE_FROM_CONFIG;
             if ( inverseTemplateMethod == null && applyReverse ) {
                 if ( applicableReversePrototypeMethods.size() == 1 ) {
-                    SourceUtils.findAllDefinedMappingSources(
+                    findAllDefinedMappingSources(
                             first( applicableReversePrototypeMethods ).method,
                             ctx.mapStructVersion
                         )
@@ -181,7 +181,7 @@ public class InheritConfigurationUtils {
         if ( inverseConfiguration != null ) {
 
             // method is configured as being inverse method, collect candidates
-            Set<SourceMethod> candidates = new HashSet<>();
+            List<SourceMethod> candidates = new ArrayList<>();
             for ( SourceMethod oneMethod : rawMethods ) {
                 if ( mappingMethod.inverses( oneMethod.method, targetType ) ) {
                     candidates.add( oneMethod );
@@ -207,7 +207,7 @@ public class InheritConfigurationUtils {
 
         if ( inheritConfiguration != null ) {
 
-            Set<SourceMethod> candidates = new HashSet<>();
+            List<SourceMethod> candidates = new ArrayList<>();
             for ( SourceMethod oneMethod : rawMethods ) {
                 // method must be similar but not equal
                 if ( mappingMethod.canInheritFrom( oneMethod.method, targetType ) &&
@@ -224,7 +224,7 @@ public class InheritConfigurationUtils {
 
     private static SourceMethod getResultMethod(
         PsiAnnotation inheritOrInverseConfigurationAnnotation,
-        Set<SourceMethod> candidates) {
+        List<SourceMethod> candidates) {
 
         String name = getStringAttributeValue( inheritOrInverseConfigurationAnnotation, "name" );
         if ( candidates.size() == 1 ) {

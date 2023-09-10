@@ -314,25 +314,21 @@ public class MapstructAnnotationUtils {
 
         Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
-        return Stream.concat( mappingAnnotations, mappingsAnnotations ).distinct();
+        return Stream.concat( mappingAnnotations, mappingsAnnotations );
     }
 
     private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiModifierListOwner method,
                                                                 boolean includeMetaAnnotations) {
 
-        Stream<PsiAnnotation> metaAnnotations = Stream.empty();
-
         if ( includeMetaAnnotations ) {
             // do not use MetaAnnotationUtil#findMetaAnnotations since it only finds the first @Mapping annotation
-            metaAnnotations = findMetaAnnotations( method, new HashSet<>() ).stream();
+            return findMetaAnnotations( method, new HashSet<>() ).stream();
         }
 
-        Stream<PsiAnnotation> directAnnotations = Stream.of( method.getModifierList() )
+        return Stream.of( method.getModifierList() )
             .filter( Objects::nonNull )
             .flatMap( psiModifierList -> Arrays.stream( psiModifierList.getAnnotations() ) )
             .filter( MapstructAnnotationUtils::isMappingAnnotation );
-
-        return Stream.concat( directAnnotations, metaAnnotations );
     }
 
     @NotNull
