@@ -192,6 +192,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
         private static boolean isPrototypeMethod(@NotNull PsiMethod method) {
 
+            return isContainedInsideMapperConfig( method );
+        }
+
+        private static boolean isContainedInsideMapperConfig(@NotNull PsiMethod method) {
+
             return Optional.ofNullable( method.getContainingClass() )
                 .map( containingClass -> findAnnotation( containingClass, MAPPER_CONFIG_ANNOTATION_FQN ) )
                 .stream().findFirst()
@@ -221,6 +226,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
             return getRelevantType( method );
         }
+
     }
 
     private static class UnmappedTargetPropertyFix extends LocalQuickFixOnPsiElement {
