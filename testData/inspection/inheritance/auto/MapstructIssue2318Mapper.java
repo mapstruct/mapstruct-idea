@@ -7,12 +7,9 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;;
 
-@Mapper(config = Issue2318Mapper.Config.class)
-interface Issue2318Mapper {
-
-    Issue2318Mapper INSTANCE = Mappers.getMapper( Issue2318Mapper.class );
+@Mapper(config = MapstructIssue2318Mapper.Config.class)
+interface MapstructIssue2318Mapper {
 
     @MapperConfig
     interface Config {

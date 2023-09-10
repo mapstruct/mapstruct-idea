@@ -10,7 +10,6 @@ import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingInheritanceStrategy;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 @MapperConfig(
     mappingInheritanceStrategy = MappingInheritanceStrategy.AUTO_INHERIT_FROM_CONFIG
@@ -28,8 +27,6 @@ interface AutoInheritedConfig {
     mappingInheritanceStrategy = MappingInheritanceStrategy.EXPLICIT
 )
 abstract class CarMapperWithExplicitInheritance {
-    public static final CarMapperWithExplicitInheritance INSTANCE =
-        Mappers.getMapper( CarMapperWithExplicitInheritance.class );
 
     @InheritConfiguration(name = "baseDtoToEntity")
     @Mapping(target = "color", source = "colour")
