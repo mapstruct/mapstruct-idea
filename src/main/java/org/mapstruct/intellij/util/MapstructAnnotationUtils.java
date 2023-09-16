@@ -322,7 +322,7 @@ public class MapstructAnnotationUtils {
 
         if ( includeMetaAnnotations ) {
             // do not use MetaAnnotationUtil#findMetaAnnotations since it only finds the first @Mapping annotation
-            return findMetaAnnotations( method, new HashSet<>() ).stream();
+            return findDirectAndMetaAnnotations( method, new HashSet<>() ).stream();
         }
 
         return Stream.of( method.getModifierList() )
@@ -332,8 +332,8 @@ public class MapstructAnnotationUtils {
     }
 
     @NotNull
-    private static Set<PsiAnnotation> findMetaAnnotations(@NotNull PsiModifierListOwner owner,
-                                                          Set<? super PsiClass> visited) {
+    private static Set<PsiAnnotation> findDirectAndMetaAnnotations(@NotNull PsiModifierListOwner owner,
+                                                                   Set<? super PsiClass> visited) {
 
         Set<PsiAnnotation> result = new HashSet<>();
 
@@ -344,7 +344,7 @@ public class MapstructAnnotationUtils {
 
         for ( PsiClass annotationClass : annotationClasses ) {
             if ( visited.add( annotationClass ) ) {
-                result.addAll( findMetaAnnotations( annotationClass, visited ) );
+                result.addAll( findDirectAndMetaAnnotations( annotationClass, visited ) );
             }
         }
 
