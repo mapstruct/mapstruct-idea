@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,7 +44,6 @@ import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.inspection.inheritance.InheritConfigurationUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
-import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
@@ -80,6 +78,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
         public void visitMethod(PsiMethod method) {
             super.visitMethod( method );
 
+            if ( !MapstructUtil.isMapper( method.getContainingClass() ) ) {
+                return;
+            }
+
             PsiType targetType = getTargetType( method );
             if ( targetType == null ) {
                 return;
@@ -93,13 +95,6 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             if (reportingPolicy == ReportingPolicy.IGNORE) {
                 return;
             }
-
-            if ( isPrototypeMethod( method )) {
-                // prototype methods can be incomplete and therefore should not provide errors or warnings
-                // that cannot be solved with quick fixes
-                return;
-            }
-
 
             Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
 
@@ -188,19 +183,6 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
 
             return false;
-        }
-
-        private static boolean isPrototypeMethod(@NotNull PsiMethod method) {
-
-            return isContainedInsideMapperConfig( method );
-        }
-
-        private static boolean isContainedInsideMapperConfig(@NotNull PsiMethod method) {
-
-            return Optional.ofNullable( method.getContainingClass() )
-                .map( containingClass -> findAnnotation( containingClass, MAPPER_CONFIG_ANNOTATION_FQN ) )
-                .stream().findFirst()
-                .isPresent();
         }
 
         /**
