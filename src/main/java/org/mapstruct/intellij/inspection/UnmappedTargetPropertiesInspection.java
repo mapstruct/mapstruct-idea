@@ -41,6 +41,7 @@ import org.mapstruct.intellij.util.MapstructUtil;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
+import static org.mapstruct.intellij.inspection.inheritance.InheritConfigurationUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
 import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
@@ -50,7 +51,6 @@ import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
-import static org.mapstruct.intellij.util.TargetUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
 
 /**
@@ -78,6 +78,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
         public void visitMethod(PsiMethod method) {
             super.visitMethod( method );
 
+            if ( !MapstructUtil.isMapper( method.getContainingClass() ) ) {
+                return;
+            }
+
             PsiType targetType = getTargetType( method );
             if ( targetType == null ) {
                 return;
@@ -86,11 +90,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             if ( isBeanMappingIgnoreByDefault( method ) ) {
                 return;
             }
+
             ReportingPolicy reportingPolicy = getUnmappedTargetPolicy( method );
             if (reportingPolicy == ReportingPolicy.IGNORE) {
                 return;
             }
-
 
             Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
 
@@ -204,6 +208,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
             return getRelevantType( method );
         }
+
     }
 
     private static class UnmappedTargetPropertyFix extends LocalQuickFixOnPsiElement {

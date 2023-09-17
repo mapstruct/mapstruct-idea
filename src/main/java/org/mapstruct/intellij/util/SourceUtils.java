@@ -11,8 +11,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.PsiClass;
@@ -26,6 +29,7 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
@@ -64,6 +68,22 @@ public class SourceUtils {
         }
 
         return sourceProperties;
+    }
+
+    /**
+     * Find all defined {@link org.mapstruct.Mapping#source()} for the given method
+     *
+     * @param method that needs to be checked
+     * @param mapStructVersion the MapStruct project version
+     *
+     * @return see description
+     */
+    public static Stream<String> findAllDefinedMappingSources(@NotNull PsiMethod method,
+                                                              @NotNull MapStructVersion mapStructVersion) {
+        return findAllDefinedMappingAnnotations( method, mapStructVersion )
+            .map( psiAnnotation -> AnnotationUtil.getDeclaredStringAttributeValue( psiAnnotation, "source" ) )
+            .filter( Objects::nonNull )
+            .filter( s -> !s.isEmpty() );
     }
 
     /**

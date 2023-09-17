@@ -51,6 +51,12 @@ public class WrongUsageOfMappersFactoryInspectionTest extends BaseInspectionTest
         myFixture.launchAction( allQuickFixes.get( 6 ) ); // Remove jsr330 componentModel
         myFixture.launchAction( allQuickFixes.get( 8 ) ); // Remove custom componentModel
 
+        // IDEA LATEST-EAP-SNAPSHOT fails to assert this (and only this) test
+        // when myFixture.getAllQuickFixes() does not get called beforehand.
+        // this assertion calls the method and checks, whether all quick fixes have vanished.
+        // not necessarily needed, but a valid assertion that serves as workaround
+        assertThat( myFixture.getAllQuickFixes() ).isEmpty();
+
         myFixture.checkResultByFile( testName + "_after.java" );
     }
 }

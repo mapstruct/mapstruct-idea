@@ -320,24 +320,20 @@ public class MapstructAnnotationUtils {
     private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiModifierListOwner method,
                                                                 boolean includeMetaAnnotations) {
 
-        Stream<PsiAnnotation> metaAnnotations = Stream.empty();
-
         if ( includeMetaAnnotations ) {
             // do not use MetaAnnotationUtil#findMetaAnnotations since it only finds the first @Mapping annotation
-            metaAnnotations = findMetaAnnotations( method, new HashSet<>() ).stream();
+            return findDirectAndMetaAnnotations( method, new HashSet<>() ).stream();
         }
 
-        Stream<PsiAnnotation> directAnnotations = Stream.of( method.getModifierList() )
+        return Stream.of( method.getModifierList() )
             .filter( Objects::nonNull )
             .flatMap( psiModifierList -> Arrays.stream( psiModifierList.getAnnotations() ) )
             .filter( MapstructAnnotationUtils::isMappingAnnotation );
-
-        return Stream.concat( directAnnotations, metaAnnotations );
     }
 
     @NotNull
-    private static Set<PsiAnnotation> findMetaAnnotations(@NotNull PsiModifierListOwner owner,
-                                                          Set<? super PsiClass> visited) {
+    private static Set<PsiAnnotation> findDirectAndMetaAnnotations(@NotNull PsiModifierListOwner owner,
+                                                                   Set<? super PsiClass> visited) {
 
         Set<PsiAnnotation> result = new HashSet<>();
 
@@ -348,7 +344,7 @@ public class MapstructAnnotationUtils {
 
         for ( PsiClass annotationClass : annotationClasses ) {
             if ( visited.add( annotationClass ) ) {
-                result.addAll( findMetaAnnotations( annotationClass, visited ) );
+                result.addAll( findDirectAndMetaAnnotations( annotationClass, visited ) );
             }
         }
 
@@ -464,6 +460,17 @@ public class MapstructAnnotationUtils {
         }
 
         return (PsiModifierListOwner) resolvedElement;
+    }
+
+    public static Optional<PsiClass> findMapperConfigClass(@NotNull PsiAnnotation mapperAnnotation) {
+
+        PsiModifierListOwner mapperConfigReference = findMapperConfigReference( mapperAnnotation );
+
+        if ( !( mapperConfigReference instanceof PsiClass ) ) {
+            return Optional.empty();
+        }
+
+        return Optional.of( (PsiClass) mapperConfigReference );
     }
 
     /**
