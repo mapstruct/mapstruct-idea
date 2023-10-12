@@ -47,16 +47,12 @@ public class MoreThanOneSourcePropertyDefinedInspectionTest extends BaseInspecti
                 .extracting( IntentionAction::getText )
                 .as( "Intent Text" )
                 .containsExactly( "Remove constant value",
-                        "Use constant value as default value",
                         "Remove expression",
-                        "Use expression as default expression",
                         "Remove constant value",
-                        "Use constant value as default value",
-                        "Remove expression",
-                        "Use expression as default expression"
+                        "Remove expression"
                 );
+        myFixture.launchAction( allQuickFixes.get( 1 ) );
         myFixture.launchAction( allQuickFixes.get( 2 ) );
-        myFixture.launchAction( allQuickFixes.get( 7 ) );
         String testName = getTestName( false );
         myFixture.checkResultByFile( testName + "_after.java" );
     }
