@@ -36,7 +36,7 @@ public class MoreThanOneSourcePropertyDefinedInspection extends MappingAnnotatio
                 quickFixes.add( createRemoveAnnotationAttributeQuickFix( mappingAnnotation.getConstantProperty(),
                         "Remove constant value", family ) );
 
-                if (mappingAnnotation.hasNoDefaultProperties()) {
+                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null) {
                     quickFixes.add( createReplaceAsDefaultValueQuickFix(
                             mappingAnnotation.getConstantProperty(), "constant", "defaultValue",
                             "Use constant value as default value", family ) );
@@ -45,7 +45,7 @@ public class MoreThanOneSourcePropertyDefinedInspection extends MappingAnnotatio
             if (mappingAnnotation.getExpressionProperty() != null) {
                 quickFixes.add( createRemoveAnnotationAttributeQuickFix( mappingAnnotation.getExpressionProperty(),
                         "Remove expression", family ) );
-                if (mappingAnnotation.hasNoDefaultProperties()) {
+                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null) {
                     quickFixes.add( createReplaceAsDefaultValueQuickFix(
                             mappingAnnotation.getExpressionProperty(), "expression", "defaultExpression",
                             "Use expression as default expression", family ) );
