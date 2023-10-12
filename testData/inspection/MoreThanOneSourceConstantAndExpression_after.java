@@ -45,7 +45,7 @@ interface SingleMappingMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-            @Mapping(target = "testName", constant = "My name", defaultExpression = "java()")
+            @Mapping(target = "testName", expression = "java()")
             })
     Target map(Source source);
 }
