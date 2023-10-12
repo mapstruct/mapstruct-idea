@@ -111,7 +111,7 @@ task libs(type: Sync) {
     rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
 }
 
-def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/master/java/mock"
+def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/212.5712/java/mock"
 def mockJdkDest = "$buildDir/mock"
 def downloadMockJdk(mockJdkLocation, mockJdkDest, mockJdkVersion) {
     def location = mockJdkLocation + mockJdkVersion
