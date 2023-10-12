@@ -1,14 +1,14 @@
 <html>
 <body>
 <p>
-    This inspection reports when no source or the ignore property is set inside the  <code>@Mapping</code>
+    This inspection reports when no source or the ignore property is set inside the <code>@Mapping</code>
 </p>
 <p>
 <pre><code>
 //wrong
 @Mapper
 public interface EmployeeMapper {
-    @Mapping(source = "employeeName")
+    @Mapping(target = "name")
     Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
 }
 </code></pre>

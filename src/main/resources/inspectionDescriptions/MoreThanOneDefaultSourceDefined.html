@@ -1,14 +1,14 @@
 <html>
 <body>
 <p>
-    This inspection reports when more than one default source is set inside the  <code>@Mapping</code>
+    This inspection reports when more than one default source is set inside the <code>@Mapping</code>
 </p>
 <p>
 <pre><code>
 //wrong
 @Mapper
 public interface EmployeeMapper {
-     @Mapping(source = "employeeName", target = "name", defaultValue = "My name", defaultExpression = "java(UUID.randomUUID().toString())")
+    @Mapping(source = "employeeName", target = "name", defaultValue = "My name", defaultExpression = "java(UUID.randomUUID().toString())")
     Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
 }
 </code></pre>
