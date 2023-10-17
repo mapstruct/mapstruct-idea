@@ -77,7 +77,7 @@
             enabledByDefault="true"
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.unmapped.target.properties"
+            key="inspection.more.than.one.source.property"
             shortName="MoreThanOneSourceDefined"
             implementationClass="org.mapstruct.intellij.inspection.MoreThanOneSourcePropertyDefinedInspection"/>
     <localInspection
@@ -85,7 +85,7 @@
             enabledByDefault="true"
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.unmapped.target.properties"
+            key="inspection.more.than.one.default.source.property"
             shortName="MoreThanOneDefaultSourceDefined"
             implementationClass="org.mapstruct.intellij.inspection.MoreThanOneDefaultSourcePropertyDefinedInspection"/>
     <localInspection
@@ -93,7 +93,7 @@
             enabledByDefault="true"
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.unmapped.target.properties"
+            key="inspection.no.source.property"
             shortName="NoSourcePropertyDefined"
             implementationClass="org.mapstruct.intellij.inspection.NoSourcePropertyDefinedInspection"/>
     <localInspection
@@ -101,7 +101,7 @@
             enabledByDefault="true"
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.unmapped.target.properties"
+            key="inspection.not.null.checkable.property.source.used.with.default.property"
             shortName="NotNullCheckableSourcePropertyUsedWithDefaultValue"
             implementationClass="org.mapstruct.intellij.inspection.NotNullCheckableSourcePropertyUsedWithDefaultValueInspection"/>
   </extensions>
