@@ -37,7 +37,7 @@ class Target {
 @Mapper
 interface SingleMappingMapper {
 
-    @Mapping(target = "testName", source = "name", defaultExpression = "java()")
+    <error descr="Expression property used with defaultExpression and defaultValue">@Mapping(target = "testName", expression = "java()", defaultExpression="java()", defaultValue = "My name")</error>
     Target map(Source source);
 }
 
@@ -45,8 +45,8 @@ interface SingleMappingMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-            @Mapping(target = "testName", source = "name", defaultValue = "My name")
-        })
-        Target map(Source source);
-        }
+            <error descr="Expression property used with defaultExpression and defaultValue">@Mapping(target = "testName", expression = "java()", defaultExpression="java()", defaultValue = "My name")</error>
+            })
+    Target map(Source source);
+}
 

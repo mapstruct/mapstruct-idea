@@ -37,7 +37,7 @@ class Target {
 @Mapper
 interface SingleMappingMapper {
 
-    <error descr="More than one default source property defined">@Mapping(target = "testName", defaultValue = "My name", defaultExpression = "java()")</error>
+    <error descr="More than one default source property defined">@Mapping(target = "testName", source = "name", defaultValue = "My name", defaultExpression = "java()")</error>
     Target map(Source source);
 }
 
@@ -45,7 +45,7 @@ interface SingleMappingMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-            <error descr="More than one default source property defined">@Mapping(target = "testName", defaultValue = "My name", defaultExpression = "java()")</error>
+            <error descr="More than one default source property defined">@Mapping(target = "testName", source = "name", defaultValue = "My name", defaultExpression = "java()")</error>
         })
         Target map(Source source);
         }

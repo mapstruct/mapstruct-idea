@@ -20,8 +20,8 @@ public class MoreThanOneDefaultSourcePropertyDefinedInspection extends MappingAn
     @Override
     void visitMappingAnnotation( @NotNull ProblemsHolder problemsHolder, @NotNull PsiAnnotation psiAnnotation,
                                  @NotNull MappingAnnotation mappingAnnotation ) {
-
-        if (mappingAnnotation.getDefaultValueProperty() != null
+        // only apply if source property is defined
+        if (mappingAnnotation.getSourceProperty() != null && mappingAnnotation.getDefaultValueProperty() != null
                 && mappingAnnotation.getDefaultExpressionProperty() != null) {
             String family = MapStructBundle.message( "intention.more.than.one.default.source.property" );
             problemsHolder.registerProblem( psiAnnotation,

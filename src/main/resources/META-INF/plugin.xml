@@ -96,7 +96,14 @@
             key="inspection.unmapped.target.properties"
             shortName="NoSourcePropertyDefined"
             implementationClass="org.mapstruct.intellij.inspection.NoSourcePropertyDefinedInspection"/>
-
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.unmapped.target.properties"
+            shortName="NotNullCheckableSourceUsedWithDefaultValue"
+            implementationClass="org.mapstruct.intellij.inspection.NotNullCheckableSourcePropertyUsedWithDefaultValueInspection"/>
   </extensions>
 
   <actions>
