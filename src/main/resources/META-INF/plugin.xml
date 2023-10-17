@@ -102,7 +102,7 @@
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
             key="inspection.unmapped.target.properties"
-            shortName="NotNullCheckableSourceUsedWithDefaultValue"
+            shortName="NotNullCheckableSourcePropertyUsedWithDefaultValue"
             implementationClass="org.mapstruct.intellij.inspection.NotNullCheckableSourcePropertyUsedWithDefaultValueInspection"/>
   </extensions>
 
