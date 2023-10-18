@@ -24,4 +24,8 @@ public class NoSourcePropertyDefinedInspectionTest extends BaseInspectionTest {
     public void testSourcePropertyDefined() {
         doTest();
     }
+
+    public void testIgnoreSourcePropertyByDefault() {
+        doTest();
+    }
 }
