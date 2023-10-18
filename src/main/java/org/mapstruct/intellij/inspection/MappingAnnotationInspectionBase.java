@@ -140,7 +140,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public boolean hasNoSourceProperties() {
             return sourceProperty == null && defaultValueProperty == null && expressionProperty == null
-                    && ignoreProperty == null;
+                    && ignoreProperty == null && constantProperty == null;
         }
 
         public boolean hasNoDefaultProperties() {
