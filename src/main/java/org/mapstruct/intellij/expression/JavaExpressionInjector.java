@@ -54,7 +54,8 @@ public class JavaExpressionInjector implements MultiHostInjector {
     private static final ElementPattern<PsiElement> PATTERN =
         StandardPatterns.or(
             MapstructElementUtils.mappingElementPattern( "expression" ),
-            MapstructElementUtils.mappingElementPattern( "defaultExpression" )
+            MapstructElementUtils.mappingElementPattern( "defaultExpression" ),
+            MapstructElementUtils.mappingElementPattern( "conditionExpression" )
         );
 
     private void importIfNecessary(PsiClass cls, @NotNull Set<String> imports) {
