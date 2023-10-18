@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 class Source {
 
@@ -88,5 +89,17 @@ interface DependsOnMapper {
 
     @Mapping(target = "testName", dependsOn = "size")
     Target map(Source source);
+}
+
+@Mapper
+interface QualifiedByNameMapper {
+
+    @Mapping(target = "size", qualifiedByName = "bitCount")
+    Target map(Source source);
+
+    @Named("bitCount")
+    default Integer bitCount(Integer in) {
+        return Integer.bitCount(in);
+    }
 }
 

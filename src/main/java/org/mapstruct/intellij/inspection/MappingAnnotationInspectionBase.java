@@ -69,6 +69,9 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             case "dependsOn":
                                 mappingAnnotation.setDependsOnProperty( nameValuePair );
                                 break;
+                            case "qualifiedByName":
+                                mappingAnnotation.setQualifiedByNameProperty( nameValuePair );
+                                break;
                             default:
                                 break;
                         }
@@ -90,9 +93,9 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         private PsiNameValuePair defaultValueProperty;
         private PsiNameValuePair expressionProperty;
         private PsiNameValuePair defaultExpressionProperty;
-
         private PsiNameValuePair ignoreProperty;
         private PsiNameValuePair dependsOnProperty;
+        private PsiNameValuePair qualifiedByNameProperty;
 
         public PsiNameValuePair getSourceProperty() {
             return sourceProperty;
@@ -144,7 +147,8 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public boolean hasNoSourceProperties() {
             return sourceProperty == null && defaultValueProperty == null && expressionProperty == null
-                    && ignoreProperty == null && constantProperty == null && dependsOnProperty == null;
+                    && ignoreProperty == null && constantProperty == null && dependsOnProperty == null
+                    && qualifiedByNameProperty == null;
         }
 
         public boolean hasNoDefaultProperties() {
@@ -157,6 +161,14 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public void setDependsOnProperty(PsiNameValuePair dependsOnProperty) {
             this.dependsOnProperty = dependsOnProperty;
+        }
+
+        public PsiNameValuePair getQualifiedByNameProperty() {
+            return qualifiedByNameProperty;
+        }
+
+        public void setQualifiedByNameProperty(PsiNameValuePair qualifiedByNameProperty) {
+            this.qualifiedByNameProperty = qualifiedByNameProperty;
         }
     }
 
