@@ -66,6 +66,9 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             case "ignore":
                                 mappingAnnotation.setIgnoreProperty( nameValuePair );
                                 break;
+                            case "dependsOn":
+                                mappingAnnotation.setDependsOnProperty( nameValuePair );
+                                break;
                             default:
                                 break;
                         }
@@ -89,6 +92,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         private PsiNameValuePair defaultExpressionProperty;
 
         private PsiNameValuePair ignoreProperty;
+        private PsiNameValuePair dependsOnProperty;
 
         public PsiNameValuePair getSourceProperty() {
             return sourceProperty;
@@ -140,11 +144,19 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public boolean hasNoSourceProperties() {
             return sourceProperty == null && defaultValueProperty == null && expressionProperty == null
-                    && ignoreProperty == null && constantProperty == null;
+                    && ignoreProperty == null && constantProperty == null && dependsOnProperty == null;
         }
 
         public boolean hasNoDefaultProperties() {
             return defaultValueProperty == null && defaultExpressionProperty == null;
+        }
+
+        public PsiNameValuePair getDependsOnProperty() {
+            return dependsOnProperty;
+        }
+
+        public void setDependsOnProperty(PsiNameValuePair dependsOnProperty) {
+            this.dependsOnProperty = dependsOnProperty;
         }
     }
 

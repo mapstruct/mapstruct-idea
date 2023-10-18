@@ -12,6 +12,7 @@ import org.mapstruct.MappingTarget;
 class Source {
 
     private String name;
+    private Integer size;
 
     public String getName() {
         return name;
@@ -20,11 +21,20 @@ class Source {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
 }
 
 class Target {
 
     private String testName;
+    private Integer size;
 
     public String getTestName() {
         return testName;
@@ -32,6 +42,14 @@ class Target {
 
     public void setTestName(String testName) {
         this.testName = testName;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
     }
 }
 
@@ -62,6 +80,13 @@ interface ConstantMapper {
 interface IgnoreMappingMapper {
 
     @Mapping(target = "testName", ignore = true)
+    Target map(Source source);
+}
+
+@Mapper
+interface DependsOnMapper {
+
+    @Mapping(target = "testName", dependsOn = "size")
     Target map(Source source);
 }
 
