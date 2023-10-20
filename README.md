@@ -34,7 +34,10 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
   * `@Mapper` or `@MapperConfig` annotation missing
   * Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property.
     Uses `unmappedTargetPolicy` to determine the severity that should be used
-
+  * No `source` defined in `@Mapping` annotation
+  * More than one `source` in `@Mapping` annotation defined with quick fixes: Remove `source`. Remove `constant`. Remove `expression`. Use `constant` as `defaultValue`. Use `expression` as `defaultExpression`. 
+  * More than one default source in `@Mapping` annotation defined with quick fixes: Remove `defaultValue`. Remove `defaultExpression`.
+ 
 ## Requirements
 
 The MapStruct plugin requires Java 11 or later

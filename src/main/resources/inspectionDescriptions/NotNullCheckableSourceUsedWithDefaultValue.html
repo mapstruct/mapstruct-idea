@@ -1,0 +1,30 @@
+<html>
+<body>
+<p>
+    This inspection reports when constant or expression source property is used with a default source property inside the <code>@Mapping</code>
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = "name", expression = "java(\"My name\")", defaultExpression = "java(\"My name\")")
+    @Mapping(target = "lastName", constant = "My name", defaultValue = "My name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = "name", expression = "java(\"My name\")")
+    @Mapping(target = "lastName", constant = "My name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

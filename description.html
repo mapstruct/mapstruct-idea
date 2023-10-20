@@ -38,6 +38,9 @@ If you want to discuss specific topics, then ping me (@filiphr) in the MapStruct
         <li><code>@Mapper</code> or <code>@MapperConfig</code> annotation missing</li>
         <li>Unmapped target properties with quick fixes: Add unmapped target property and Ignore unmapped target property.
             Uses <code>unmappedTargetPolicy</code> to determine the severity that should be used</li>
+        <li>No <code>source</code> defined in <code>@Mapping</code> annotation</li>
+        <li>More than one <code>source</code> in <code>@Mapping</code> annotation defined with quick fixes: Remove <code>source</code>. Remove <code>constant</code>. Remove <code>expression</code>. Use <code>constant</code> as <code>defaultValue</code>. Use <code>expression</code> as <code>defaultExpression</code>.</li>
+        <li>More than one default source in <code>@Mapping</code> annotation defined with quick fixes: Remove <code>defaultValue</code>. Remove <code>defaultExpression</code>.</li>
     </ul>
     </li>
 </ul>
