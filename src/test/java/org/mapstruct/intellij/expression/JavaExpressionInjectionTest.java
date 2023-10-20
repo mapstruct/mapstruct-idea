@@ -192,6 +192,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithNoTargetDefinedMapper() {
         noTargetDefinedMapper( "expression" );
         noTargetDefinedMapper( "defaultExpression" );
+        noTargetDefinedMapper( "conditionExpression" );
     }
 
     protected void noTargetDefinedMapper(String attribute) {
@@ -215,6 +216,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithoutJavaExpression() {
         withoutJavaExpression( "expression" );
         withoutJavaExpression( "defaultExpression" );
+        withoutJavaExpression( "conditionExpression" );
     }
 
     protected void withoutJavaExpression(String attribute) {
@@ -233,6 +235,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithTargetDefinedMapper() {
         withTargetDefinedMapper( "expression" );
         withTargetDefinedMapper( "defaultExpression" );
+        withTargetDefinedMapper( "conditionExpression" );
     }
 
     protected void withTargetDefinedMapper(String attribute) {
@@ -268,6 +271,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithTargetDefinedMapperInMappings() {
         withTargetDefinedMapperInMappings( "expression" );
         withTargetDefinedMapperInMappings( "defaultExpression" );
+        withTargetDefinedMapperInMappings( "conditionExpression" );
     }
 
     protected void withTargetDefinedMapperInMappings(String attribute) {
@@ -305,6 +309,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithMapperWithImports() {
         withMapperWithImports( "expression" );
         withMapperWithImports( "defaultExpression" );
+        withMapperWithImports( "conditionExpression" );
     }
 
     protected void withMapperWithImports(String attribute) {
@@ -333,6 +338,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithMapperWithCustomImports() {
         withMapperWithCustomImports( "expression" );
         withMapperWithCustomImports( "defaultExpression" );
+        withMapperWithCustomImports( "conditionExpression" );
     }
 
     protected void withMapperWithCustomImports(String attribute) {
@@ -360,6 +366,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithMapperWithoutImports() {
         withMapperWithoutImports( "expression" );
         withMapperWithoutImports( "defaultExpression" );
+        withMapperWithoutImports( "conditionExpression" );
     }
 
     protected void withMapperWithoutImports(String attribute) {
@@ -387,6 +394,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithMultiSourceParameters() {
         withMultiSourceParameters( "expression" );
         withMultiSourceParameters( "defaultExpression" );
+        withMultiSourceParameters( "conditionExpression" );
     }
 
     protected void withMultiSourceParameters(String attribute) {
@@ -414,6 +422,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithGenericSourceParameters() {
         withGenericSourceParameters( "expression" );
         withGenericSourceParameters( "defaultExpression" );
+        withGenericSourceParameters( "conditionExpression" );
     }
 
     protected void withGenericSourceParameters(String attribute) {
@@ -442,6 +451,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithSourceParameterWithAnnotations() {
         withExpressionWithSourceParameterWithAnnotations( "expression" );
         withExpressionWithSourceParameterWithAnnotations( "defaultExpression" );
+        withExpressionWithSourceParameterWithAnnotations( "conditionExpression" );
     }
 
     protected void withExpressionWithSourceParameterWithAnnotations(String attribute) {
@@ -471,6 +481,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithSourceParameterWithMultipleGenerics() {
         withExpressionWithSourceParameterWithMultipleGenerics( "expression" );
         withExpressionWithSourceParameterWithMultipleGenerics( "defaultExpression" );
+        withExpressionWithSourceParameterWithMultipleGenerics( "conditionExpression" );
     }
 
     protected void withExpressionWithSourceParameterWithMultipleGenerics(String attribute) {
@@ -500,6 +511,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithGenericMethod() {
         withExpressionWithGenericMethod( "expression" );
         withExpressionWithGenericMethod( "defaultExpression" );
+        withExpressionWithGenericMethod( "conditionExpression" );
     }
 
     protected void withExpressionWithGenericMethod(String attribute) {
@@ -526,6 +538,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithGenericMapper() {
         withGenericMapper( "expression" );
         withGenericMapper( "defaultExpression" );
+        withGenericMapper( "conditionExpression" );
     }
 
     protected void withGenericMapper(String attribute) {
@@ -553,6 +566,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithClassMapper() {
         withClassMapper( "expression" );
         withClassMapper( "defaultExpression" );
+        withClassMapper( "conditionExpression" );
     }
 
     protected void withClassMapper(String attribute) {
@@ -587,6 +601,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithTargetUsingStaticString() {
         withTargetUsingStaticString( "expression" );
         withTargetUsingStaticString( "defaultExpression" );
+        withTargetUsingStaticString( "conditionExpression" );
     }
 
     protected void withTargetUsingStaticString(String attribute) {
@@ -622,6 +637,7 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
     public void testExpressionWithMapperToDtoWithoutAccessors() {
         withMapperToDtoWithoutAccessors( "expression" );
         withMapperToDtoWithoutAccessors( "defaultExpression" );
+        withMapperToDtoWithoutAccessors( "conditionExpression" );
     }
 
     protected void withMapperToDtoWithoutAccessors(String attribute) {
