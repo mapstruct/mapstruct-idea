@@ -6,6 +6,7 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +109,7 @@ public final class MapstructUtil {
     }
 
     public static LookupElement[] asLookup(Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors,
-        Function<PsiElement, PsiType> typeMapper) {
+                                           Function<PsiElement, PsiType> typeMapper) {
         if ( !accessors.isEmpty() ) {
             LookupElement[] lookupElements = new LookupElement[accessors.size()];
             int index = 0;
@@ -163,7 +164,7 @@ public final class MapstructUtil {
     }
 
     public static LookupElement asLookup(String propertyName, @NotNull Pair<? extends PsiElement, PsiSubstitutor> pair,
-        Function<PsiElement, PsiType> typeMapper, Icon icon) {
+                                         Function<PsiElement, PsiType> typeMapper, Icon icon) {
         PsiElement member = pair.getFirst();
         PsiSubstitutor substitutor = pair.getSecond();
 
@@ -200,17 +201,35 @@ public final class MapstructUtil {
 
     public static boolean isPublicModifiable(@NotNull PsiField field) {
         return isPublicNonStatic( field ) &&
-               !field.hasModifierProperty( PsiModifier.FINAL );
+            !field.hasModifierProperty( PsiModifier.FINAL );
     }
 
     public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
-            TypeConversionUtil.isAssignable(
-                psiType,
-                PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( method.getReturnType() )
-            );
+            isAssignableFromReturnTypeOrSuperTypes( psiType, method.getReturnType() );
+    }
+
+    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, @Nullable PsiType returnType) {
+
+        if ( returnType == null ) {
+            return false;
+        }
+
+        if ( isAssignableFrom( psiType, returnType ) ) {
+            return true;
+        }
+
+        return Arrays.stream( returnType.getSuperTypes() )
+            .anyMatch( superType -> isAssignableFrom( psiType, superType ) );
+    }
+
+    private static boolean isAssignableFrom(PsiType psiType, @Nullable PsiType returnType) {
+        return TypeConversionUtil.isAssignable(
+            psiType,
+            PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( returnType )
+        );
     }
 
     private static boolean isAdderWithUpperCase4thCharacter(@NotNull PsiMethod method) {
