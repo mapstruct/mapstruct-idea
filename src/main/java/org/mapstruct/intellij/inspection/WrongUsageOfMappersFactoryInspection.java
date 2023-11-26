@@ -5,9 +5,13 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.daemon.impl.quickfix.RemoveUnusedVariableFix;
 import com.intellij.codeInsight.intention.AddAnnotationPsiFix;
+import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.IntentionWrapper;
 import com.intellij.codeInspection.LocalQuickFix;
@@ -43,6 +47,20 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         MapstructUtil.MAPPERS_FQN,
         "getMapper"
     ).parameterTypes( CommonClassNames.JAVA_LANG_CLASS );
+
+    private static final Method AS_INTENTION_ACTION_METHOD;
+
+    static {
+        Method asIntentionActionMethod;
+        try {
+            asIntentionActionMethod = RemoveMappersFix.class.getMethod( "asIntentAction" );
+        }
+        catch ( NoSuchMethodException e ) {
+            asIntentionActionMethod = null;
+        }
+
+        AS_INTENTION_ACTION_METHOD = asIntentionActionMethod;
+    }
 
     @NotNull
     @Override
@@ -145,8 +163,27 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
     private static LocalQuickFix createRemoveMappersFix(@NotNull PsiMethodCallExpression methodCallExpression) {
         PsiElement parent = methodCallExpression.getParent();
         if ( parent instanceof PsiVariable ) {
+            RemoveMappersFix fix = new RemoveMappersFix( (PsiVariable) parent );
+            IntentionAction action = null;
+            if ( fix instanceof IntentionAction ) {
+                action = (IntentionAction) fix;
+            } else if ( AS_INTENTION_ACTION_METHOD != null ) {
+                try {
+                    Object intentionAction = AS_INTENTION_ACTION_METHOD.invoke( fix );
+                    if ( intentionAction instanceof IntentionAction ) {
+                        action = (IntentionAction) intentionAction;
+                    }
+                }
+                catch ( IllegalAccessException | InvocationTargetException e ) {
+                    action = null;
+                }
+            }
+
+            if ( action == null ) {
+                return null;
+            }
             return IntentionWrapper.wrapToQuickFix(
-                new RemoveMappersFix( (PsiVariable) parent ),
+                action,
                 methodCallExpression.getContainingFile()
             );
         }
