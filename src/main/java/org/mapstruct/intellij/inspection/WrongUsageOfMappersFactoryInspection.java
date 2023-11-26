@@ -167,7 +167,8 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
             IntentionAction action = null;
             if ( fix instanceof IntentionAction ) {
                 action = (IntentionAction) fix;
-            } else if ( AS_INTENTION_ACTION_METHOD != null ) {
+            }
+            else if ( AS_INTENTION_ACTION_METHOD != null ) {
                 try {
                     Object intentionAction = AS_INTENTION_ACTION_METHOD.invoke( fix );
                     if ( intentionAction instanceof IntentionAction ) {
