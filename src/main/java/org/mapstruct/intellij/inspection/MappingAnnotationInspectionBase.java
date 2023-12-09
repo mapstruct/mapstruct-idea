@@ -38,7 +38,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         }
 
         @Override
-        public void visitAnnotation( PsiAnnotation annotation ) {
+        public void visitAnnotation(@NotNull PsiAnnotation annotation ) {
             super.visitAnnotation( annotation );
             if (annotation.hasQualifiedName( MapstructUtil.MAPPING_ANNOTATION_FQN )) {
                 MappingAnnotation mappingAnnotation = new MappingAnnotation();
@@ -72,6 +72,9 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             case "qualifiedByName":
                                 mappingAnnotation.setQualifiedByNameProperty( nameValuePair );
                                 break;
+                            case "conditionExpression":
+                                mappingAnnotation.setConditionExpression( nameValuePair );
+                                break;
                             default:
                                 break;
                         }
@@ -96,6 +99,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         private PsiNameValuePair ignoreProperty;
         private PsiNameValuePair dependsOnProperty;
         private PsiNameValuePair qualifiedByNameProperty;
+        private PsiNameValuePair conditionExpression;
 
         public PsiNameValuePair getSourceProperty() {
             return sourceProperty;
@@ -169,6 +173,14 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public void setQualifiedByNameProperty(PsiNameValuePair qualifiedByNameProperty) {
             this.qualifiedByNameProperty = qualifiedByNameProperty;
+        }
+
+        public PsiNameValuePair getConditionExpression() {
+            return conditionExpression;
+        }
+
+        public void setConditionExpression(PsiNameValuePair conditionExpression) {
+            this.conditionExpression = conditionExpression;
         }
     }
 

@@ -1,0 +1,27 @@
+<html>
+<body>
+<p>
+    This inspection reports when a java expression has whitespaces before or after the <code>java()</code> block.
+</p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", expression = "  java(\"Name\")")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", expression = "java(\"Name\")")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>
