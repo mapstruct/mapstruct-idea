@@ -39,8 +39,8 @@ class Target {
 @Mapper
 interface SingleMappingMapper {
 
-    @Mapping(target = "name", source = "name", <weak_warning descr="Remove Whitespace after conditionExpression">conditionExpression = "java( !source.getName().length > 0 ) "</weak_warning>)
-    @Mapping(target = "lastName", source = "name", <weak_warning descr="Remove Whitespace after defaultExpression">defaultExpression = "java( \"  \" ) "</weak_warning>)
-    @Mapping(target = "city", <weak_warning descr="Remove Whitespace after expression">expression = "java( \"  \" )  "</weak_warning>)
+    @Mapping(target = "name", source = "name", <weak_warning descr="Unnecessary whitespaces after conditionExpression">conditionExpression = "java( !source.getName().length > 0 ) "</weak_warning>)
+    @Mapping(target = "lastName", source = "name", <weak_warning descr="Unnecessary whitespaces after defaultExpression">defaultExpression = "java( \"  \" ) "</weak_warning>)
+    @Mapping(target = "city", <weak_warning descr="Unnecessary whitespaces after expression">expression = "java( \"  \" )  "</weak_warning>)
     Target map(Source source);
 }

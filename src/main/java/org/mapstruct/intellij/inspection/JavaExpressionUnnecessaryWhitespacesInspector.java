@@ -45,11 +45,15 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
             return;
         }
         if ( text.indexOf( "java(" ) > 1 ) {
-            problemsHolder.registerProblem( property, "Remove Whitespaces before " + property.getName(),
+            problemsHolder.registerProblem( property,
+                    MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace",
+                            "before", property.getAttributeName() ),
                     ProblemHighlightType.WEAK_WARNING, new RemoveWhitespacesBefore(property) );
         }
         if ( text.lastIndexOf( ')' ) < text.length() - 2) {
-            problemsHolder.registerProblem( property, "Remove Whitespace after " + property.getName(),
+            problemsHolder.registerProblem( property,
+                    MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace",
+                    "after", property.getAttributeName() ),
                     ProblemHighlightType.WEAK_WARNING, new RemoveWhitespacesAfter(property) );
         }
     }
@@ -65,7 +69,8 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
 
         @Override
         public @IntentionName @NotNull String getText() {
-            return MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace", "before", name );
+            return MapStructBundle.message( "inspection.java.expression.remove.unnecessary.whitespace",
+                    "before", name );
         }
 
         @Override
@@ -84,7 +89,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
 
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
-            return MapStructBundle.message( "intention.java.expression.unnecessary.whitespace" );
+            return MapStructBundle.message( "intention.java.expression.remove.unnecessary.whitespace" );
         }
 
         @Override
@@ -111,7 +116,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
 
         @Override
         public @IntentionName @NotNull String getText() {
-            return MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace", "after", name );
+            return MapStructBundle.message( "inspection.java.expression.remove.unnecessary.whitespace", "after", name );
         }
 
         @Override
@@ -130,7 +135,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
 
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
-            return MapStructBundle.message( "intention.java.expression.unnecessary.whitespace" );
+            return MapStructBundle.message( "intention.java.expression.remove.unnecessary.whitespace" );
         }
 
         @Override

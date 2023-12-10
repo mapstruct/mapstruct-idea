@@ -101,7 +101,7 @@
             enabledByDefault="true"
             level="ERROR"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.not.null.checkable.property.source.used.with.default.property"
+            key="inspection.not.null.checkable.property.source.used.with.default.property.title"
             shortName="NotNullCheckableSourcePropertyUsedWithDefaultValue"
             implementationClass="org.mapstruct.intellij.inspection.NotNullCheckableSourcePropertyUsedWithDefaultValueInspection"/>
     <localInspection
@@ -109,7 +109,7 @@
             enabledByDefault="true"
             level="WARNING"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
-            key="inspection.java.expression.unnecessary.whitespace"
+            key="inspection.java.expression.unnecessary.whitespace.title"
             shortName="JavaExpressionUnnecessaryWhitespaces"
             implementationClass="org.mapstruct.intellij.inspection.JavaExpressionUnnecessaryWhitespacesInspector"/>
   </extensions>
