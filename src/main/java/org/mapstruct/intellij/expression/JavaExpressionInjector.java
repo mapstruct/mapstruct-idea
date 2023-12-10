@@ -34,6 +34,7 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiPolyadicExpression;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
@@ -148,9 +149,10 @@ public class JavaExpressionInjector implements MultiHostInjector {
 
     @Override
     public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
-
         if ( PATTERN.accepts( context ) && context instanceof PsiLiteralExpression &&
-            JAVA_EXPRESSION.matcher( context.getText() ).matches() ) {
+                ( JAVA_EXPRESSION.matcher( context.getText() ).matches()) ||
+                ( context.getParent() instanceof PsiPolyadicExpression && JAVA_EXPRESSION.matcher( context.getParent().getText() ).matches() )
+        ) {
 
             // Context is the PsiLiteralExpression
             // In order to reach the method have the following steps to take:
@@ -273,16 +275,51 @@ public class JavaExpressionInjector implements MultiHostInjector {
                     }
                 }
             }
-
-            registrar.startInjecting( JavaLanguage.INSTANCE )
-                .addPlace(
-                    imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining( "\n", "", "\n" ) )
-                        + prefixBuilder,
-                    ";\n    }\n}",
-                    (PsiLanguageInjectionHost) context,
-                    new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
-                )
-                .doneInjecting();
+            MultiHostRegistrar register = registrar.startInjecting(JavaLanguage.INSTANCE);
+            if (context.getParent() instanceof PsiPolyadicExpression) {
+                PsiElement[] parentChildren = PsiTreeUtil.getChildrenOfType(context.getParent(), PsiLiteralExpression.class);
+                if (parentChildren != null) {
+                    int startOffSet = 1; // exclude `"`
+                    int endOffSet = context.getTextRange().getLength() - 1; // exclude `"`
+                    StringBuilder suffixBuilder = new StringBuilder();
+                    boolean left = true;
+                    for (int i = 0; i < parentChildren.length; i++) {
+                        PsiElement element = parentChildren[i];
+                        if (element.equals(context)) {
+                            left = false;
+                            // current is first or last
+                            if (i == 0) {
+                                startOffSet = "\"java(".length();
+                            } else if (i == parentChildren.length - 1) {
+                                // exclude `)`
+                                endOffSet --;
+                            }
+                        } else {
+                            if (left) {
+                                prefixBuilder.append(element.getText().replaceAll("\"?(java\\()?(.*?)\"", "$2"));
+                            } else {
+                                suffixBuilder.append(element.getText().replaceAll("\"(.*?)\"", "$1"));
+                            }
+                        }
+                    }
+                    register.addPlace(
+                            imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining( "\n", "", "\n" ) )
+                                    + prefixBuilder,
+                            suffixBuilder + ";\n    }\n}",
+                            (PsiLanguageInjectionHost) context,
+                            new TextRange( startOffSet, endOffSet )
+                    );
+                }
+            } else {
+                register.addPlace(
+                        imports.stream().map( imp -> "import " + imp + ";" ).collect( Collectors.joining( "\n", "", "\n" ) )
+                                + prefixBuilder,
+                        ";\n    }\n}",
+                        (PsiLanguageInjectionHost) context,
+                        new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
+                );
+            }
+            register.doneInjecting();
         }
     }
 
