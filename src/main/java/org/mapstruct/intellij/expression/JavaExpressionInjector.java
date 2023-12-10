@@ -49,7 +49,7 @@ import org.mapstruct.intellij.util.MapstructUtil;
  */
 public class JavaExpressionInjector implements MultiHostInjector {
 
-    private static final Pattern JAVA_EXPRESSION = Pattern.compile( "\"java\\(.*\\)\"" );
+    public static final Pattern JAVA_EXPRESSION = Pattern.compile( "\" *java\\(.*\\) *\"" );
 
     private static final ElementPattern<PsiElement> PATTERN =
         StandardPatterns.or(
@@ -280,10 +280,21 @@ public class JavaExpressionInjector implements MultiHostInjector {
                         + prefixBuilder,
                     ";\n    }\n}",
                     (PsiLanguageInjectionHost) context,
-                    new TextRange( "\"java(".length(), context.getTextRange().getLength() - ")\"".length() )
+                    getTextRange( context )
                 )
                 .doneInjecting();
         }
+    }
+
+    @NotNull
+    private static TextRange getTextRange(@NotNull PsiElement context) {
+        String text = context.getText();
+        return new TextRange(text.indexOf( "java(" ) + 5,
+                context.getTextRange().getLength() - getEndOfExpression( text ) );
+    }
+
+    private static int getEndOfExpression(@NotNull String text) {
+        return text.length() - text.lastIndexOf( ')' );
     }
 
     @NotNull
