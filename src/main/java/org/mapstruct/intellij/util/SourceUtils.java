@@ -10,9 +10,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
@@ -210,5 +212,24 @@ public class SourceUtils {
             return null;
         }
 
+    }
+
+    public static boolean isFromMapMapping(@NotNull PsiMethod method) {
+        return getFromMapMappingParameter( method ) != null;
+    }
+
+    @Nullable
+    public static  PsiParameter getFromMapMappingParameter(@NotNull PsiMethod method) {
+        List<PsiParameter> sourceParameters = Arrays.stream( method.getParameterList().getParameters() )
+                .filter( MapstructUtil::isValidSourceParameter ).collect( Collectors.toList() );
+        if (sourceParameters.size() == 1) {
+            PsiParameter parameter = sourceParameters.get( 0 );
+            if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+                    method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
+                return parameter;
+            }
+
+        }
+        return null;
     }
 }

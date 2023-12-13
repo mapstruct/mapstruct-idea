@@ -1,0 +1,33 @@
+<html>
+<body>
+<p>
+    This inspection reports when a raw <code>Map</code> or a <code>Map</code> where the key isn't a <code>String</code>
+    is used for mapping to Bean.
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+
+    Employee toEmployee(Map map);
+
+    EmployeeDto toEmployeeDto(Map&lt;Long, ?> map);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+
+    Employee toEmployee(Map&lt;String String> map);
+
+    EmployeeDto toEmployeeDto(Map&lt;String, ?> map);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

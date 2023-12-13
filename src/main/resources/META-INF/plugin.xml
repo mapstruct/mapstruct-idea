@@ -112,6 +112,14 @@
             key="inspection.java.expression.unnecessary.whitespace.title"
             shortName="JavaExpressionUnnecessaryWhitespaces"
             implementationClass="org.mapstruct.intellij.inspection.JavaExpressionUnnecessaryWhitespacesInspector"/>
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.wrong.map.mapping.map.type"
+            shortName="FromMapMappingInspection"
+            implementationClass="org.mapstruct.intellij.inspection.FromMapMappingMapTypeInspection"/>
   </extensions>
 
   <actions>
