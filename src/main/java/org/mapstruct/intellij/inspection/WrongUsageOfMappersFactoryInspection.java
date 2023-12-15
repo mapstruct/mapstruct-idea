@@ -16,7 +16,6 @@ import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.IntentionWrapper;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiAnnotation;
