@@ -16,6 +16,7 @@ import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.IntentionWrapper;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiAnnotation;
@@ -146,9 +147,15 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
             this.myText = MapStructBundle.message( "inspection.wrong.usage.mappers.factory.remove.mappers.usage" );
         }
 
+        // This method is there for prior to 2023.3
         @NotNull
-        @Override
         public String getText() {
+            return myText;
+        }
+
+        // This method is there for after to 2023.3
+        @NotNull
+        protected String getText(@NotNull PsiVariable variable) {
             return myText;
         }
 
