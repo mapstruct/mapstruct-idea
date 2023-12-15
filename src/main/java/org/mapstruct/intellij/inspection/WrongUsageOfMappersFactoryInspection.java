@@ -7,6 +7,8 @@ package org.mapstruct.intellij.inspection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.daemon.impl.quickfix.RemoveUnusedVariableFix;
@@ -100,15 +102,22 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                 PsiClass mapperClass = (PsiClass) mapperElement;
                 PsiAnnotation mapperAnnotation = mapperClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
                 if ( mapperAnnotation == null ) {
-                    problemsHolder.registerProblem(
-                        expression,
-                        MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.mapstruct" ),
+                    Collection<LocalQuickFix> fixes = new ArrayList<>( 2 );
+                    fixes.add(
                         new AddAnnotationPsiFix(
                             MapstructUtil.MAPPER_ANNOTATION_FQN,
                             mapperClass,
                             PsiNameValuePair.EMPTY_ARRAY
-                        ),
-                        createRemoveMappersFix( expression )
+                        )
+                    );
+                    LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );
+                    if ( removeMappersFix != null ) {
+                        fixes.add( removeMappersFix );
+                    }
+                    problemsHolder.registerProblem(
+                        expression,
+                        MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.mapstruct" ),
+                        fixes.toArray( LocalQuickFix[]::new )
                     );
                 }
                 else {
