@@ -2,7 +2,7 @@ import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
 
 plugins {
-    id "org.jetbrains.intellij" version "1.13.3"
+    id "org.jetbrains.intellij" version "1.16.1"
     id "com.github.hierynomus.license" version "0.16.1"
     id "de.undercouch.download" version "5.4.0"
 }
