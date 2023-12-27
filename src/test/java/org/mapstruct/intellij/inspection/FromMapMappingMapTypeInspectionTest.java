@@ -58,4 +58,10 @@ public class FromMapMappingMapTypeInspectionTest extends BaseInspectionTest {
         allQuickFixes.forEach( myFixture::launchAction );
         myFixture.checkResultByFile( testName + "_after.java" );
     }
+
+    public void testFromMapMappingMapTypeToMapNoInspection() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes ).isEmpty();
+    }
 }
