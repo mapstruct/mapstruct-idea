@@ -143,7 +143,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
 
             private ReplaceMapKeyByStringTypeFix(@NotNull PsiParameter element) {
                 super( element );
-                this.text = MapStructBundle.message( "inspection.wrong.map.mapping.map.key.change.to.String" );
+                this.text = MapStructBundle.message( "inspection.wrong.map.mapping.map.key.change.to.string" );
             }
 
             @Override
