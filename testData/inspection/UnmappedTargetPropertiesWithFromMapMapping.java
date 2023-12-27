@@ -14,7 +14,7 @@ import org.example.data.UnmappedTargetPropertiesData.Target;
 import java.util.Map;
 
 @Mapper
-interface SinglMapper {
+interface SingleMapper {
 
     Target map(Map<String, String> source);
 }
