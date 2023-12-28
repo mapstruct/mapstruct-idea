@@ -40,4 +40,39 @@ public class UnmappedTargetPropertiesWithFromMapMappingTest  extends BaseInspect
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
         assertThat( allQuickFixes ).isEmpty();
     }
+
+    public void testUnmappedTargetPropertiesWithFromMapMappingMultiSource() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes ).isEmpty();
+    }
+
+    public void testUnmappedTargetPropertiesWithFromMapMappingMultiSourceWrongKeyType() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes )
+                .extracting( IntentionAction::getText )
+                .as( "Intent Text" )
+                .containsExactly(
+                        "Ignore unmapped target property: 'matching'",
+                        "Add unmapped target property: 'matching'",
+
+                        "Ignore unmapped target property: 'moreTarget'",
+                        "Add unmapped target property: 'moreTarget'",
+
+                        "Ignore unmapped target property: 'testName'",
+                        "Add unmapped target property: 'testName'",
+                        "Ignore all unmapped target properties",
+
+                        "Ignore unmapped target property: 'matching'",
+                        "Add unmapped target property: 'matching'",
+
+                        "Ignore unmapped target property: 'moreTarget'",
+                        "Add unmapped target property: 'moreTarget'",
+
+                        "Ignore unmapped target property: 'testName'",
+                        "Add unmapped target property: 'testName'",
+                        "Ignore all unmapped target properties"
+                );
+    }
 }

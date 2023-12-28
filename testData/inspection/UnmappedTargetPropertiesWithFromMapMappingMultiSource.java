@@ -16,10 +16,10 @@ import java.util.Map;
 @Mapper
 interface SingleMapper {
 
-    Target map(Map<String, String> source, String secondSource);
+    Target map(Map<String, String> source);
 }
 @Mapper
 abstract class AbstractMapperWitAbstractMethod {
 
-    abstract Target map(Map<String, String> source, String secondSource);
+    abstract Target map(Map<String, String> source);
 }

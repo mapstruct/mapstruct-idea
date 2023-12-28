@@ -115,7 +115,7 @@
     <localInspection
             language="JAVA"
             enabledByDefault="true"
-            level="ERROR"
+            level="WARNING"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
             key="inspection.wrong.map.mapping.map.type"
             shortName="FromMapMappingInspection"

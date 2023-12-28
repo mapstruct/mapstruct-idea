@@ -16,10 +16,10 @@ import java.util.Map;
 @Mapper
 interface SingleMapper {
 
-    Target map(Map<String, String> source, String secondSource);
+    Target <warning descr="Unmapped target properties: matching, moreTarget, testName">map</warning>(Map<Long, String> source);
 }
 @Mapper
 abstract class AbstractMapperWitAbstractMethod {
 
-    abstract Target map(Map<String, String> source, String secondSource);
+    abstract Target <warning descr="Unmapped target properties: matching, moreTarget, testName">map</warning>(Map<Long, String> source);
 }

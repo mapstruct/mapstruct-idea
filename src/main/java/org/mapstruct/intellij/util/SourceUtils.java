@@ -25,6 +25,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -212,20 +213,12 @@ public class SourceUtils {
 
     }
 
-    public static boolean isFromMapMapping(@NotNull PsiMethod method) {
-        return getFromMapMappingParameter( method ) != null;
-    }
-
     @Nullable
-    public static  PsiParameter getFromMapMappingParameter(@NotNull PsiMethod method) {
-        PsiParameter[]  sourceParameters = getSourceParameters( method );
-        if (sourceParameters.length == 1) {
-            PsiParameter parameter = sourceParameters[0];
-            if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
-                    method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
-                return parameter;
-            }
+    public static PsiType[] getGenericTypes(@Nullable PsiParameter fromMapMappingParameter) {
+        if (fromMapMappingParameter == null ||
+                !(fromMapMappingParameter.getType() instanceof PsiClassReferenceType)) {
+            return null;
         }
-        return null;
+        return ((PsiClassReferenceType) fromMapMappingParameter.getType()).getParameters();
     }
 }

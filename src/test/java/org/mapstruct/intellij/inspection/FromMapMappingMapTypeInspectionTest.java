@@ -64,4 +64,10 @@ public class FromMapMappingMapTypeInspectionTest extends BaseInspectionTest {
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
         assertThat( allQuickFixes ).isEmpty();
     }
+
+    public void testFromMapMappingMapTypeWithSourceParameterNoInspection() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes ).isEmpty();
+     }
 }

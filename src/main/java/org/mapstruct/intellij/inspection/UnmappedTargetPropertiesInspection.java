@@ -26,6 +26,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.Nls;
@@ -41,8 +42,9 @@ import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.inspection.inheritance.InheritConfigurationUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
+import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
-import static org.mapstruct.intellij.util.SourceUtils.isFromMapMapping;
+import static org.mapstruct.intellij.util.SourceUtils.getGenericTypes;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
@@ -181,6 +183,20 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 }
             }
 
+            return false;
+        }
+
+        private static boolean isFromMapMapping(@NotNull PsiMethod method) {
+            PsiParameter[]  sourceParameters = getSourceParameters( method );
+            for (PsiParameter parameter : sourceParameters) {
+                if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+                        method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
+                    PsiType[] generics = getGenericTypes( parameter );
+                    if (generics != null && generics.length > 0) {
+                        return  generics[0].equalsToText( "java.lang.String" );
+                    }
+                }
+            }
             return false;
         }
 

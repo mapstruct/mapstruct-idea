@@ -34,9 +34,9 @@ interface NotMapStructMapper {
 @Mapper
 interface NoMappingMapper {
 
-    Target map(<error descr="Raw map used for mapping Map to Bean">Map source</error>);
+    Target map(<warning descr="Raw map used for mapping Map to Bean">Map source</warning>);
 
-    Target map(<error descr="Raw map used for mapping Map to Bean">HashMap source</error>);
+    Target map(<warning descr="Raw map used for mapping Map to Bean">HashMap source</warning>);
 }
 
 @Mapper
@@ -48,9 +48,9 @@ interface MultiSourceMappingsMapper {
 @Mapper
 interface UpdateMapper {
 
-    void update(@MappingTarget Target target, <error descr="Raw map used for mapping Map to Bean">Map source</error>);
+    void update(@MappingTarget Target target, <warning descr="Raw map used for mapping Map to Bean">Map source</warning>);
 
-    void update(@MappingTarget Target target, <error descr="Raw map used for mapping Map to Bean">HashMap source</error>);
+    void update(@MappingTarget Target target, <warning descr="Raw map used for mapping Map to Bean">HashMap source</warning>);
 }
 
 @Mapper

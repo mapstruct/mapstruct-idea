@@ -34,9 +34,9 @@ interface NotMapStructMapper {
 @Mapper
 interface NoMappingMapper {
 
-    Target map(<error descr="Key must be of type String for mapping Map to Bean">Map<Integer, String> source</error>);
+    Target map(<warning descr="Key must be of type String for mapping Map to Bean">Map<Integer, String> source</warning>);
 
-    Target map(<error descr="Key must be of type String for mapping Map to Bean">HashMap<Integer, String> source</error>);
+    Target map(<warning descr="Key must be of type String for mapping Map to Bean">HashMap<Integer, String> source</warning>);
 }
 
 @Mapper
@@ -48,9 +48,9 @@ interface MultiSourceMappingsMapper {
 @Mapper
 interface UpdateMapper {
 
-    void update(@MappingTarget Target target, <error descr="Key must be of type String for mapping Map to Bean">Map<Integer, String> source</error>);
+    void update(@MappingTarget Target target, <warning descr="Key must be of type String for mapping Map to Bean">Map<Integer, String> source</warning>);
 
-    void update(@MappingTarget Target target, <error descr="Key must be of type String for mapping Map to Bean">HashMap<Integer, String> source</error>);
+    void update(@MappingTarget Target target, <warning descr="Key must be of type String for mapping Map to Bean">HashMap<Integer, String> source</warning>);
 }
 
 @Mapper

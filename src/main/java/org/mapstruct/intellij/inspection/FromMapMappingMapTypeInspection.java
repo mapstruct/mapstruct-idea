@@ -17,14 +17,19 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.MapStructBundle;
+import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 
+import java.util.Set;
+
 import static com.intellij.psi.PsiElementFactory.getInstance;
-import static org.mapstruct.intellij.util.SourceUtils.getFromMapMappingParameter;
+import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
+import static org.mapstruct.intellij.util.SourceUtils.findAllDefinedMappingSources;
+import static org.mapstruct.intellij.util.SourceUtils.getGenericTypes;
+import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
 import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
 
 /**
@@ -35,14 +40,16 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
     @NotNull
     @Override
     PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        return new MyJavaElementVisitor( holder );
+        return new MyJavaElementVisitor( holder, MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ) );
     }
 
     private static class MyJavaElementVisitor extends JavaElementVisitor {
         private final ProblemsHolder holder;
+        private final MapStructVersion mapStructVersion;
 
-        private MyJavaElementVisitor(ProblemsHolder holder) {
+        private MyJavaElementVisitor(ProblemsHolder holder, MapStructVersion mapStructVersion) {
             this.holder = holder;
+            this.mapStructVersion = mapStructVersion;
         }
 
         @Override
@@ -59,8 +66,19 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             }
 
             PsiParameter fromMapMappingParameter = getFromMapMappingParameter( method );
-            PsiType[] parameters = getParameters( fromMapMappingParameter );
-            if ( parameters == null )  {
+            if (fromMapMappingParameter == null) {
+                return;
+            }
+            PsiType[] parameters = getGenericTypes( fromMapMappingParameter );
+            if (parameters == null)  {
+                return;
+            }
+            Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
+            if ( allTargetProperties.contains( fromMapMappingParameter.getName() ) ) {
+                return;
+            }
+            if ( findAllDefinedMappingSources( method, mapStructVersion )
+                    .anyMatch( source -> fromMapMappingParameter.getName().equals( source ) ) ) {
                 return;
             }
             if (parameters.length == 0) {
@@ -82,12 +100,16 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
         }
 
         @Nullable
-        private static PsiType[] getParameters(@Nullable PsiParameter fromMapMappingParameter) {
-            if (fromMapMappingParameter == null ||
-                    !(fromMapMappingParameter.getType() instanceof PsiClassReferenceType)) {
-                return null;
+        private static  PsiParameter getFromMapMappingParameter(@NotNull PsiMethod method) {
+            PsiParameter[]  sourceParameters = getSourceParameters( method );
+            if (sourceParameters.length == 1) {
+                PsiParameter parameter = sourceParameters[0];
+                if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+                        method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
+                    return parameter;
+                }
             }
-            return ((PsiClassReferenceType) fromMapMappingParameter.getType()).getParameters();
+            return null;
         }
 
         private static class ReplaceByStringStringMapTypeFix extends LocalQuickFixOnPsiElement {
@@ -113,7 +135,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
                 }
                 if (startElement instanceof PsiParameter) {
                     PsiParameter parameter = (PsiParameter) startElement;
-                    PsiType[] parameters = getParameters( parameter );
+                    PsiType[] parameters = getGenericTypes( parameter );
                     return parameters != null && parameters.length == 0;
                 }
                 return false;
@@ -159,7 +181,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
                 }
                 if (startElement instanceof PsiParameter) {
                     PsiParameter parameter = (PsiParameter) startElement;
-                    PsiType[] parameters = getParameters( parameter );
+                    PsiType[] parameters = getGenericTypes( parameter );
                     if (parameters == null || parameters.length != 2) {
                         return false;
                     }
