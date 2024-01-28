@@ -21,18 +21,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierListOwner;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.settings.ProjectSettings;
@@ -44,14 +42,13 @@ import static com.intellij.codeInsight.AnnotationUtil.getBooleanAttributeValue;
 import static org.mapstruct.intellij.inspection.inheritance.InheritConfigurationUtils.findInheritedTargetProperties;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.addMappingAnnotation;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getUnmappedTargetPolicy;
-import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
-import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
-import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
+import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
+import static org.mapstruct.intellij.util.SourceUtils.getGenericTypes;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
-import static org.mapstruct.intellij.util.TargetUtils.getRelevantType;
+import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
 
 /**
  * Inspection that checks if there are unmapped target properties.
@@ -88,6 +85,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
 
             if ( isBeanMappingIgnoreByDefault( method ) ) {
+                return;
+            }
+
+            if ( isFromMapMapping( method ) ) {
                 return;
             }
 
@@ -185,28 +186,18 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             return false;
         }
 
-        /**
-         * @param method the method to be used
-         *
-         * @return the target class for the inspection, or {@code null} if no inspection needs to be performed
-         */
-        @Nullable
-        private static PsiType getTargetType(PsiMethod method) {
-            if ( !method.getModifierList().hasModifierProperty( PsiModifier.ABSTRACT ) ) {
-                return null;
+        private static boolean isFromMapMapping(@NotNull PsiMethod method) {
+            PsiParameter[]  sourceParameters = getSourceParameters( method );
+            for (PsiParameter parameter : sourceParameters) {
+                if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+                        method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
+                    PsiType[] generics = getGenericTypes( parameter );
+                    if (generics != null && generics.length > 0) {
+                        return  generics[0].equalsToText( "java.lang.String" );
+                    }
+                }
             }
-
-            if ( isInheritInverseConfiguration( method ) ) {
-                return null;
-            }
-            PsiClass containingClass = method.getContainingClass();
-
-            if ( containingClass == null
-                || method.getNameIdentifier() == null
-                || !( isMapper( containingClass ) || isMapperConfig( containingClass ) ) ) {
-                return null;
-            }
-            return getRelevantType( method );
+            return false;
         }
 
     }

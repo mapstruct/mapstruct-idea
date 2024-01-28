@@ -29,6 +29,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
@@ -45,6 +46,9 @@ import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findMapperCon
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 import static org.mapstruct.intellij.util.MapstructUtil.isFluentSetter;
+import static org.mapstruct.intellij.util.MapstructUtil.isInheritInverseConfiguration;
+import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
+import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 import static org.mapstruct.intellij.util.MapstructUtil.publicFields;
 
 /**
@@ -431,6 +435,30 @@ public class TargetUtils {
     public static Set<String> findAllTargetProperties(@NotNull PsiType targetType, MapStructVersion mapStructVersion,
                                                       PsiMethod mappingMethod) {
         return publicWriteAccessors( targetType, mapStructVersion, mappingMethod ).keySet();
+    }
+
+    /**
+     * @param method the method to be used
+     *
+     * @return the target class for the inspection, or {@code null} if no inspection needs to be performed
+     */
+    @Nullable
+    public static PsiType getTargetType( @NotNull PsiMethod method) {
+        if ( !method.getModifierList().hasModifierProperty( PsiModifier.ABSTRACT ) ) {
+            return null;
+        }
+
+        if ( isInheritInverseConfiguration( method ) ) {
+            return null;
+        }
+        PsiClass containingClass = method.getContainingClass();
+
+        if ( containingClass == null
+                || method.getNameIdentifier() == null
+                || !( isMapper( containingClass ) || isMapperConfig( containingClass ) ) ) {
+            return null;
+        }
+        return getRelevantType( method );
     }
 
 }

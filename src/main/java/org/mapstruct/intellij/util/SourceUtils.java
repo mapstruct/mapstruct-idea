@@ -25,6 +25,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -210,5 +211,14 @@ public class SourceUtils {
             return null;
         }
 
+    }
+
+    @Nullable
+    public static PsiType[] getGenericTypes(@Nullable PsiParameter fromMapMappingParameter) {
+        if (fromMapMappingParameter == null ||
+                !(fromMapMappingParameter.getType() instanceof PsiClassReferenceType)) {
+            return null;
+        }
+        return ((PsiClassReferenceType) fromMapMappingParameter.getType()).getParameters();
     }
 }
