@@ -120,6 +120,14 @@
             key="inspection.wrong.map.mapping.map.type"
             shortName="FromMapMappingInspection"
             implementationClass="org.mapstruct.intellij.inspection.FromMapMappingMapTypeInspection"/>
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.this.target.mapping.no.source.property"
+            shortName="TargetThisMappingNoSourcePropertyInspection"
+            implementationClass="org.mapstruct.intellij.inspection.TargetThisMappingNoSourcePropertyInspection"/>
   </extensions>
 
   <actions>
