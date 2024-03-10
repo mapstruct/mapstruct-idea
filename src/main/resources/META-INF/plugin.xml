@@ -71,7 +71,7 @@
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
             key="inspection.unmapped.target.properties"
             shortName="UnexistingTargetProperties"
-            implementationClass="org.mapstruct.intellij.inspection.UnexistingTargetPropertiesInspection"/>
+            implementationClass="org.mapstruct.intellij.inspection.NonExistingTargetPropertiesInspection"/>
 
     <localInspection
             language="JAVA"

@@ -1,6 +1,8 @@
 package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.codeInsight.intention.QuickFixFactory;
+import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -14,6 +16,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
+import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructAnnotationUtils;
 import org.mapstruct.intellij.util.MapstructUtil;
@@ -23,7 +26,7 @@ import java.util.Set;
 
 import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
 
-public class UnexistingTargetPropertiesInspection extends MappingAnnotationInspectionBase {
+public class NonExistingTargetPropertiesInspection extends MappingAnnotationInspectionBase {
 
   @Override
   void visitMappingAnnotation(
@@ -39,18 +42,31 @@ public class UnexistingTargetPropertiesInspection extends MappingAnnotationInspe
       PsiMethod method = MapstructAnnotationUtils.getAnnotatedMethod(psiAnnotation);
       if (method != null) {
         PsiType targetType = getTargetType(method);
-        Set<String> targets = TargetUtils.findAllTargetProperties(targetType, version, method);
+        if (targetType != null && targetProperty.getValue() != null) {
+          Set<String> targets = TargetUtils.findAllTargetProperties(targetType, version, method);
 
-        String value = AnnotationUtil.getStringAttributeValue(targetProperty.getValue());
+          String value = AnnotationUtil.getStringAttributeValue(targetProperty.getValue());
 
-        if (!targets.contains(value)) {
-          problemsHolder.registerProblem(
-            method.getNameIdentifier(),
-            "Target field \"" + value + "\" is unknown",
-            ProblemHighlightType.ERROR,
-//            createRemoveAnnotationAttributeQuickFix(targetProperty, "Remove \"target\" attribute", "def"),
-            RemoveMappingQuickFix.createRemoveMappingQuickFix(psiAnnotation)
-          );
+          if (!targets.contains(value)) {
+
+            LocalQuickFix quickFix = QuickFixFactory.getInstance().createDeleteFix(
+              psiAnnotation,
+              MapStructBundle.message(
+                "intention.remove.non.existing.mapping.declaration",
+                value
+              )
+            );
+
+            problemsHolder.registerProblem(
+              method.getNameIdentifier(),
+              MapStructBundle.message(
+                "inspection.non.existing.target.property",
+                value
+              ),
+              ProblemHighlightType.ERROR,
+              quickFix
+            );
+          }
         }
       }
     }
