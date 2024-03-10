@@ -243,7 +243,6 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                                 methodCallExpression.getContainingFile() ) ) {
                             action = null;
                         }
-                        action.getText();
                     }
                 }
                 catch ( IllegalAccessException | InvocationTargetException e ) {
