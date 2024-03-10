@@ -12,7 +12,5 @@ public class NonExistingTargetPropertyInspectionTest extends BaseInspectionTest 
 
   public void testNonExistingProperty() {
     doTest();
-
-
   }
 }
