@@ -10,7 +10,9 @@ public class NonExistingTargetPropertyInspectionTest extends BaseInspectionTest 
     return NonExistingTargetPropertiesInspection.class;
   }
 
-  public void testSourcePropertyDefined() {
+  public void testNonExistingProperty() {
     doTest();
+
+
   }
 }

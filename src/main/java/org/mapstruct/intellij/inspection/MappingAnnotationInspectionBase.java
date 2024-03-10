@@ -54,9 +54,6 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             case "source":
                                 mappingAnnotation.setSourceProperty( nameValuePair );
                                 break;
-                            case "target":
-                                mappingAnnotation.setTargetProperty( nameValuePair );
-                                break;
                             case "constant":
                                 mappingAnnotation.setConstantProperty( nameValuePair );
                                 break;
@@ -99,7 +96,6 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
     protected static class MappingAnnotation {
         private PsiNameValuePair targetProperty;
         private PsiNameValuePair sourceProperty;
-        private PsiNameValuePair targetProperty;
         private PsiNameValuePair constantProperty;
         private PsiNameValuePair defaultValueProperty;
         private PsiNameValuePair expressionProperty;
@@ -127,14 +123,6 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public void setSourceProperty( PsiNameValuePair sourceProperty ) {
             this.sourceProperty = sourceProperty;
-        }
-
-        public PsiNameValuePair getTargetProperty() {
-            return targetProperty;
-        }
-
-        public void setTargetProperty(final PsiNameValuePair targetProperty) {
-            this.targetProperty = targetProperty;
         }
 
         public PsiNameValuePair getConstantProperty() {
