@@ -28,7 +28,7 @@ public class MoreThanOneSourcePropertyDefinedInspection extends MappingAnnotatio
             || (mappingAnnotation.getSourceProperty() != null && mappingAnnotation.getExpressionProperty() != null)) {
             ArrayList<LocalQuickFix> quickFixes = new ArrayList<>( 5 );
             String family = MapStructBundle.message( "intention.more.than.one.source.property" );
-            if (mappingAnnotation.getSourceProperty() != null) {
+            if (mappingAnnotation.getSourceProperty() != null && mappingAnnotation.isNotThisTarget()) {
                 quickFixes.add( createRemoveAnnotationAttributeQuickFix( mappingAnnotation.getSourceProperty(),
                         "Remove source value", family ) );
             }
@@ -36,7 +36,8 @@ public class MoreThanOneSourcePropertyDefinedInspection extends MappingAnnotatio
                 quickFixes.add( createRemoveAnnotationAttributeQuickFix( mappingAnnotation.getConstantProperty(),
                         "Remove constant value", family ) );
 
-                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null) {
+                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null
+                        && mappingAnnotation.isNotThisTarget() ) {
                     quickFixes.add( createReplaceAsDefaultValueQuickFix(
                             mappingAnnotation.getConstantProperty(), "constant", "defaultValue",
                             "Use constant value as default value", family ) );
@@ -45,7 +46,8 @@ public class MoreThanOneSourcePropertyDefinedInspection extends MappingAnnotatio
             if (mappingAnnotation.getExpressionProperty() != null) {
                 quickFixes.add( createRemoveAnnotationAttributeQuickFix( mappingAnnotation.getExpressionProperty(),
                         "Remove expression", family ) );
-                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null) {
+                if (mappingAnnotation.hasNoDefaultProperties() && mappingAnnotation.getSourceProperty() != null
+                        && mappingAnnotation.isNotThisTarget() ) {
                     quickFixes.add( createReplaceAsDefaultValueQuickFix(
                             mappingAnnotation.getExpressionProperty(), "expression", "defaultExpression",
                             "Use expression as default expression", family ) );

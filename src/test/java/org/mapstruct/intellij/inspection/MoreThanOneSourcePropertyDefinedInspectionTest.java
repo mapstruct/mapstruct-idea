@@ -40,6 +40,21 @@ public class MoreThanOneSourcePropertyDefinedInspectionTest extends BaseInspecti
         myFixture.checkResultByFile( testName + "_after.java" );
     }
 
+    public void testMoreThanOneSourceConstantAndSourceThisMapping() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes )
+                .extracting( IntentionAction::getText )
+                .as( "Intent Text" )
+                .containsExactly(
+                        "Remove constant value",
+                        "Remove constant value"
+                );
+        allQuickFixes.forEach( myFixture::launchAction );
+        String testName = getTestName( false );
+        myFixture.checkResultByFile( testName + "_after.java" );
+    }
+
     public void testMoreThanOneSourceConstantAndExpression() {
         doTest();
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
@@ -71,6 +86,21 @@ public class MoreThanOneSourcePropertyDefinedInspectionTest extends BaseInspecti
                 );
         myFixture.launchAction( allQuickFixes.get( 0 ) );
         myFixture.launchAction( allQuickFixes.get( 2 ) );
+        String testName = getTestName( false );
+        myFixture.checkResultByFile( testName + "_after.java" );
+    }
+
+    public void testMoreThanOneSourceExpressionAndSourceThisMapping() {
+        doTest();
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes )
+                .extracting( IntentionAction::getText )
+                .as( "Intent Text" )
+                .containsExactly(
+                        "Remove expression",
+                        "Remove expression"
+                );
+        allQuickFixes.forEach( myFixture::launchAction );
         String testName = getTestName( false );
         myFixture.checkResultByFile( testName + "_after.java" );
     }

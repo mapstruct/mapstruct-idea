@@ -1,0 +1,28 @@
+<html>
+<body>
+<p>
+    This inspection reports when <code> @Mapping( target = ".") </code> is used without a source property.
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = ".", expression = "java(company.getEmployee())"
+    Employee toEmployee(Company company, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = ".", source = "employee")
+    Employee toEmployee(Company company, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

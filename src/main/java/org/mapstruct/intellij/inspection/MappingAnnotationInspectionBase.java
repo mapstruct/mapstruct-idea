@@ -48,6 +48,9 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             && annotationAttribute.getAttributeValue() != null) {
                         PsiNameValuePair nameValuePair = (PsiNameValuePair) annotationAttribute;
                         switch (nameValuePair.getAttributeName()) {
+                            case "target" :
+                                mappingAnnotation.setTargetProperty( nameValuePair );
+                                break;
                             case "source":
                                 mappingAnnotation.setSourceProperty( nameValuePair );
                                 break;
@@ -94,6 +97,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                                           @NotNull MappingAnnotation mappingAnnotation );
 
     protected static class MappingAnnotation {
+        private PsiNameValuePair targetProperty;
         private PsiNameValuePair sourceProperty;
         private PsiNameValuePair targetProperty;
         private PsiNameValuePair constantProperty;
@@ -104,6 +108,18 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         private PsiNameValuePair dependsOnProperty;
         private PsiNameValuePair qualifiedByNameProperty;
         private PsiNameValuePair conditionExpression;
+
+        public PsiNameValuePair getTargetProperty() {
+            return targetProperty;
+        }
+
+        public void setTargetProperty( PsiNameValuePair targetProperty ) {
+            this.targetProperty = targetProperty;
+        }
+
+        public boolean isNotThisTarget() {
+            return targetProperty == null || !".".equals( targetProperty.getLiteralValue() );
+        }
 
         public PsiNameValuePair getSourceProperty() {
             return sourceProperty;
