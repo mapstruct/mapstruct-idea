@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.daemon.impl.quickfix.RemoveUnusedVariableFix;
@@ -132,11 +133,16 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                         null :
                         AnnotationUtil.getStringAttributeValue( memberValue );
                     if ( componentModel != null && !componentModel.equals( "default" ) ) {
+                        List<LocalQuickFix> fixes = new ArrayList<>( 2 );
+                        fixes.add( createRemoveComponentModelFix( componentModelAttribute, mapperClass ) );
+                        LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );
+                        if ( removeMappersFix != null ) {
+                            fixes.add( removeMappersFix );
+                        }
                         problemsHolder.registerProblem(
                             expression,
                             MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.default" ),
-                            createRemoveComponentModelFix( componentModelAttribute, mapperClass ),
-                            createRemoveMappersFix( expression )
+                            fixes.toArray( LocalQuickFix[]::new )
                         );
                     }
                 }
