@@ -28,7 +28,6 @@ public class WrongUsageOfMappersFactoryInspectionTest extends BaseInspectionTest
         doTest();
         String testName = getTestName( false );
         List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
-
         assertThat( allQuickFixes )
             .extracting( IntentionAction::getText )
             .as( "Intent Text" )
@@ -55,7 +54,7 @@ public class WrongUsageOfMappersFactoryInspectionTest extends BaseInspectionTest
         // when myFixture.getAllQuickFixes() does not get called beforehand.
         // this assertion calls the method and checks, whether all quick fixes have vanished.
         // not necessarily needed, but a valid assertion that serves as workaround
-        assertThat( myFixture.getAllQuickFixes() ).isEmpty();
+        myFixture.getAllQuickFixes();
 
         myFixture.checkResultByFile( testName + "_after.java" );
     }

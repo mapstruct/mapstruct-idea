@@ -19,6 +19,11 @@ import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.IntentionWrapper;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.modcommand.ActionContext;
+import com.intellij.modcommand.ModChooseAction;
+import com.intellij.modcommand.ModCommand;
+import com.intellij.modcommand.ModCommandAction;
+import com.intellij.modcommand.Presentation;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiAnnotation;
@@ -36,6 +41,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.siyeh.ig.callMatcher.CallMatcher;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapstructUtil;
 
@@ -52,6 +58,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
     ).parameterTypes( CommonClassNames.JAVA_LANG_CLASS );
 
     private static final Method AS_INTENTION_ACTION_METHOD;
+    private static final Method AS_INTENTION;
 
     static {
         Method asIntentionActionMethod;
@@ -63,6 +70,16 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         }
 
         AS_INTENTION_ACTION_METHOD = asIntentionActionMethod;
+
+        Method asIntention;
+        try {
+            asIntention = RemoveMappersFix.class.getMethod( "asIntention" );
+        }
+        catch ( NoSuchMethodException e ) {
+            asIntention = null;
+        }
+
+        AS_INTENTION = asIntention;
     }
 
     @NotNull
@@ -173,6 +190,23 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
             return myText;
         }
 
+        // This method is there for after to 2023.3
+        protected @Nullable Presentation getPresentation( @NotNull ActionContext context,
+                                                          @NotNull PsiVariable variable) {
+            return Presentation.of( myText );
+        }
+
+        // This method is there for after to 2023.3
+        protected @NotNull ModCommand perform(@NotNull ActionContext context, @NotNull PsiVariable variable) {
+            ModCommand modCommand = super.perform( context, variable );
+            if ( modCommand instanceof ModChooseAction ) {
+                ModChooseAction modChooseAction = (ModChooseAction) modCommand;
+                List<? extends @NotNull ModCommandAction> actions = modChooseAction.actions();
+                return (actions.size() > 1 ? actions.get( 1 ) : actions.get( 0 )).perform( context );
+            }
+            return modCommand;
+        }
+
         @Nls
         @NotNull
         @Override
@@ -194,6 +228,22 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                     Object intentionAction = AS_INTENTION_ACTION_METHOD.invoke( fix );
                     if ( intentionAction instanceof IntentionAction ) {
                         action = (IntentionAction) intentionAction;
+                    }
+                }
+                catch ( IllegalAccessException | InvocationTargetException e ) {
+                    action = null;
+                }
+            }
+            else if ( AS_INTENTION != null ) {
+                try {
+                    Object intentionAction = AS_INTENTION.invoke( fix );
+                    if ( intentionAction instanceof IntentionAction ) {
+                        action = (IntentionAction) intentionAction;
+                        if ( !action.isAvailable( methodCallExpression.getProject(), null,
+                                methodCallExpression.getContainingFile() ) ) {
+                            action = null;
+                        }
+                        action.getText();
                     }
                 }
                 catch ( IllegalAccessException | InvocationTargetException e ) {
