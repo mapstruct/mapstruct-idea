@@ -6,10 +6,9 @@
 package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.codeInsight.daemon.impl.quickfix.RemoveUnusedVariableFix;
+import com.intellij.codeInsight.daemon.impl.quickfix.SafeDeleteFix;
 import com.intellij.codeInsight.intention.AddAnnotationPsiFix;
 import com.intellij.codeInsight.intention.QuickFixFactory;
-import com.intellij.codeInspection.IntentionWrapper;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.CommonClassNames;
@@ -31,6 +30,9 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapstructUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Inspection that checks that Mappers factory is correctly used
@@ -82,15 +84,20 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                 PsiClass mapperClass = (PsiClass) mapperElement;
                 PsiAnnotation mapperAnnotation = mapperClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
                 if ( mapperAnnotation == null ) {
-                    problemsHolder.registerProblem(
-                        expression,
-                        MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.mapstruct" ),
-                        new AddAnnotationPsiFix(
+                    List<LocalQuickFix> fixes = new ArrayList<>(2);
+                    fixes.add( new AddAnnotationPsiFix(
                             MapstructUtil.MAPPER_ANNOTATION_FQN,
                             mapperClass,
                             PsiNameValuePair.EMPTY_ARRAY
-                        ),
-                        createRemoveMappersFix( expression )
+                    ) );
+                    LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );
+                    if ( removeMappersFix != null ) {
+                        fixes.add( removeMappersFix );
+                    }
+                    problemsHolder.registerProblem(
+                        expression,
+                        MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.mapstruct" ),
+                        fixes.toArray( LocalQuickFix[]::new )
                     );
                 }
                 else {
@@ -105,11 +112,16 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                         null :
                         AnnotationUtil.getStringAttributeValue( memberValue );
                     if ( componentModel != null && !componentModel.equals( "default" ) ) {
+                        List<LocalQuickFix> fixes = new ArrayList<>(2);
+                        fixes.add(  createRemoveComponentModelFix( componentModelAttribute, mapperClass ) );
+                        LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );
+                        if ( removeMappersFix != null ) {
+                            fixes.add( removeMappersFix );
+                        }
                         problemsHolder.registerProblem(
                             expression,
                             MapStructBundle.message( "inspection.wrong.usage.mappers.factory.non.default" ),
-                            createRemoveComponentModelFix( componentModelAttribute, mapperClass ),
-                            createRemoveMappersFix( expression )
+                             fixes.toArray( LocalQuickFix[]::new )
                         );
                     }
                 }
@@ -117,7 +129,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         }
     }
 
-    private static class RemoveMappersFix extends RemoveUnusedVariableFix {
+    private static class RemoveMappersFix extends SafeDeleteFix {
 
         private final String myText;
         private final String myFamilyName;
@@ -145,10 +157,8 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
     private static LocalQuickFix createRemoveMappersFix(@NotNull PsiMethodCallExpression methodCallExpression) {
         PsiElement parent = methodCallExpression.getParent();
         if ( parent instanceof PsiVariable ) {
-            return IntentionWrapper.wrapToQuickFix(
-                new RemoveMappersFix( (PsiVariable) parent ),
-                methodCallExpression.getContainingFile()
-            );
+
+                return new RemoveMappersFix( (PsiVariable) parent );
         }
 
         return null;
