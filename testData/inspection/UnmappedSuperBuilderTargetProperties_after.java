@@ -5,12 +5,13 @@
  */
 
 import org.mapstruct.Context;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
-import org.example.data.UnmappedFluentTargetPropertiesData.Target;
-import org.example.data.UnmappedFluentTargetPropertiesData.Source;
+import org.example.data.UnmappedSuperBuilderTargetPropertiesData.Target;
+import org.example.data.UnmappedSuperBuilderTargetPropertiesData.Source;
 
 interface NotMapStructMapper {
 
@@ -48,7 +49,7 @@ interface NoMappingMapper {
     @Mapping(target = "moreTarget", ignore = true)
     Target map(Source source);
 
-    @org.mapstruct.InheritInverseConfiguration
+    @InheritInverseConfiguration
     Source reverse(Target target);
 }
 

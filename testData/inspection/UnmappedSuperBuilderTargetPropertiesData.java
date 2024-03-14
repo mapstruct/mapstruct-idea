@@ -5,7 +5,7 @@
  */
 package org.example.data;
 
-public class UnmappedFluentTargetPropertiesData {
+public class UnmappedSuperBuilderTargetPropertiesData {
     public static class Source {
 
         private String name;
@@ -109,11 +109,6 @@ public class UnmappedFluentTargetPropertiesData {
             protected abstract B self();
 
             public abstract C build();
-
-            public String toString() {
-                return "Target.TargetBuilder(testName=" + this.testName + ", matching=" + this.matching + ", moreTarget=" +
-                    this.moreTarget + ")";
-            }
         }
 
         private static final class TargetBuilderImpl extends TargetBuilder<Target, TargetBuilderImpl> {
