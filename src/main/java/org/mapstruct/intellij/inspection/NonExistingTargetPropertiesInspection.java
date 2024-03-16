@@ -58,7 +58,7 @@ public class NonExistingTargetPropertiesInspection extends MappingAnnotationInsp
             );
 
             problemsHolder.registerProblem(
-              method.getNameIdentifier(),
+              targetProperty.getValue(),
               MapStructBundle.message(
                 "inspection.non.existing.target.property",
                 value
