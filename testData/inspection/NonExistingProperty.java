@@ -36,7 +36,6 @@ class Target {
 
 @Mapper
 interface SingleMappingMapper {
-
-  @Mapping(target = "nonExistingField")
-  Target <error descr="Non-existing target property: nonExistingField">map</error>(Source source);
+  @Mapping(target = <error descr="Non-existing target property: nonExistingField">"nonExistingField"</error>, ignore = true)
+  Target map(Source source);
 }
