@@ -70,7 +70,7 @@
             level="WARNING"
             bundle="org.mapstruct.intellij.messages.MapStructBundle"
             key="inspection.unmapped.target.properties"
-            shortName="UnexistingTargetProperties"
+            shortName="NonExistingTargetProperties"
             implementationClass="org.mapstruct.intellij.inspection.NonExistingTargetPropertiesInspection"/>
 
     <localInspection
