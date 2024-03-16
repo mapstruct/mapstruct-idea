@@ -28,78 +28,56 @@ import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
 
 public class NonExistingTargetPropertiesInspection extends MappingAnnotationInspectionBase {
 
-  @Override
-  void visitMappingAnnotation(
-    @NotNull final ProblemsHolder problemsHolder,
-    @NotNull final PsiAnnotation psiAnnotation,
-    @NotNull final MappingAnnotation mappingAnnotation) {
+    @Override
+    void visitMappingAnnotation(
+        @NotNull final ProblemsHolder problemsHolder,
+        @NotNull final PsiAnnotation psiAnnotation,
+        @NotNull final MappingAnnotation mappingAnnotation) {
 
-    MapStructVersion version = MapstructUtil.resolveMapStructProjectVersion(problemsHolder.getFile());
+        MapStructVersion version = MapstructUtil.resolveMapStructProjectVersion(problemsHolder.getFile());
 
-    PsiNameValuePair targetProperty = mappingAnnotation.getTargetProperty();
-    if (targetProperty != null) {
+        PsiNameValuePair targetProperty = mappingAnnotation.getTargetProperty();
+        if (targetProperty != null) {
 
-      PsiMethod method = MapstructAnnotationUtils.getAnnotatedMethod(psiAnnotation);
-      if (method != null) {
-        PsiType targetType = getTargetType(method);
-        if (targetType != null && targetProperty.getValue() != null) {
-          Set<String> targets = TargetUtils.findAllTargetProperties(targetType, version, method);
+            PsiMethod method = MapstructAnnotationUtils.getAnnotatedMethod(psiAnnotation);
+            if (method != null) {
+                PsiType targetType = getTargetType(method);
+                if (targetType != null && targetProperty.getValue() != null) {
+                    Set<String> targets = TargetUtils.findAllTargetProperties(targetType, version, method);
 
-          String value = AnnotationUtil.getStringAttributeValue(targetProperty.getValue());
+                    String value = AnnotationUtil.getStringAttributeValue(targetProperty.getValue());
 
-          if (!targets.contains(value)) {
+                    if (value != null && !targets.contains(getBaseTarget(value))) {
 
-            LocalQuickFix quickFix = QuickFixFactory.getInstance().createDeleteFix(
-              psiAnnotation,
-              MapStructBundle.message(
-                "intention.remove.non.existing.mapping.declaration",
-                value
-              )
-            );
+                        LocalQuickFix quickFix = QuickFixFactory.getInstance().createDeleteFix(
+                            psiAnnotation,
+                            MapStructBundle.message(
+                                "intention.remove.non.existing.mapping.declaration",
+                                value
+                            )
+                        );
 
-            problemsHolder.registerProblem(
-              targetProperty.getValue(),
-              MapStructBundle.message(
-                "inspection.non.existing.target.property",
-                value
-              ),
-              ProblemHighlightType.ERROR,
-              quickFix
-            );
-          }
+                        problemsHolder.registerProblem(
+                            targetProperty.getValue(),
+                            MapStructBundle.message(
+                                "inspection.non.existing.target.property",
+                                value
+                            ),
+                            ProblemHighlightType.ERROR,
+                            quickFix
+                        );
+                    }
+                }
+            }
         }
-      }
-    }
-  }
-
-  private static class RemoveMappingQuickFix extends LocalQuickFixOnPsiElement {
-
-    private RemoveMappingQuickFix(PsiElement element) {
-      super(element);
     }
 
-    static LocalQuickFixOnPsiElement createRemoveMappingQuickFix(PsiElement element) {
-      return new RemoveMappingQuickFix(element);
+    @NotNull
+    private static String getBaseTarget(@NotNull String target) {
+        int dotIndex = target.indexOf( "." );
+        if ( dotIndex > 0 ) {
+            return target.substring( 0, dotIndex );
+        }
+        return target;
     }
-
-    @Override
-    public @IntentionName @NotNull String getText() {
-      return "Remove @Mapping declaration";
-    }
-
-    @Override
-    public void invoke(
-      @NotNull final Project project,
-      @NotNull final PsiFile psiFile,
-      @NotNull final PsiElement psiElement,
-      @NotNull final PsiElement psiElement1) {
-
-      psiElement1.delete();
-    }
-
-    @Override
-    public @IntentionFamilyName @NotNull String getFamilyName() {
-      return "IntentionFamilyName";
-    }
-  }
 }
