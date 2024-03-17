@@ -211,18 +211,18 @@ public final class MapstructUtil {
             isAssignableFromReturnTypeOrSuperTypes( psiType, method.getReturnType() );
     }
 
-    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, @Nullable PsiType returnType) {
-
-        if ( returnType == null ) {
-            return false;
-        }
+    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, PsiType returnType) {
 
         if ( isAssignableFrom( psiType, returnType ) ) {
             return true;
         }
 
-        return Arrays.stream( returnType.getSuperTypes() )
-            .anyMatch( superType -> isAssignableFrom( psiType, superType ) );
+        for ( PsiType superType : returnType.getSuperTypes() ) {
+            if ( isAssignableFrom( psiType, superType ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isAssignableFrom(PsiType psiType, @Nullable PsiType returnType) {
