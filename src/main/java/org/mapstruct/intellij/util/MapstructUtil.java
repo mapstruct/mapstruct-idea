@@ -6,7 +6,6 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
