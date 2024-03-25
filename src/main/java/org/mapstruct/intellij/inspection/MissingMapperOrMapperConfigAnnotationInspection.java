@@ -20,7 +20,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.isMapper;
 import static org.mapstruct.intellij.util.MapstructUtil.isMapperConfig;
 
 /**
- * Inspection that checks if a mapping class (a class that contains at lease one mapping method) is anntoated with
+ * Inspection that checks if a mapping class (a class that contains at lease one mapping method) is annotated with
  * {@link org.mapstruct.Mapper} or {@link org.mapstruct.MapperConfig}.
  *
  * @author Filip Hrisafov
