@@ -567,22 +567,34 @@ public class MapstructAnnotationUtils {
 
     @NotNull
     private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig(@NotNull PsiAnnotation mapperAnnotation) {
+        PsiAnnotationMemberValue configValue = findConfigValueFromMapperConfig( mapperAnnotation,
+                UNMAPPED_TARGET_POLICY );
+        if (configValue == null) {
+            return ReportingPolicy.WARN;
+        }
+        return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
+    }
+
+    /**
+     * finds a property from a referenced mapper config class
+     * @param mapperAnnotation the @Mapper annotation from the current class
+     * @param name the name of the property tp find
+     * @return null if no mapper config class is used or no property with name is found.
+     */
+    @Nullable
+    public static PsiAnnotationMemberValue findConfigValueFromMapperConfig(@NotNull PsiAnnotation mapperAnnotation,
+                                                                           @NotNull String name) {
         PsiModifierListOwner mapperConfigReference = findMapperConfigReference( mapperAnnotation );
         if ( mapperConfigReference == null ) {
-            return ReportingPolicy.WARN;
+            return null;
         }
         PsiAnnotation mapperConfigAnnotation = mapperConfigReference.getAnnotation(
             MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN );
 
         if ( mapperConfigAnnotation == null ) {
-            return ReportingPolicy.WARN;
+            return null;
         }
-        PsiAnnotationMemberValue configValue =
-            mapperConfigAnnotation.findDeclaredAttributeValue( UNMAPPED_TARGET_POLICY );
-        if ( configValue == null ) {
-            return ReportingPolicy.WARN;
-        }
-        return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
+        return mapperConfigAnnotation.findDeclaredAttributeValue( name );
     }
 
 
