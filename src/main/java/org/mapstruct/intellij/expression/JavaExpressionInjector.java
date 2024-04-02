@@ -49,7 +49,8 @@ import org.mapstruct.intellij.util.MapstructUtil;
  */
 public class JavaExpressionInjector implements MultiHostInjector {
 
-    public static final Pattern JAVA_EXPRESSION = Pattern.compile( "^\"\\s*java\\((.*)\\)\\s*\"$", Pattern.DOTALL );
+    public static final Pattern JAVA_EXPRESSION = Pattern.compile( "^(\"|\"{3})\\s*java\\((.*)\\)\\s*\\1$",
+            Pattern.DOTALL );
 
     private static final ElementPattern<PsiElement> PATTERN =
         StandardPatterns.or(

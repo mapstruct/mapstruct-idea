@@ -44,6 +44,10 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         if ( !JAVA_EXPRESSION.matcher( text ).matches() ) {
             return;
         }
+        if ( text.charAt( 1 ) == '"') {
+            // Text-Block
+            return;
+        }
         if ( text.indexOf( "java(" ) > 1 ) {
             problemsHolder.registerProblem( property,
                     MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace",

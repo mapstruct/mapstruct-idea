@@ -706,6 +706,43 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         assertThat( elementAt.getText() ).isEqualTo( ";" );
     }
 
+    public void testWithTextBlockAndTargetDefined() {
+        withTextBlockAndTargetDefined( "expression" );
+        withTextBlockAndTargetDefined( "defaultExpression" );
+        withTextBlockAndTargetDefined( "conditionExpression" );
+    }
+
+    protected void withTextBlockAndTargetDefined(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute
+                + " = \"\"\"\njava(car.<caret>)\"\"\")\n";
+        @Language("java")
+        String mapper = formatMapper( CAR_MAPPER, mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+                .extracting( LookupElementPresentation::renderElement )
+                .extracting( LookupElementPresentation::getItemText )
+                .contains(
+                        "getMake",
+                        "setMake",
+                        "getManufacturingDate",
+                        "setManufacturingDate",
+                        "getNumberOfSeats",
+                        "setNumberOfSeats"
+                );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+                .extracting( LookupElementPresentation::renderElement )
+                .extracting( LookupElementPresentation::getItemText )
+                .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+                .isNotNull()
+                .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
     private PsiFile configureMapperByText(@Language("java") String text) {
         return myFixture.configureByText( JavaFileType.INSTANCE, text );
     }

@@ -7,6 +7,7 @@ package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.pom.java.LanguageLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -53,5 +54,18 @@ public class JavaExpressionUnnecessaryWhitespacesInspectorTest extends BaseInspe
 
         allQuickFixes.forEach( myFixture::launchAction );
         myFixture.checkResultByFile( testName + "_after.java" );
+    }
+
+    //Tests if inspection ignores Textblocks
+    public void testJavaExpressionUnnecessaryWhitespacesTextBlock() {
+        doTest();
+        String testName = getTestName( false );
+        List<IntentionAction> allQuickFixes = myFixture.getAllQuickFixes();
+        assertThat( allQuickFixes ).isEmpty();
+    }
+
+    @Override
+    protected LanguageLevel getLanguageLevel() {
+        return LanguageLevel.JDK_15;
     }
 }
