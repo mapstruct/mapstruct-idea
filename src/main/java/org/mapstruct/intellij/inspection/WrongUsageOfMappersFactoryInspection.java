@@ -46,7 +46,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         MapstructUtil.MAPPERS_FQN,
         "getMapper"
     ).parameterTypes( CommonClassNames.JAVA_LANG_CLASS );
-    public static final String COMPONENT_MODEL = "componentModel";
+    private static final String COMPONENT_MODEL = "componentModel";
 
     @NotNull
     @Override
