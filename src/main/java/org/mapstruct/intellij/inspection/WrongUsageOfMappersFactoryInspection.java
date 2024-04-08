@@ -29,6 +29,7 @@ import com.siyeh.ig.callMatcher.CallMatcher;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
+import org.mapstruct.intellij.util.MapstructAnnotationUtils;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
         MapstructUtil.MAPPERS_FQN,
         "getMapper"
     ).parameterTypes( CommonClassNames.JAVA_LANG_CLASS );
+    private static final String COMPONENT_MODEL = "componentModel";
 
     @NotNull
     @Override
@@ -103,17 +105,24 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                 else {
                     PsiNameValuePair componentModelAttribute = AnnotationUtil.findDeclaredAttribute(
                         mapperAnnotation,
-                        "componentModel"
+                            COMPONENT_MODEL
                     );
-                    PsiAnnotationMemberValue memberValue = componentModelAttribute == null ?
-                        null :
-                        componentModelAttribute.getDetachedValue();
-                    String componentModel = memberValue == null ?
-                        null :
-                        AnnotationUtil.getStringAttributeValue( memberValue );
+                    PsiAnnotationMemberValue memberValue;
+
+                    if (componentModelAttribute != null) {
+                        memberValue = componentModelAttribute.getDetachedValue();
+                    }
+                    else {
+                        memberValue = MapstructAnnotationUtils.findConfigValueFromMapperConfig( mapperAnnotation,
+                                COMPONENT_MODEL );
+                    }
+                    String componentModel = memberValue == null ? null :
+                            AnnotationUtil.getStringAttributeValue(  memberValue );
                     if ( componentModel != null && !componentModel.equals( "default" ) ) {
                         List<LocalQuickFix> fixes = new ArrayList<>(2);
-                        fixes.add(  createRemoveComponentModelFix( componentModelAttribute, mapperClass ) );
+                        if (componentModelAttribute != null) {
+                            fixes.add(  createRemoveComponentModelFix( componentModelAttribute, mapperClass ) );
+                        }
                         LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );
                         if ( removeMappersFix != null ) {
                             fixes.add( removeMappersFix );
