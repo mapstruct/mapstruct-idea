@@ -14,6 +14,7 @@ jobs:
           - { jdk: 17, idea: 2023.1 }
           - { jdk: 17, idea: 2023.2 }
           - { jdk: 17, idea: 2023.3 }
+          - { jdk: 17, idea: 2024.1 }
           - { jdk: 17, idea: LATEST-EAP-SNAPSHOT }
     name: 'IDEA ${{ matrix.version.idea }}'
     env:
@@ -31,6 +32,6 @@ jobs:
       - name: 'Generate coverage report'
         run: ./gradlew --warning-mode=all jacocoTestReport
       - name: 'Upload coverage to Codecov'
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
