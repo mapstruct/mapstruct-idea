@@ -81,7 +81,7 @@ checkstyle {
 }
 
 jacoco {
-    toolVersion "0.8.8"
+    toolVersion "0.8.11"
 }
 
 jacocoTestReport {
@@ -155,6 +155,12 @@ prepareTestingSandbox.dependsOn( libs )
 prepareSandbox.dependsOn( libs )
 
 test {
+    // Idea SDK needs special configuration
+    // see https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#jacoco-reports-0-coverage
+    jacoco {
+        includeNoLocationClasses = true
+        excludes = ["jdk.internal.*"]
+    }
     useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
