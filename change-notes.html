@@ -1,4 +1,40 @@
 <html lang="en">
+<h2>1.7.0</h2>
+<ul>
+    <li>
+        New Inspections:
+        <ul>
+            <li>No source defined in <code>@Mapping</code></li>
+            <li>
+                More than one source defined in <code>@Mapping</code>.
+                Quick fixes:
+                <ul>
+                    <li>Remove <code>source</code></li>
+                    <li>Remove <code>constant</code></li>
+                    <li>Remove <code>expression</code></li>
+                    <li>Use <code>constant</code> as <code>defaultValue</code></li>
+                    <li>Use <code>expression</code> as <code>defaultExpression</code></li>
+                </ul>
+
+            </li>
+            <li>
+                More than one default source in <code>@Mapping</code>.
+                Quick fixes:
+                <ul>
+                    <li>Remove <code>defaultValue</code></li>
+                    <li>Remove <code>defaultExpression</code></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>Align <code>@InheritConfiguration</code> with MapStruct core and support auto inheritance</li>
+    <li>Support collection getters as viable target setter</li>
+    <li>Support java text blocks for expression injection</li>
+    <li>Support <code>Map&lt;String, ?&gt;</code>, as a valid mapping source</li>
+    <li>Support fluent setters with super types (e.g. Lomboks <code>@SuperBuilder</code></li>
+    <li>Align expression detection with MapStruct core</li>
+    <li>Fix "Remove usage of Mappers factory" inspection ignoring component model defined in <code>@MapperConfig</code></li>
+</ul>
 <h2>1.6.1</h2>
 <ul>
     <li>Add smart completion for target in <code>Mapping</code> (already mapped target are not proposed)</li>
