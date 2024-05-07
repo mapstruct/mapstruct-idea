@@ -1,10 +1,11 @@
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
+import de.undercouch.gradle.tasks.download.Download
 
 plugins {
-    id "org.jetbrains.intellij" version "1.16.1"
+    id "org.jetbrains.intellij" version "1.17.3"
     id "com.github.hierynomus.license" version "0.16.1"
-    id "de.undercouch.download" version "5.4.0"
+    id "de.undercouch.download" version "5.6.0"
 }
 
 
@@ -18,8 +19,10 @@ apply plugin: 'license'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java {
+    sourceCompatibility = 17
+    targetCompatibility = 17
+}
 
 repositories {
     mavenLocal()
@@ -27,10 +30,10 @@ repositories {
 }
 
 intellij {
-    version = System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
+    version = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
     type = ideaType
     downloadSources = Boolean.valueOf(sources)
-    sameSinceUntilBuild = Boolean.valueOf(isEAP)
+    sameSinceUntilBuild = Boolean.valueOf(System.getenv().getOrDefault('IDEA_EAP', isEAP))
     instrumentCode = false
     updateSinceUntilBuild = false
     pluginName = 'MapStruct-Intellij-Plugin'
@@ -47,20 +50,18 @@ patchPluginXml {
     pluginDescription = htmlFixer('description.html')
 }
 
-task licenseTestData(type: LicenseCheck) {
+tasks.register "licenseTestData", LicenseCheck, {
     source = fileTree(dir: "testData").include("**/*")
 }
 
-task licenseFormatForKotlin(type: LicenseFormat) {
+tasks.register "licenseFormatForKotlin", LicenseFormat, {
     source = fileTree(dir: "src/main").include("**/*.kt").include("**/*.xml")
 }
 
 license {
     header rootProject.file('etc/license.txt')
     strictCheck true
-    mapping {
-        java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
-    }
+    mapping('java', 'SLASHSTAR_STYLE') // IntelliJ reports the JAVADOC_STYLE as a dangling comment
     excludes([
             '**/META-INF/plugin.xml', // For some reason the plugin thinks that the license is not valid
             '**/*.properties',
@@ -72,16 +73,11 @@ licenseFormat.dependsOn licenseFormatForKotlin
 licenseTest.dependsOn licenseTestData
 
 checkstyle {
-    toolVersion '8.36.1'
     config resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
     configProperties = [
-            'checkstyle.cache.file': rootProject.buildDir.toPath().resolve('checkstyle-cachefile').toString(),
+            'checkstyle.cache.file': rootProject.layout.buildDirectory.get().asFile.toPath().resolve('checkstyle-cachefile').toString(),
             'basedir': 'https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config',
     ]
-}
-
-jacoco {
-    toolVersion "0.8.11"
 }
 
 jacocoTestReport {
@@ -92,67 +88,44 @@ jacocoTestReport {
 }
 
 dependencies {
-    implementation('org.mapstruct:mapstruct:1.5.3.Final')
-    testImplementation(platform('org.junit:junit-bom:5.8.2'))
+    implementation( "org.mapstruct:mapstruct:$mapstructVersion" )
+    testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation('org.junit.platform:junit-platform-launcher')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
     testImplementation('org.junit.jupiter:junit-jupiter-engine')
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
-    testImplementation('org.assertj:assertj-core:3.11.1')
-    testImplementation('org.apache.commons:commons-text:1.10.0')
+    testImplementation('org.assertj:assertj-core:3.26.0')
+    testImplementation('org.apache.commons:commons-text:1.12.0')
 }
 
-task libs(type: Sync) {
+def libs = tasks.register "libs", Sync, {
     from configurations.runtimeClasspath
-    into "$buildDir/libs"
+    into "${layout.buildDirectory.get().asFile}/libs"
     preserve {
         include 'mapstruct-intellij-*.jar'
     }
-    rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
+    rename "mapstruct-${mapstructVersion}.jar", 'mapstruct.jar'
+}
+[prepareSandbox, prepareTestingSandbox, test]*.each { it.dependsOn libs }
+
+
+def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/212.5712/java"
+def mockJdkDest = "${layout.buildDirectory.get().asFile}"
+for ( def jdkVersion : [7, 8, 11] ) {
+    def jdkName = "mockJDK-${jdkVersion < 9 ? "1.$jdkVersion" : "$jdkVersion"}"
+    def mockJdkSrc = "$mockJdkLocation/$jdkName"
+    test.dependsOn(
+            tasks.register "downloadMockJdk$jdkName", Download, { task ->
+                src( "$mockJdkSrc/jre/lib/annotations.jar" )
+                src( "$mockJdkSrc/jre/lib/rt.jar" )
+                dest "$mockJdkDest/$jdkName/jre/lib"
+                overwrite false
+                quiet false
+            }
+    )
 }
 
-def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/212.5712/java/mock"
-def mockJdkDest = "$buildDir/mock"
-def downloadMockJdk(mockJdkLocation, mockJdkDest, mockJdkVersion) {
-    def location = mockJdkLocation + mockJdkVersion
-    def destination = mockJdkDest + mockJdkVersion
-    download.run {
-        src([
-            "$location/jre/lib/annotations.jar",
-            "$location/jre/lib/rt.jar"
-        ])
-        dest "$destination/jre/lib/"
-        overwrite false
-        quiet false
-    }
-}
-
-task downloadMockJdk7() {
-    def jdkVersion = "JDK-1.7"
-    def mockJdk7Location = mockJdkLocation + jdkVersion
-    def mockJdk7Dest = mockJdkDest + jdkVersion
-    downloadMockJdk(mockJdkLocation, mockJdkDest, jdkVersion)
-    download.run {
-        src([
-             "$mockJdk7Location/src.zip"
-        ])
-        dest "$mockJdk7Dest"
-        overwrite false
-        quiet false
-    }
-}
-
-task downloadMockJdk8() {
-    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-1.8")
-}
-
-task downloadMockJdk11() {
-    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-11")
-}
-
-test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
-prepareTestingSandbox.dependsOn( libs )
-prepareSandbox.dependsOn( libs )
+classpathIndexCleanup.mustRunAfter compileTestJava  // a workaround for a someone else's bug
 
 test {
     // Idea SDK needs special configuration
@@ -165,4 +138,12 @@ test {
     testLogging {
         exceptionFormat = 'full'
     }
+}
+
+jacocoTestReport {
+    classDirectories.from = instrumentCode
+}
+
+jacocoTestCoverageVerification {
+    classDirectories.from = instrumentCode
 }

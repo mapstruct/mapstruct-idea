@@ -61,13 +61,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             @Override
             public Sdk getSdk() {
                 JavaVersion version = languageLevel.toJavaVersion();
-                int mockJdk;
-                if ( version.feature >= 11 ) {
-                    mockJdk = 11;
-                }
-                else {
-                    mockJdk = version.feature;
-                }
+                int mockJdk = Math.min( version.feature, 11 );
                 String compilerOption = ( mockJdk < 11 ? "1." : "" ) + mockJdk;
                 return JavaSdk.getInstance()
                     .createJdk( "java " + compilerOption, BUILD_MOCK_JDK_DIRECTORY + compilerOption, false );

@@ -13,3 +13,5 @@
 # Java-friendly readable chunk headers
 
 *.java	diff=java
+
+/gradlew.bat eol=crlf
