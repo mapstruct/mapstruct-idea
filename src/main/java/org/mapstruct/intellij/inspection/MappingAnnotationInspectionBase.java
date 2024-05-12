@@ -78,6 +78,8 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                             case "conditionExpression":
                                 mappingAnnotation.setConditionExpression( nameValuePair );
                                 break;
+                            case "conditionQualifiedByName":
+                                mappingAnnotation.setConditionQualifiedByName( nameValuePair );
                             default:
                                 break;
                         }
@@ -104,6 +106,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         private PsiNameValuePair dependsOnProperty;
         private PsiNameValuePair qualifiedByNameProperty;
         private PsiNameValuePair conditionExpression;
+        private PsiNameValuePair conditionQualifiedByName;
 
         public PsiNameValuePair getTargetProperty() {
             return targetProperty;
@@ -168,7 +171,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         public boolean hasNoSourceProperties() {
             return sourceProperty == null && defaultValueProperty == null && expressionProperty == null
                     && ignoreProperty == null && constantProperty == null && dependsOnProperty == null
-                    && qualifiedByNameProperty == null;
+                    && qualifiedByNameProperty == null && conditionQualifiedByName == null;
         }
 
         public boolean hasNoDefaultProperties() {
@@ -197,6 +200,14 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
 
         public void setConditionExpression(PsiNameValuePair conditionExpression) {
             this.conditionExpression = conditionExpression;
+        }
+
+        public PsiNameValuePair getConditionQualifiedByName() {
+            return conditionQualifiedByName;
+        }
+
+        public void setConditionQualifiedByName(PsiNameValuePair conditionQualifiedByName) {
+            this.conditionQualifiedByName = conditionQualifiedByName;
         }
     }
 
