@@ -8,7 +8,6 @@ package org.mapstruct.intellij.codeinsight.references;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -18,7 +17,6 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
@@ -31,14 +29,13 @@ import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findReference
 import static org.mapstruct.intellij.util.MapstructUtil.NAMED_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
-import static org.mapstruct.intellij.util.MapstructUtil.asLookupWithRepresentableText;
 
 /**
  * Reference for {@link org.mapstruct.Mapping#qualifiedByName()}.
  *
  * @author Oliver Erhart
  */
-class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
+class MapstructMappingQualifiedByNameReference extends MapstructNonNestedBaseReference {
 
     /**
      * Create a new {@link MapstructMappingQualifiedByNameReference} with the provided parameters
@@ -52,11 +49,6 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
                                                      MapstructMappingQualifiedByNameReference previousReference,
                                                      TextRange rangeInElement, String value) {
         super( element, previousReference, rangeInElement, value );
-    }
-
-    @Override
-    PsiElement resolveInternal(@NotNull String value, @NotNull PsiType psiType) {
-        return null; // not needed
     }
 
     @Override
@@ -78,12 +70,6 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
         }
 
         return getStringAttributeValue( namedAnnotation, "value" );
-    }
-
-    @NotNull
-    @Override
-    Object[] getVariantsInternal(@NotNull PsiType psiType) {
-        return LookupElement.EMPTY_ARRAY; // not needed
     }
 
     @NotNull
@@ -139,31 +125,7 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
             return null;
         }
 
-        return asLookupWithRepresentableText(
-            method,
-            lookupString,
-            lookupString,
-            String.format(
-                " %s#%s(%s)",
-                Objects.requireNonNull( method.getContainingClass() ).getName(),
-                method.getName(),
-                formatParameters( method )
-            )
-        );
-    }
-
-    @NotNull
-    private static String formatParameters(@NotNull PsiMethod method) {
-        return Arrays.stream( method.getParameterList().getParameters() )
-            .map( PsiParameter::getType )
-            .map( PsiType::getPresentableText )
-            .collect( Collectors.joining( ", " ) );
-    }
-
-    @Nullable
-    @Override
-    PsiType resolvedType() {
-        return null;
+        return MapstructUtil.asLookup( method, lookupString, lookupString );
     }
 
     /**
