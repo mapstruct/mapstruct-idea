@@ -39,7 +39,7 @@ abstract class CarMapperWithExplicitInheritance {
     @Mapping(target = "auditTrail", constant = "fixed")
     abstract CarEntity toCarEntityWithFixedAuditTrail(CarDto carDto);
 
-    // this method should not be considered. See issue #1013
+    // this method should not be considered. See https://github.com/mapstruct/mapstruct/issues/1013
     void toCarEntity(CarDto carDto, @MappingTarget CarEntity carEntity) { }
 }
 
