@@ -420,7 +420,7 @@ public class MapstructAnnotationUtils {
      * {@code false} otherwise
      */
     private static boolean isValueMappingAnnotation(PsiAnnotation psiAnnotation) {
-        return Objects.equals( psiAnnotation.getQualifiedName(), VALUE_MAPPING_ANNOTATION_FQN );
+        return VALUE_MAPPING_ANNOTATION_FQN.equals( psiAnnotation.getQualifiedName() );
     }
 
     /**
@@ -430,7 +430,7 @@ public class MapstructAnnotationUtils {
      * false} otherwise
      */
     private static boolean isMappingAnnotation(PsiAnnotation psiAnnotation) {
-        return Objects.equals( psiAnnotation.getQualifiedName(), MAPPING_ANNOTATION_FQN );
+        return MAPPING_ANNOTATION_FQN.equals( psiAnnotation.getQualifiedName() );
     }
 
     /**
