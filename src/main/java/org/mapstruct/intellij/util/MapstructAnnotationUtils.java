@@ -296,24 +296,30 @@ public class MapstructAnnotationUtils {
     private static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiModifierListOwner owner,
                                                                           boolean includeMetaAnnotations) {
         //TODO cache
-        Stream<PsiAnnotation> mappingsAnnotations = Stream.empty();
         PsiAnnotation mappings = findAnnotation( owner, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
-        if ( mappings != null ) {
-            //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
-            PsiAnnotationMemberValue mappingsValue = mappings.findDeclaredAttributeValue( null );
-            if ( mappingsValue instanceof PsiArrayInitializerMemberValue mappingsArrayInitializerMemberValue ) {
-                mappingsAnnotations = Stream.of( mappingsArrayInitializerMemberValue.getInitializers() )
-                    .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
-                    .map( PsiAnnotation.class::cast );
-            }
-            else if ( mappingsValue instanceof PsiAnnotation mappingsAnnotation ) {
-                mappingsAnnotations = Stream.of( mappingsAnnotation );
-            }
-        }
-
+        Stream<PsiAnnotation> mappingsAnnotations = extractMappingAnnotationsFromMappings( mappings );
         Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
         return Stream.concat( mappingAnnotations, mappingsAnnotations );
+    }
+
+    @NotNull
+    public static Stream<PsiAnnotation> extractMappingAnnotationsFromMappings(@Nullable PsiAnnotation mappings) {
+        if (mappings == null) {
+            return Stream.empty();
+        }
+        //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
+        PsiAnnotationMemberValue mappingsValue = mappings.findDeclaredAttributeValue( null );
+        if ( mappingsValue instanceof PsiArrayInitializerMemberValue mappingsArrayInitializerMemberValue) {
+            return Stream.of( mappingsArrayInitializerMemberValue
+                            .getInitializers() )
+                    .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
+                    .map( PsiAnnotation.class::cast );
+        }
+        else if ( mappingsValue instanceof PsiAnnotation mappingsAnnotation ) {
+            return Stream.of( mappingsAnnotation );
+        }
+        return Stream.empty();
     }
 
     private static Stream<PsiAnnotation> findMappingAnnotations(@NotNull PsiModifierListOwner method,

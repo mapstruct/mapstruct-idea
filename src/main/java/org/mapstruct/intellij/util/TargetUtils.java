@@ -387,14 +387,15 @@ public class TargetUtils {
     /**
      * Find all defined {@link org.mapstruct.Mapping#target()} for the given method
      *
-     * @param method that needs to be checked
+     * @param owner that needs to be checked
      * @param mapStructVersion the MapStruct project version
      *
      * @return see description
      */
-    public static Stream<String> findAllDefinedMappingTargets(@NotNull PsiMethod method,
+    @NotNull
+    public static Stream<String> findAllDefinedMappingTargets(@NotNull PsiModifierListOwner owner,
         MapStructVersion mapStructVersion) {
-        return findAllDefinedMappingAnnotations( method, mapStructVersion )
+        return findAllDefinedMappingAnnotations( owner, mapStructVersion )
             .map( psiAnnotation -> AnnotationUtil.getDeclaredStringAttributeValue( psiAnnotation, "target" ) )
             .filter( Objects::nonNull )
             .filter( s -> !s.isEmpty() );

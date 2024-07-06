@@ -93,7 +93,7 @@ public final class MapstructUtil {
     public static final String INHERIT_CONFIGURATION_FQN = InheritConfiguration.class.getName();
     public static final String INHERIT_INVERSE_CONFIGURATION_FQN = InheritInverseConfiguration.class.getName();
 
-    static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
+    public static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
