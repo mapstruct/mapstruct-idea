@@ -54,15 +54,15 @@ public class TargetPropertyMappedMoreThanOnceInspectionTest extends BaseInspecti
                 );
 
         // Delete annotations
-        myFixture.launchAction(allQuickFixes.get(0));
-        myFixture.launchAction(allQuickFixes.get(3));
-        myFixture.launchAction(allQuickFixes.get(6));
-        myFixture.launchAction(allQuickFixes.get(8));
-        myFixture.launchAction(allQuickFixes.get(14));
+        myFixture.launchAction( allQuickFixes.get( 0 ) );
+        myFixture.launchAction( allQuickFixes.get( 3 ) );
+        myFixture.launchAction( allQuickFixes.get( 6 ) );
+        myFixture.launchAction( allQuickFixes.get( 8 ) );
+        myFixture.launchAction( allQuickFixes.get( 14 ) );
         // Set cursor
-        myFixture.launchAction(allQuickFixes.get(16));
+        myFixture.launchAction( allQuickFixes.get( 16 ) );
         myFixture.checkResultByFile( testName + "_after.java" );
         Caret currentCaret = myFixture.getEditor().getCaretModel().getCurrentCaret();
-        assertThat(currentCaret.getSelectedText()).isEqualTo("testName");
+        assertThat( currentCaret.getSelectedText( ) ).isEqualTo( "testName" );
     }
 }
