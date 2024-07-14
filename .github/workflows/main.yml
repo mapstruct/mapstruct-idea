@@ -8,17 +8,17 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - { jdk: 11, idea: 2022.1 }
-          - { jdk: 17, idea: 2022.2 }
-          - { jdk: 17, idea: 2022.3 }
-          - { jdk: 17, idea: 2023.1 }
-          - { jdk: 17, idea: 2023.2 }
-          - { jdk: 17, idea: 2023.3 }
-          - { jdk: 17, idea: 2024.1 }
-          - { jdk: 17, idea: LATEST-EAP-SNAPSHOT }
+          - { jdk: 17, idea: 2022.2, eap: false }
+          - { jdk: 17, idea: 2022.3, eap: false }
+          - { jdk: 17, idea: 2023.1, eap: false }
+          - { jdk: 17, idea: 2023.2, eap: false }
+          - { jdk: 17, idea: 2023.3, eap: false }
+          - { jdk: 17, idea: 2024.1, eap: false }
+          - { jdk: 21, idea: LATEST-EAP-SNAPSHOT, eap: true }
     name: 'IDEA ${{ matrix.version.idea }}'
     env:
       IDEA_VERSION: ${{ matrix.version.idea }}
+      IDEA_EAP: ${{ matrix.version.eap }}
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'

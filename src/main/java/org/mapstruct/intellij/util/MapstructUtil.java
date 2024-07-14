@@ -154,9 +154,9 @@ public final class MapstructUtil {
         return builder;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends PsiElement> LookupElement asLookup(String propertyName, @NotNull T psiElement,
                                                                 Function<T, PsiType> typeMapper, Icon icon) {
-        //noinspection unchecked
         return asLookup( propertyName, Pair.pair( psiElement, EmptySubstitutor.getInstance() ),
             (Function<PsiElement, PsiType>) typeMapper, icon
         );
