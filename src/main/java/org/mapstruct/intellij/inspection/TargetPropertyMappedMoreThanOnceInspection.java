@@ -29,8 +29,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.source.tree.java.PsiAnnotationImpl;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapStructVersion;
@@ -42,7 +44,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
@@ -126,11 +127,11 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
         }
 
         private static @NotNull LocalQuickFixAndIntentionActionOnPsiElement getDeleteFix(
-                PsiElement problemElement, QuickFixFactory quickFixFactory) {
-            String qualifiedName = Objects.requireNonNullElse(
-                    ( (PsiAnnotation) problemElement).getQualifiedName(), "unknown" );
+                @NotNull PsiElement problemElement, @NotNull QuickFixFactory quickFixFactory) {
+
+            String annotationName = PsiAnnotationImpl.getAnnotationShortName( problemElement.getText() );
             return quickFixFactory.createDeleteFix( problemElement,
-                    MapStructBundle.message( "intention.remove.annotation", qualifiedName ) );
+                    MapStructBundle.message( "intention.remove.annotation", annotationName ) );
         }
 
         private void handleAnnotationWithMappingAnnotation(PsiAnnotation psiAnnotation,

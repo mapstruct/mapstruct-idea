@@ -33,22 +33,22 @@ public class TargetPropertyMappedMoreThanOnceInspectionTest extends BaseInspecti
                 .extracting( IntentionAction::getText )
                 .as( "Intent Text" )
                 .containsExactly(
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
                         "Remove MyMappingAnnotation annotation",
-                        "Remove org.mapstruct.Mapping annotation",
+                        "Remove Mapping annotation",
                         "Change target property",
                         "Remove MyMappingAnnotation annotation"
                 );
