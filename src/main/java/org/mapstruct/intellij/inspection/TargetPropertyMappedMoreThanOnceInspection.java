@@ -81,7 +81,7 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
                 return;
             }
             Map<String, List<PsiElement>> problemMap = new HashMap<>();
-            for (PsiAnnotation psiAnnotation :method.getAnnotations()) {
+            for (PsiAnnotation psiAnnotation : method.getAnnotations()) {
                 String qualifiedName = psiAnnotation.getQualifiedName();
                 if ( MAPPING_ANNOTATION_FQN.equals( qualifiedName ) ) {
                     handleMappingAnnotation( psiAnnotation, problemMap );
