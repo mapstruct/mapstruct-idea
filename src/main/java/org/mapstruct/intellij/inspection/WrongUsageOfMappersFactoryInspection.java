@@ -66,10 +66,9 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
             if ( MAPPERS_FACTORY_CALL_MATCHER.test( expression ) ) {
                 PsiExpression argument = PsiUtil.skipParenthesizedExprDown( expression.getArgumentList()
                     .getExpressions()[0] );
-                if ( !( argument instanceof PsiClassObjectAccessExpression ) ) {
+                if ( !( argument instanceof PsiClassObjectAccessExpression classObjectAccessExpression ) ) {
                     return;
                 }
-                PsiClassObjectAccessExpression classObjectAccessExpression = (PsiClassObjectAccessExpression) argument;
                 PsiJavaCodeReferenceElement referenceElement = classObjectAccessExpression.getOperand()
                     .getInnermostComponentReferenceElement();
 
@@ -79,11 +78,10 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
 
                 PsiElement mapperElement = referenceElement.resolve();
 
-                if ( !( mapperElement instanceof PsiClass ) ) {
+                if ( !( mapperElement instanceof PsiClass mapperClass ) ) {
                     return;
                 }
 
-                PsiClass mapperClass = (PsiClass) mapperElement;
                 PsiAnnotation mapperAnnotation = mapperClass.getAnnotation( MapstructUtil.MAPPER_ANNOTATION_FQN );
                 if ( mapperAnnotation == null ) {
                     List<LocalQuickFix> fixes = new ArrayList<>(2);
@@ -165,9 +163,9 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
 
     private static LocalQuickFix createRemoveMappersFix(@NotNull PsiMethodCallExpression methodCallExpression) {
         PsiElement parent = methodCallExpression.getParent();
-        if ( parent instanceof PsiVariable ) {
+        if ( parent instanceof PsiVariable parentPsiVariable ) {
 
-                return new RemoveMappersFix( (PsiVariable) parent );
+                return new RemoveMappersFix( parentPsiVariable );
         }
 
         return null;

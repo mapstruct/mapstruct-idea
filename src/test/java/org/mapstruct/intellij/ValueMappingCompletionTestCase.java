@@ -22,57 +22,63 @@ import static org.mapstruct.intellij.testutil.TestUtils.createField;
 public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestCase {
 
     @Language("JAVA")
-    private static final String SOURCE_VALUE_MAPPING_DYNAMIC = "import org.mapstruct.Mapper;\n" +
-        "import org.mapstruct.ValueMapping;\n" +
-        "import org.mapstruct.example.ExternalRoofType;\n" +
-        "import org.mapstruct.example.RoofType;\n" +
-        "\n" +
-        "@Mapper\n" +
-        "public interface RoofTypeMapper {\n" +
-        "\n" +
-        "    %s" +
-        "    ExternalRoofType map(RoofType type);\n" +
-        "}";
+    private static final String SOURCE_VALUE_MAPPING_DYNAMIC = """
+            import org.mapstruct.Mapper;
+            import org.mapstruct.ValueMapping;
+            import org.mapstruct.example.ExternalRoofType;
+            import org.mapstruct.example.RoofType;
+
+            @Mapper
+            public interface RoofTypeMapper {
+
+                %s\
+                ExternalRoofType map(RoofType type);
+            }""";
 
     @Language("JAVA")
-    private static final String SOURCE_VALUE_MAPPINGS_DYNAMIC = "import org.mapstruct.Mapper;\n" +
-        "import org.mapstruct.ValueMapping;\n" +
-        "import org.mapstruct.ValueMappings;\n" +
-        "import org.mapstruct.example.ExternalRoofType;\n" +
-        "import org.mapstruct.example.RoofType;\n" +
-        "\n" +
-        "@Mapper\n" +
-        "public interface RoofTypeMapper {\n" +
-        "\n" +
-        "    @ValueMappings({\n%s\n})\n" +
-        "    ExternalRoofType map(RoofType type);\n" +
-        "}";
+    private static final String SOURCE_VALUE_MAPPINGS_DYNAMIC = """
+            import org.mapstruct.Mapper;
+            import org.mapstruct.ValueMapping;
+            import org.mapstruct.ValueMappings;
+            import org.mapstruct.example.ExternalRoofType;
+            import org.mapstruct.example.RoofType;
+
+            @Mapper
+            public interface RoofTypeMapper {
+
+                @ValueMappings({
+            %s
+            })
+                ExternalRoofType map(RoofType type);
+            }""";
 
     @Language("JAVA")
-    private static final String SOURCE_VALUE_MAPPING = "import org.mapstruct.Mapper;\n" +
-        "import org.mapstruct.ValueMapping;\n" +
-        "import org.mapstruct.example.ExternalRoofType;\n" +
-        "import org.mapstruct.example.RoofType;\n" +
-        "\n" +
-        "@Mapper\n" +
-        "public interface RoofTypeMapper {\n" +
-        "\n" +
-        "    @ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n" +
-        "    ExternalRoofType map(RoofType type);\n" +
-        "}";
+    private static final String SOURCE_VALUE_MAPPING = """
+            import org.mapstruct.Mapper;
+            import org.mapstruct.ValueMapping;
+            import org.mapstruct.example.ExternalRoofType;
+            import org.mapstruct.example.RoofType;
+
+            @Mapper
+            public interface RoofTypeMapper {
+
+                @ValueMapping(source = "<caret>%s", target = "STANDARD")
+                ExternalRoofType map(RoofType type);
+            }""";
 
     @Language("JAVA")
-    private static final String TARGET_VALUE_MAPPING = "import org.mapstruct.Mapper;\n" +
-        "import org.mapstruct.ValueMapping;\n" +
-        "import org.mapstruct.example.ExternalRoofType;\n" +
-        "import org.mapstruct.example.RoofType;\n" +
-        "\n" +
-        "@Mapper\n" +
-        "public interface RoofTypeMapper {\n" +
-        "\n" +
-        "    @ValueMapping(source = \"NORMAL\", target = \"<caret>%s\")\n" +
-        "    ExternalRoofType map(RoofType type);\n" +
-        "}";
+    private static final String TARGET_VALUE_MAPPING = """
+            import org.mapstruct.Mapper;
+            import org.mapstruct.ValueMapping;
+            import org.mapstruct.example.ExternalRoofType;
+            import org.mapstruct.example.RoofType;
+
+            @Mapper
+            public interface RoofTypeMapper {
+
+                @ValueMapping(source = "NORMAL", target = "<caret>%s")
+                ExternalRoofType map(RoofType type);
+            }""";
 
     @Override
     protected String getTestDataPath() {
@@ -112,8 +118,10 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
     public void testSourceValueMappingWithExisting() {
         String source = String.format(
             SOURCE_VALUE_MAPPING_DYNAMIC,
-            "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
-                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+                """
+                        @ValueMapping(source = "GAMBREL", target = "NORMAL")
+                        @ValueMapping(source = "<caret>%s", target = "STANDARD")
+                        """
         );
         myFixture.configureByText( JavaFileType.INSTANCE, source );
         complete();
@@ -138,8 +146,10 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
     public void testSourceValueMappingsWithExisting() {
         String source = String.format(
             SOURCE_VALUE_MAPPINGS_DYNAMIC,
-            "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\"),\n" +
-                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+                """
+                        @ValueMapping(source = "GAMBREL", target = "NORMAL"),
+                        @ValueMapping(source = "<caret>%s", target = "STANDARD")
+                        """
         );
         myFixture.configureByText( JavaFileType.INSTANCE, source );
         complete();
@@ -164,11 +174,13 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
     public void testSourceValueMappingAllValuesAlreadyMapped() {
         String source = String.format(
             SOURCE_VALUE_MAPPING_DYNAMIC,
-            "@ValueMapping(source = \"OPEN\", target = \"NORMAL\")\n" +
-                "@ValueMapping(source = \"BOX\", target = \"NORMAL\")\n" +
-                "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\")\n" +
-                "@ValueMapping(source = \"NORMAL\", target = \"NORMAL\")\n" +
-                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+                """
+                        @ValueMapping(source = "OPEN", target = "NORMAL")
+                        @ValueMapping(source = "BOX", target = "NORMAL")
+                        @ValueMapping(source = "GAMBREL", target = "NORMAL")
+                        @ValueMapping(source = "NORMAL", target = "NORMAL")
+                        @ValueMapping(source = "<caret>%s", target = "STANDARD")
+                        """
         );
         myFixture.configureByText( JavaFileType.INSTANCE, source );
         complete();
@@ -185,11 +197,13 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
     public void testSourceValueMappingsAllValuesAlreadyMapped() {
         String source = String.format(
             SOURCE_VALUE_MAPPINGS_DYNAMIC,
-            "@ValueMapping(source = \"OPEN\", target = \"NORMAL\"),\n" +
-                "@ValueMapping(source = \"BOX\", target = \"NORMAL\"),\n" +
-                "@ValueMapping(source = \"GAMBREL\", target = \"NORMAL\"),\n" +
-                "@ValueMapping(source = \"NORMAL\", target = \"NORMAL\"),\n" +
-                "@ValueMapping(source = \"<caret>%s\", target = \"STANDARD\")\n"
+                """
+                        @ValueMapping(source = "OPEN", target = "NORMAL"),
+                        @ValueMapping(source = "BOX", target = "NORMAL"),
+                        @ValueMapping(source = "GAMBREL", target = "NORMAL"),
+                        @ValueMapping(source = "NORMAL", target = "NORMAL"),
+                        @ValueMapping(source = "<caret>%s", target = "STANDARD")
+                        """
         );
         myFixture.configureByText( JavaFileType.INSTANCE, source );
         complete();

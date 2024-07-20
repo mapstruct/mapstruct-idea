@@ -191,17 +191,17 @@ class MapstructTargetReference extends MapstructBaseReference {
     PsiType resolvedType() {
         PsiElement element = resolve();
 
-        if ( element instanceof PsiMethod ) {
-            return firstParameterPsiType( (PsiMethod) element );
+        if ( element instanceof PsiMethod psiMethod ) {
+            return firstParameterPsiType( psiMethod );
         }
-        else if ( element instanceof PsiParameter ) {
-            return ( (PsiParameter) element ).getType();
+        else if ( element instanceof PsiParameter psiParameter ) {
+            return psiParameter.getType();
         }
-        else if ( element instanceof PsiRecordComponent ) {
-            return ( (PsiRecordComponent) element ).getType();
+        else if ( element instanceof PsiRecordComponent psiRecordComponent ) {
+            return psiRecordComponent.getType();
         }
-        else if ( element instanceof PsiField ) {
-            return ( (PsiField) element ).getType();
+        else if ( element instanceof PsiField psiField ) {
+            return psiField.getType();
         }
 
         return null;
@@ -217,11 +217,11 @@ class MapstructTargetReference extends MapstructBaseReference {
     }
 
     private static PsiType memberPsiType(PsiElement psiMember) {
-        if ( psiMember instanceof PsiMethod ) {
-            return firstParameterPsiType( (PsiMethod) psiMember );
+        if ( psiMember instanceof PsiMethod psiMemberMethod ) {
+            return firstParameterPsiType( psiMemberMethod );
         }
-        else if ( psiMember instanceof PsiVariable ) {
-            return ( (PsiVariable) psiMember ).getType();
+        else if ( psiMember instanceof PsiVariable psiMemberVariable ) {
+            return psiMemberVariable.getType();
         }
         else {
             return null;

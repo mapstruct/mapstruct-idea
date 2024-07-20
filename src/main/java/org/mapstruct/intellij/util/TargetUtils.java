@@ -179,8 +179,8 @@ public class TargetUtils {
     private static Optional<Boolean> findDisabledBuilder(@Nullable PsiAnnotation requestedAnnotation) {
         if ( requestedAnnotation != null ) {
             PsiAnnotationMemberValue builderValue = requestedAnnotation.findDeclaredAttributeValue( "builder" );
-            if ( builderValue instanceof PsiAnnotation ) {
-                Boolean disableBuilder = getBooleanAttributeValue( (PsiAnnotation) builderValue, "disableBuilder" );
+            if ( builderValue instanceof PsiAnnotation builderAnnotation ) {
+                Boolean disableBuilder = getBooleanAttributeValue( builderAnnotation, "disableBuilder" );
                 return Optional.ofNullable( disableBuilder );
             }
         }

@@ -80,8 +80,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         @Override
         public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                            @NotNull PsiElement psiElement1) {
-            if (psiElement instanceof PsiNameValuePair) {
-                PsiNameValuePair psiNameValuePair = (PsiNameValuePair) psiElement;
+            if (psiElement instanceof PsiNameValuePair psiNameValuePair) {
                 PsiAnnotationMemberValue value = psiNameValuePair.getValue();
                 if (value != null) {
                     String text = value.getText();
@@ -102,10 +101,10 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
             if ( !super.isAvailable( project, file, startElement, endElement ) ) {
                 return false;
             }
-            if ( !(startElement instanceof PsiNameValuePair ) ) {
+            if ( !(startElement instanceof PsiNameValuePair startPsiNameValuePair ) ) {
                 return false;
             }
-            return ((PsiNameValuePair) startElement).getValue() != null;
+            return startPsiNameValuePair.getValue() != null;
         }
     }
 
@@ -126,8 +125,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         @Override
         public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                            @NotNull PsiElement psiElement1) {
-            if (psiElement instanceof PsiNameValuePair) {
-                PsiNameValuePair psiNameValuePair = (PsiNameValuePair) psiElement;
+            if (psiElement instanceof PsiNameValuePair psiNameValuePair) {
                 PsiAnnotationMemberValue value = psiNameValuePair.getValue();
                 if (value != null) {
                     String text = value.getText();
@@ -148,10 +146,10 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
             if ( !super.isAvailable( project, file, startElement, endElement ) ) {
                 return false;
             }
-            if ( !(startElement instanceof PsiNameValuePair ) ) {
+            if ( !(startElement instanceof PsiNameValuePair startPsiNameValuePair ) ) {
                 return false;
             }
-            return ((PsiNameValuePair) startElement).getValue() != null;
+            return startPsiNameValuePair.getValue() != null;
         }
     }
 }

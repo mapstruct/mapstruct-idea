@@ -30,8 +30,8 @@ public class KtValueArgumentNamePattern extends PsiElementPattern<KtValueArgumen
             @Nullable
             @Override
             public String getPropertyValue(@NotNull Object o) {
-                if ( o instanceof KtValueArgumentName ) {
-                    return ( (KtValueArgumentName) o ).getAsName().getIdentifier();
+                if ( o instanceof KtValueArgumentName ktValueArgumentName ) {
+                    return ktValueArgumentName.getAsName().getIdentifier();
                 }
                 return null;
             }

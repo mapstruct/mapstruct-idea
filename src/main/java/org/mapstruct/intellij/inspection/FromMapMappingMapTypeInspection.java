@@ -133,8 +133,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
                 if (!super.isAvailable( project, file, startElement, endElement ) ) {
                     return false;
                 }
-                if (startElement instanceof PsiParameter) {
-                    PsiParameter parameter = (PsiParameter) startElement;
+                if (startElement instanceof PsiParameter parameter) {
                     PsiType[] parameters = getGenericTypes( parameter );
                     return parameters != null && parameters.length == 0;
                 }
@@ -179,8 +178,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
                 if (!super.isAvailable( project, file, startElement, endElement ) ) {
                     return false;
                 }
-                if (startElement instanceof PsiParameter) {
-                    PsiParameter parameter = (PsiParameter) startElement;
+                if (startElement instanceof PsiParameter parameter) {
                     PsiType[] parameters = getGenericTypes( parameter );
                     if (parameters == null || parameters.length != 2) {
                         return false;
