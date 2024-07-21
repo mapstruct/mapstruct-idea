@@ -6,7 +6,6 @@
 package org.mapstruct.intellij.inspection;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.openapi.editor.Caret;
@@ -40,7 +39,7 @@ public class UnmappedTargetPropertiesInspectionCaretAfterQuickfixTest extends Ba
         List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
             .stream()
             .filter( i -> i.getText().startsWith( "Add unmapped target property " ) )
-            .collect( Collectors.toList() );
+            .toList();
 
         addMissingTargetQuickfixes.forEach( this::launchAndAssertCaretPositionInSource );
     }
@@ -51,7 +50,7 @@ public class UnmappedTargetPropertiesInspectionCaretAfterQuickfixTest extends Ba
         List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
             .stream()
             .filter( i -> i.getText().startsWith( "Ignore unmapped target property" ) )
-            .collect( Collectors.toList() );
+            .toList();
 
         addMissingTargetQuickfixes.forEach( this::launchAndAssertUnchangedCaretPosition );
     }
@@ -62,7 +61,7 @@ public class UnmappedTargetPropertiesInspectionCaretAfterQuickfixTest extends Ba
         List<IntentionAction> addMissingTargetQuickfixes = myFixture.getAllQuickFixes()
             .stream()
             .filter( i -> i.getText().startsWith( "Ignore all unmapped target properties" ) )
-            .collect( Collectors.toList() );
+            .toList();
 
         addMissingTargetQuickfixes.forEach( this::launchAndAssertUnchangedCaretPosition );
     }

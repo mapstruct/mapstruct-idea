@@ -114,11 +114,11 @@ public class SourceUtils {
 
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicReadAccessors(
         @Nullable PsiElement psiElement) {
-        if ( psiElement instanceof PsiMethod ) {
-            return publicReadAccessors( ( (PsiMethod) psiElement ).getReturnType() );
+        if ( psiElement instanceof PsiMethod psiMethod ) {
+            return publicReadAccessors( psiMethod.getReturnType() );
         }
-        else if ( psiElement instanceof PsiParameter ) {
-            return publicReadAccessors( ( (PsiParameter) psiElement ).getType() );
+        else if ( psiElement instanceof PsiParameter psiParameter ) {
+            return publicReadAccessors( psiParameter.getType() );
         }
 
         return Collections.emptyMap();

@@ -354,20 +354,21 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER, mapping, "imports = java.util.Collections.class" );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import java.util.Collections;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car\n" +
-            "    ) {\n" +
-            "        return Collections;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import java.util.Collections;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Car car
+                    ) {
+                        return Collections;
+                    }
+                }""" );
 
     }
 
@@ -383,20 +384,21 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER, mapping, "imports = org.example.dto.Utils.class" );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "import org.example.dto.Utils;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car\n" +
-            "    ) {\n" +
-            "        return Utils;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+                import org.example.dto.Utils;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Car car
+                    ) {
+                        return Utils;
+                    }
+                }""" );
     }
 
     public void testExpressionWithMapperWithoutImports() {
@@ -411,19 +413,20 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car\n" +
-            "    ) {\n" +
-            "        return Collections;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Car car
+                    ) {
+                        return Collections;
+                    }
+                }""" );
 
     }
 
@@ -439,20 +442,21 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER_MULTI_SOURCE, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car,\n" +
-            "        String make\n" +
-            "    ) {\n" +
-            "        return car.;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Car car,
+                        String make
+                    ) {
+                        return car.;
+                    }
+                }""" );
     }
 
     public void testExpressionWithGenericSourceParameters() {
@@ -468,20 +472,21 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "import org.example.dto.Wrapper;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Wrapper<Car> carWrapper\n" +
-            "    ) {\n" +
-            "        return carWrapper.getValue().;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+                import org.example.dto.Wrapper;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Wrapper<Car> carWrapper
+                    ) {
+                        return carWrapper.getValue().;
+                    }
+                }""" );
     }
 
     public void testExpressionWithSourceParameterWithAnnotations() {
@@ -497,21 +502,22 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER_WITH_ANNOTATION, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "import org.example.dto.Wrapper;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        @Context\n" +
-            "        Wrapper<Car> carWrapper\n" +
-            "    ) {\n" +
-            "        return carWrapper.getValue().;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+                import org.example.dto.Wrapper;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        @Context
+                        Wrapper<Car> carWrapper
+                    ) {
+                        return carWrapper.getValue().;
+                    }
+                }""" );
     }
 
     public void testExpressionWithSourceParameterWithMultipleGenerics() {
@@ -527,21 +533,22 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER_FROM_WRAPPER_WITH_MULTI_GENERICS, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import java.util.function.BiFunction;\n" +
-            "import org.example.dto.Car;\n" +
-            "import org.example.dto.Wrapper;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Wrapper<BiFunction<String, Number, Car>> carWrapper\n" +
-            "    ) {\n" +
-            "        return carWrapper.getValue().apply(null, null).;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import java.util.function.BiFunction;
+                import org.example.dto.Car;
+                import org.example.dto.Wrapper;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    String __test__(
+                        Wrapper<BiFunction<String, Number, Car>> carWrapper
+                    ) {
+                        return carWrapper.getValue().apply(null, null).;
+                    }
+                }""" );
     }
 
     public void testExpressionWithGenericMethod() {
@@ -556,19 +563,20 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( CAR_MAPPER_FROM_NUMBER_WRAPPER, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.NumberWrapper;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    implements CarMapper {\n" +
-            "\n" +
-            "    <T extends Number> int __test__(\n" +
-            "        NumberWrapper<T> numberWrapper\n" +
-            "    ) {\n" +
-            "        return numberWrapper.;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.NumberWrapper;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    implements CarMapper {
+
+                    <T extends Number> int __test__(
+                        NumberWrapper<T> numberWrapper
+                    ) {
+                        return numberWrapper.;
+                    }
+                }""" );
     }
 
     public void testExpressionWithGenericMapper() {
@@ -583,20 +591,21 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         String mapper = formatMapper( GENERIC_MAPPER, mapping );
         configureMapperByText( mapper );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl<T, R>\n" +
-            "    implements CarMapper<T, R> {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car,\n" +
-            "        String make\n" +
-            "    ) {\n" +
-            "        return car.;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl<T, R>
+                    implements CarMapper<T, R> {
+
+                    String __test__(
+                        Car car,
+                        String make
+                    ) {
+                        return car.;
+                    }
+                }""" );
     }
 
     public void testExpressionWithClassMapper() {
@@ -619,19 +628,20 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "    CarDto carToCarDto(Car car);\n" +
             "}" );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    extends CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car\n" +
-            "    ) {\n" +
-            "        return car.;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    extends CarMapper {
+
+                    String __test__(
+                        Car car
+                    ) {
+                        return car.;
+                    }
+                }""" );
     }
 
     public void testExpressionWithTargetUsingStaticString() {
@@ -655,19 +665,20 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
             "    CarDto carToCarDto(Car car);\n" +
             "}" );
 
-        assertJavaFragment( "import CarMapper;\n" +
-            "import org.example.dto.Car;\n" +
-            "\n" +
-            "@SuppressWarnings(\"unused\")\n" +
-            "abstract class CarMapperImpl\n" +
-            "    extends CarMapper {\n" +
-            "\n" +
-            "    String __test__(\n" +
-            "        Car car\n" +
-            "    ) {\n" +
-            "        return car.;\n" +
-            "    }\n" +
-            "}" );
+        assertJavaFragment( """
+                import CarMapper;
+                import org.example.dto.Car;
+
+                @SuppressWarnings("unused")
+                abstract class CarMapperImpl
+                    extends CarMapper {
+
+                    String __test__(
+                        Car car
+                    ) {
+                        return car.;
+                    }
+                }""" );
     }
 
     public void testExpressionWithMapperToDtoWithoutAccessors() {

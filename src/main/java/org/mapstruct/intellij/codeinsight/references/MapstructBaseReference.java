@@ -170,8 +170,8 @@ abstract class MapstructBaseReference extends BaseReference {
         ReferenceCreator<T> creator, boolean supportsNested) {
         String targetValue;
         Function<String, TextRange> rangeCreator;
-        if ( psiElement instanceof PsiReferenceExpression ) {
-            PsiElement resolvedPsiElement = ( (PsiReferenceExpression) psiElement ).resolve();
+        if ( psiElement instanceof PsiReferenceExpression psiReferenceExpression ) {
+            PsiElement resolvedPsiElement = psiReferenceExpression.resolve();
 
             PsiLiteralExpression expression = PsiTreeUtil.findChildOfType(
                 resolvedPsiElement,

@@ -44,9 +44,8 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
                 MappingAnnotation mappingAnnotation = new MappingAnnotation();
                 for (JvmAnnotationAttribute annotationAttribute : annotation.getAttributes()) {
                     // exclude not written attributes. They result in a syntax error
-                    if (annotationAttribute instanceof PsiNameValuePair
+                    if (annotationAttribute instanceof PsiNameValuePair nameValuePair
                             && annotationAttribute.getAttributeValue() != null) {
-                        PsiNameValuePair nameValuePair = (PsiNameValuePair) annotationAttribute;
                         switch (nameValuePair.getAttributeName()) {
                             case "target" :
                                 mappingAnnotation.setTargetProperty( nameValuePair );
@@ -285,8 +284,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         @Override
         public void invoke( @NotNull Project project, @NotNull PsiFile file, @NotNull PsiElement startElement,
                             @NotNull PsiElement endElement ) {
-            if (endElement instanceof PsiNameValuePair) {
-                PsiNameValuePair end = (PsiNameValuePair) endElement;
+            if (endElement instanceof PsiNameValuePair end) {
                 PsiAnnotationParamListImpl parent = (PsiAnnotationParamListImpl) end.getParent();
                 PsiElement parent1 = parent.getParent();
 
