@@ -1,0 +1,29 @@
+<html>
+<body>
+<p>
+    This inspection reports when a target property is explicit mapped more than once
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", target = "name")
+    @Mapping(source = "employeeNameLast", target = "name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeName", target = "name")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

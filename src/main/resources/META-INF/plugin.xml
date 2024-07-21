@@ -128,6 +128,14 @@
             key="inspection.this.target.mapping.no.source.property"
             shortName="TargetThisMappingNoSourcePropertyInspection"
             implementationClass="org.mapstruct.intellij.inspection.TargetThisMappingNoSourcePropertyInspection"/>
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.target.property.mapped.more.than.once.title"
+            shortName="TargetPropertyMappedMoreThanOnceInspection"
+            implementationClass="org.mapstruct.intellij.inspection.TargetPropertyMappedMoreThanOnceInspection"/>
   </extensions>
 
   <actions>
