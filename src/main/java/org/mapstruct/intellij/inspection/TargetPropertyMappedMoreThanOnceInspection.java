@@ -115,12 +115,12 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
             if (problemElement instanceof PsiAnnotation) {
                 quickFixes.add( getDeleteFix( problemElement, quickFixFactory ) );
             }
-            else if (problemElement instanceof PsiAnnotationMemberValue) {
+            else if (problemElement instanceof PsiAnnotationMemberValue problemPsiAnnotationMemberValue) {
                 Optional.ofNullable( problemElement.getParent() ).map( PsiElement::getParent )
                         .map( PsiElement::getParent ).filter( PsiAnnotation.class::isInstance )
                         .ifPresent( annotation -> quickFixes.add(
                                 getDeleteFix( annotation, quickFixFactory ) ) );
-                quickFixes.add( new ChangeTargetQuickFix( (PsiAnnotationMemberValue) problemElement) );
+                quickFixes.add( new ChangeTargetQuickFix( problemPsiAnnotationMemberValue ) );
             }
             return quickFixes.toArray( new LocalQuickFix[]{} );
         }
@@ -176,8 +176,8 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
             public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                                @NotNull PsiElement psiElement1) {
                 FileEditor selectedEditor = FileEditorManager.getInstance( project ).getSelectedEditor();
-                if ( selectedEditor instanceof TextEditor) {
-                    Editor editor = ( (TextEditor) selectedEditor ).getEditor();
+                if ( selectedEditor instanceof TextEditor textEditor) {
+                    Editor editor = textEditor.getEditor();
 
                     TextRange textRange = psiElement.getTextRange();
                     String textOfElement = String.valueOf( editor.getDocument()
