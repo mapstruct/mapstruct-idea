@@ -36,9 +36,9 @@ public class ThisUsedAsSourcePropertyInspectionTest extends BaseInspectionTest {
                         "Replace source '.' with 'age'"
                 );
 
-        myFixture.launchAction(allQuickFixes.get(0));
-        myFixture.launchAction(allQuickFixes.get(1));
-        myFixture.launchAction(allQuickFixes.get(2));
+        myFixture.launchAction( allQuickFixes.get( 0 ) );
+        myFixture.launchAction( allQuickFixes.get( 1 ) );
+        myFixture.launchAction( allQuickFixes.get( 2 ) );
         String testName = getTestName( false );
         myFixture.checkResultByFile( testName + "_after.java" );
     }
