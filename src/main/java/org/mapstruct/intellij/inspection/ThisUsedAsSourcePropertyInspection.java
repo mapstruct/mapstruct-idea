@@ -43,9 +43,9 @@ public class ThisUsedAsSourcePropertyInspection extends MappingAnnotationInspect
             return;
         }
         List<LocalQuickFix>  fixes = new ArrayList<>();
-        PsiMethod annotatedMethode = getAnnotatedMethod( psiAnnotation );
-        if (annotatedMethode != null) {
-            for (PsiParameter sourceParameter : getSourceParameters( annotatedMethode )) {
+        PsiMethod annotatedMethod = getAnnotatedMethod( psiAnnotation );
+        if (annotatedMethod != null) {
+            for (PsiParameter sourceParameter : getSourceParameters( annotatedMethod )) {
                 fixes.add( new ReplaceSourceParameterValueQuickFix(sourceProperty, sourceParameter.getName() ) );
             }
         }
