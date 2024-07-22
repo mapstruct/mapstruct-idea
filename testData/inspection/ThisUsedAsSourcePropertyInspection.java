@@ -7,6 +7,7 @@
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.Context;
 
 class Source {
 
@@ -50,3 +51,23 @@ interface SingleMappingsMapper {
     Target map(Source source);
 }
 
+@Mapper
+interface MultiSourceMappingMapper {
+
+    @Mapping(target = "source", source = <warning descr="''.'' should not be used as a source.">"."</warning>)
+    Target map(Source source, Long age, @Context String thisMustNotBeSuggested);
+}
+
+@Mapper
+interface NoSourcePropertyMappingMapper {
+
+    @Mapping(target = "source", ignore = true)
+    Target map(Source source);
+}
+
+@Mapper
+interface CorrectSourcePropertyMappingMapper {
+
+    @Mapping(target = "source", source = "source")
+    Target map(Source source);
+}

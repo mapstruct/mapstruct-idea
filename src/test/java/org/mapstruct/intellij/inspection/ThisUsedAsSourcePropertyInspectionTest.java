@@ -7,6 +7,7 @@ package org.mapstruct.intellij.inspection;
 
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -31,10 +32,14 @@ public class ThisUsedAsSourcePropertyInspectionTest extends BaseInspectionTest {
                 .as( "Intent Text" )
                 .containsExactlyInAnyOrder(
                         "Replace source '.' with 'source'",
-                        "Replace source '.' with 'source'"
+                        "Replace source '.' with 'source'",
+                        "Replace source '.' with 'source'",
+                        "Replace source '.' with 'age'"
                 );
 
-        allQuickFixes.forEach( myFixture::launchAction );
+        myFixture.launchAction(allQuickFixes.get(0));
+        myFixture.launchAction(allQuickFixes.get(1));
+        myFixture.launchAction(allQuickFixes.get(2));
         String testName = getTestName( false );
         myFixture.checkResultByFile( testName + "_after.java" );
     }
