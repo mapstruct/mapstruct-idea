@@ -1,0 +1,28 @@
+<html>
+<body>
+<p>
+    This inspection reports when "." is used as a source in <code>@Mapping</code>
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = "dto", source = ".")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(source = "employeeDto", target = "dto")
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>

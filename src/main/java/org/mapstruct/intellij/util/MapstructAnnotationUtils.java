@@ -45,6 +45,7 @@ import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.impl.source.tree.java.PsiAnnotationParamListImpl;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
@@ -616,6 +617,51 @@ public class MapstructAnnotationUtils {
             case "ERROR", "ReportingPolicy.ERROR" -> ReportingPolicy.ERROR;
             default -> ReportingPolicy.WARN;
         };
+    }
+
+    @Nullable
+    public static PsiMethod getAnnotatedMethod(@NotNull PsiAnnotation psiAnnotation) {
+        PsiElement psiAnnotationParent = psiAnnotation.getParent();
+        if (psiAnnotationParent == null) {
+            return null;
+        }
+        PsiElement psiAnnotationParentParent = psiAnnotationParent.getParent();
+        if (psiAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+            // directly annotated with @Mapping
+            return annotatedPsiMethod;
+        }
+
+        PsiElement psiAnnotationParentParentParent = psiAnnotationParentParent.getParent();
+        if (psiAnnotationParentParentParent instanceof PsiAnnotation) {
+            // inside @Mappings without array
+            PsiElement mappingsAnnotationParent = psiAnnotationParentParentParent.getParent();
+            if (mappingsAnnotationParent == null) {
+                return null;
+            }
+            PsiElement mappingsAnnotationParentParent = mappingsAnnotationParent.getParent();
+            if (mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+                return annotatedPsiMethod;
+            }
+            return null;
+        }
+        else if (psiAnnotationParentParentParent instanceof PsiAnnotationParamListImpl) {
+            // inside @Mappings wit array
+            PsiElement mappingsArray = psiAnnotationParentParentParent.getParent();
+            if (mappingsArray == null) {
+                return null;
+            }
+            PsiElement mappingsAnnotationParent = mappingsArray.getParent();
+            if (mappingsAnnotationParent == null) {
+                return null;
+            }
+            PsiElement mappingsAnnotationParentParent = mappingsAnnotationParent.getParent();
+            if (mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+                return annotatedPsiMethod;
+            }
+            return null;
+
+        }
+        return null;
     }
 
 }
