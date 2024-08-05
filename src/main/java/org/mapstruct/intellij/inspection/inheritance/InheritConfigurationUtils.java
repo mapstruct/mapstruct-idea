@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,6 +82,65 @@ public class InheritConfigurationUtils {
         return ctx.mappedTargets.stream();
     }
 
+    public static Stream<PsiMethod> findInheritConfigurationMethods(@NotNull PsiMethod mappingMethod,
+                                                                    MapStructVersion mapStructVersion) {
+
+        Optional<InheritConfigurationContext> inheritContext = findInheritContext( mappingMethod, mapStructVersion );
+
+        return inheritContext.stream()
+            .flatMap( ctx -> ctx.forwardTemplateCandidates.stream() );
+    }
+
+    public static Stream<PsiMethod> findInheritInverseConfigurationMethods(@NotNull PsiMethod mappingMethod,
+                                                                           MapStructVersion mapStructVersion) {
+
+        Optional<InheritConfigurationContext> inheritContext = findInheritContext( mappingMethod, mapStructVersion );
+
+        return inheritContext.stream()
+            .flatMap( ctx -> ctx.inverseTemplateCandidates.stream() );
+    }
+
+    private static Optional<InheritConfigurationContext> findInheritContext(@NotNull PsiMethod mappingMethod,
+                                                                           MapStructVersion mapStructVersion) {
+
+        PsiClass containingClass = mappingMethod.getContainingClass();
+
+        if ( containingClass == null ) {
+            return Optional.empty();
+        }
+
+        PsiAnnotation containingAnnotation =
+            Optional.ofNullable( findAnnotation( containingClass, MAPPER_ANNOTATION_FQN ) )
+                .orElseGet( () -> findAnnotation( containingClass, MAPPER_CONFIG_ANNOTATION_FQN ) );
+
+        if ( containingAnnotation == null ) {
+            return Optional.empty();
+        }
+
+        List<SourceMethod> availableMethods =
+            findMappingMethodsFromInheritScope( containingClass, containingAnnotation )
+                .map( SourceMethod::new )
+                .collect( Collectors.toList() );
+        List<SourceMethod> prototypeMethods =
+            findPrototypeMappingMethods( containingAnnotation )
+                .map( SourceMethod::new )
+                .collect( Collectors.toList() );
+        MappingInheritanceStrategy inheritanceStrategy =
+            findAnnotatedMappingInheritanceStrategy( containingAnnotation );
+
+        InheritConfigurationContext ctx = new InheritConfigurationContext(
+            mapStructVersion,
+            availableMethods,
+            prototypeMethods,
+            new ArrayList<>(),
+            inheritanceStrategy
+        );
+
+        mergeInheritedOptions( new SourceMethod( mappingMethod ), ctx );
+
+        return Optional.of( ctx );
+    }
+
     /**
      * Merges inherited properties in a recursive way.
      *
@@ -105,6 +165,8 @@ public class InheritConfigurationUtils {
             targetType,
             ctx.prototypeMethods
         );
+        applicablePrototypeMethods
+            .forEach( sourceMethod -> ctx.forwardTemplateCandidates.add( sourceMethod.method ) );
 
         SourceMethod forwardTemplateMethod =
             getForwardTemplateMethod(
@@ -114,15 +176,17 @@ public class InheritConfigurationUtils {
                 ctx
             );
 
-        Set<SourceMethod> applicableReversePrototypeMethods = getApplicableReversePrototypeMethods(
+        Set<SourceMethod> applicableInversePrototypeMethods = getApplicableInversePrototypeMethods(
             method,
             targetType,
             ctx.prototypeMethods
         );
+        applicableInversePrototypeMethods
+            .forEach( sourceMethod -> ctx.inverseTemplateCandidates.add( sourceMethod.method ) );
 
         SourceMethod inverseTemplateMethod =
             getInverseTemplateMethod(
-                join( ctx.availableMethods, applicableReversePrototypeMethods ),
+                join( ctx.availableMethods, applicableInversePrototypeMethods ),
                 method,
                 targetType,
                 ctx
@@ -155,9 +219,9 @@ public class InheritConfigurationUtils {
             boolean applyReverse = ctx.inheritanceStrategy == MappingInheritanceStrategy.AUTO_INHERIT_ALL_FROM_CONFIG ||
                 ctx.inheritanceStrategy == MappingInheritanceStrategy.AUTO_INHERIT_REVERSE_FROM_CONFIG;
             if ( inverseTemplateMethod == null && applyReverse ) {
-                if ( applicableReversePrototypeMethods.size() == 1 ) {
+                if ( applicableInversePrototypeMethods.size() == 1 ) {
                     findAllDefinedMappingSources(
-                            first( applicableReversePrototypeMethods ).method,
+                            first( applicableInversePrototypeMethods ).method,
                             ctx.mapStructVersion
                         )
                         .forEach( ctx.mappedTargets::add );
@@ -185,6 +249,7 @@ public class InheritConfigurationUtils {
             for ( SourceMethod oneMethod : rawMethods ) {
                 if ( mappingMethod.inverses( oneMethod.method, targetType ) ) {
                     candidates.add( oneMethod );
+                    ctx.inverseTemplateCandidates.add( oneMethod.method );
                 }
             }
 
@@ -213,6 +278,7 @@ public class InheritConfigurationUtils {
                 if ( mappingMethod.canInheritFrom( oneMethod.method, targetType ) &&
                     !( oneMethod.equals( mappingMethod ) ) ) {
                     candidates.add( oneMethod );
+                    ctx.forwardTemplateCandidates.add( oneMethod.method );
                 }
             }
 
@@ -265,7 +331,7 @@ public class InheritConfigurationUtils {
         return null;
     }
 
-    private static Set<SourceMethod> getApplicableReversePrototypeMethods(SourceMethod mappingMethod,
+    private static Set<SourceMethod> getApplicableInversePrototypeMethods(SourceMethod mappingMethod,
                                                                           PsiType targetType,
                                                                           List<SourceMethod> prototypeMethods) {
         return prototypeMethods.stream()
@@ -357,6 +423,8 @@ public class InheritConfigurationUtils {
         private final List<SourceMethod> initializingMethods;
         private final MappingInheritanceStrategy inheritanceStrategy;
         private final Set<String> mappedTargets = new HashSet<>();
+        private final Set<PsiMethod> forwardTemplateCandidates = new HashSet<>();
+        private final Set<PsiMethod> inverseTemplateCandidates = new HashSet<>();
 
         private InheritConfigurationContext(MapStructVersion mapStructVersion,
                                             @NotNull List<SourceMethod> availableMethods,
