@@ -1,8 +1,9 @@
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id "org.jetbrains.intellij" version "1.17.4"
+    id "org.jetbrains.intellij.platform" version "2.0.1"
     id "com.github.hierynomus.license" version "0.16.1"
     id "de.undercouch.download" version "5.6.0"
 }
@@ -13,7 +14,7 @@ version pluginVersion
 
 apply plugin: 'idea'
 apply plugin: 'java'
-apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'org.jetbrains.intellij.platform'
 apply plugin: 'license'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
@@ -26,19 +27,20 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-intellij {
-    version = System.getenv().getOrDefault('IDEA_VERSION', ideaVersion)
-    type = ideaType
-    downloadSources = Boolean.valueOf(sources)
-    sameSinceUntilBuild = Boolean.valueOf(isEAP)
+intellijPlatform {
     instrumentCode = false
-    updateSinceUntilBuild = false
-    pluginName = 'MapStruct-Intellij-Plugin'
-    // The properties plugin is needed because Kotlin uses it
-    // and for some reason plugins does not transitively pull itx
-    plugins = ['java', 'Kotlin', 'properties']
+    projectName = 'MapStruct-Intellij-Plugin'
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "223"
+            untilBuild = provider { null } as Provider<? extends String>
+        }
+    }
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
@@ -89,15 +91,29 @@ jacocoTestReport {
     }
 }
 
+def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
+def useInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
+    intellijPlatform {
+        ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useInstaller) : intellijIdeaUltimate(versionToUse, useInstaller)
+
+        jetbrainsRuntime()
+
+        bundledPlugin( 'com.intellij.java' )
+        bundledPlugin( 'org.jetbrains.kotlin' )
+
+        testFramework( TestFrameworkType.Platform.INSTANCE )
+        testFramework( TestFrameworkType.Bundled.INSTANCE )
+    }
     implementation('org.mapstruct:mapstruct:1.5.3.Final')
-    testImplementation(platform('org.junit:junit-bom:5.8.2'))
+    testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation('org.junit.platform:junit-platform-launcher')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
     testImplementation('org.junit.jupiter:junit-jupiter-engine')
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
-    testImplementation('org.assertj:assertj-core:3.11.1')
-    testImplementation('org.apache.commons:commons-text:1.10.0')
+    testImplementation('org.assertj:assertj-core:3.26.3')
+    testImplementation('org.apache.commons:commons-text:1.12.0')
+    testImplementation( 'junit:junit:4.13.2' )
 }
 
 task libs(type: Sync) {
@@ -105,6 +121,7 @@ task libs(type: Sync) {
     into layout.buildDirectory.dir("libs")
     preserve {
         include 'mapstruct-intellij-*.jar'
+        include 'MapStruct-Intellij-*.jar'
     }
     rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
 }
@@ -149,8 +166,8 @@ task downloadMockJdk11() {
 }
 
 test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
-prepareTestingSandbox.dependsOn( libs )
 prepareSandbox.dependsOn( libs )
+composedJar.dependsOn( libs )
 
 test {
     // Idea SDK needs special configuration
