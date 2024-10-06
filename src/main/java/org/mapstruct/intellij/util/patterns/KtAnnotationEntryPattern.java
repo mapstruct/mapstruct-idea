@@ -10,12 +10,9 @@ import com.intellij.patterns.PatternCondition;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor;
-import org.jetbrains.kotlin.idea.caches.resolve.ResolutionUtils;
-import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.psi.KtAnnotationEntry;
-import org.jetbrains.kotlin.resolve.BindingContext;
-import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
+import org.jetbrains.uast.UAnnotation;
+import org.jetbrains.uast.UastContextKt;
 
 /**
  * @author Filip Hrisafov
@@ -32,20 +29,12 @@ public class KtAnnotationEntryPattern extends PsiElementPattern<KtAnnotationEntr
         return with( new PatternCondition<KtAnnotationEntry>( "qName" ) {
             @Override
             public boolean accepts(@NotNull KtAnnotationEntry ktAnnotation, ProcessingContext context) {
-                AnnotationDescriptor descriptor = ResolutionUtils.analyze(
-                    ktAnnotation,
-                    BodyResolveMode.PARTIAL_FOR_COMPLETION
-                ).get( BindingContext.ANNOTATION, ktAnnotation );
-
-                if ( descriptor == null ) {
+                UAnnotation uElement = UastContextKt.toUElement( ktAnnotation, UAnnotation.class );
+                if ( uElement == null ) {
                     return false;
                 }
-
-                FqName fqName = descriptor.getFqName();
-                if ( fqName == null ) {
-                    return false;
-                }
-                return pattern.accepts( fqName.asString(), context );
+                String name = uElement.getQualifiedName();
+                return pattern.accepts( name, context );
             }
         } );
     }
