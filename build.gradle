@@ -37,7 +37,7 @@ intellijPlatform {
     projectName = 'MapStruct-Intellij-Plugin'
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "223"
+            sinceBuild = "233"
             untilBuild = provider { null } as Provider<? extends String>
         }
     }
