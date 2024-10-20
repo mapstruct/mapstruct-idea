@@ -8,6 +8,8 @@ package org.mapstruct.intellij.inspection;
 import java.util.List;
 
 import com.intellij.codeInsight.intention.IntentionAction;
+import com.intellij.pom.java.LanguageLevel;
+import com.intellij.testFramework.IdeaTestUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,10 +28,17 @@ public class UnmappedTargetPropertiesInspectionTest extends BaseInspectionTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        IdeaTestUtil.setModuleLanguageLevel( getModule(), LanguageLevel.JDK_1_7 );
         myFixture.copyFileToProject(
             "UnmappedTargetPropertiesData.java",
             "org/example/data/UnmappedTargetPropertiesData.java"
         );
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        IdeaTestUtil.setModuleLanguageLevel( getModule(), LanguageLevel.JDK_17 );
+        super.tearDown();
     }
 
     public void testUnmappedTargetProperties() {
