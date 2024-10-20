@@ -8,6 +8,7 @@ package org.mapstruct.intellij.inspection;
 import java.util.List;
 
 import com.intellij.codeInsight.intention.IntentionAction;
+import com.intellij.ide.util.PropertiesComponent;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.settings.ProjectSettings;
 
@@ -31,6 +32,14 @@ public class UnmappedTargetPropertiesInspectionSourceBeforeTargetTest extends Ba
             "UnmappedTargetPropertiesData.java",
             "org/example/data/UnmappedTargetPropertiesData.java"
         );
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        PropertiesComponent.getInstance( myFixture.getProject() )
+            .unsetValue( ProjectSettings.PREFER_SOURCE_BEFORE_TARGET_IN_MAPPING );
+
+        super.tearDown();
     }
 
     public void testUnmappedTargetPropertiesSourceBeforeTarget() {
