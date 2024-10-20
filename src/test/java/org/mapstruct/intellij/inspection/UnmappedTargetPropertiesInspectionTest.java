@@ -8,7 +8,6 @@ package org.mapstruct.intellij.inspection;
 import java.util.List;
 
 import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.pom.java.LanguageLevel;
 import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,11 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Filip Hrisafov
  */
 public class UnmappedTargetPropertiesInspectionTest extends BaseInspectionTest {
-
-    @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_1_7;
-    }
 
     @NotNull
     @Override

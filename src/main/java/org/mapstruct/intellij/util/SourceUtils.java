@@ -25,6 +25,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypes;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -187,7 +188,7 @@ public class SourceUtils {
         // This logic is aligned with the DefaultAccessorNamingStrategy
 
         PsiType returnType = method.getReturnType();
-        if ( returnType == null || PsiType.VOID.equals( returnType ) ) {
+        if ( returnType == null || PsiTypes.voidType().equals( returnType ) ) {
             return null;
         }
 
@@ -201,7 +202,7 @@ public class SourceUtils {
             }
         }
         else if ( methodName.startsWith( "is" ) && (
-            PsiType.BOOLEAN.equals( returnType ) ||
+            PsiTypes.booleanType().equals( returnType ) ||
                 returnType.equalsToText( CommonClassNames.JAVA_LANG_BOOLEAN ) )
         ) {
             // boolean getter

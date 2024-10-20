@@ -20,11 +20,9 @@ interface NotMapStructMapper {
 @Mapper
 interface SingleMappingMapper {
 
-    @Mappings({
-            @Mapping(target = "testName", source = "name"),
-            @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "moreTarget", source = "")
-    })
+    @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "testName", source = "name")
     Target map(Source source);
 }
 
@@ -53,14 +51,12 @@ interface SingleMappingsNoBracesMapper {
 @Mapper
 interface NoMappingMapper {
 
-    @Mappings({
-            @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "moreTarget", source = ""),
-            @Mapping(target = "testName", ignore = true),
-            @Mapping(target = "testName", source = ""),
-            @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "testName", ignore = true)
-    })
+    @Mapping(target = "testName", ignore = true)
+    @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "testName", source = "")
+    @Mapping(target = "testName", ignore = true)
+    @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
     Target map(Source source);
 
     @org.mapstruct.InheritInverseConfiguration
@@ -94,21 +90,17 @@ interface AllMappingsMapperConfig {
 @Mapper
 interface UpdateMapper {
 
-    @Mappings({
-            @Mapping(target = "moreTarget", source = "moreSource"),
-            @Mapping(target = "testName", ignore = true),
-            @Mapping(target = "testName", source = "")
-    })
+    @Mapping(target = "testName", source = "")
+    @Mapping(target = "testName", ignore = true)
+    @Mapping(target = "moreTarget", source = "moreSource")
     void update(@MappingTarget Target target, Source source);
 }
 
 @Mapper
 interface MultiSourceUpdateMapper {
 
-    @Mappings({
-            @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "moreTarget", source = "")
-    })
+    @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
     void update(@MappingTarget Target moreTarget, Source source, String testName, @org.mapstruct.Context String matching);
 }
 
@@ -117,10 +109,8 @@ interface SingleMappingConstantReferenceMapper {
 
     String TEST_NAME = "testName";
 
-    @Mappings({
-            @Mapping(target = TEST_NAME, source = "name"),
-            @Mapping(target = "moreTarget", ignore = true),
-            @Mapping(target = "moreTarget", source = "")
-    })
+    @Mapping(target = "moreTarget", source = "")
+    @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = TEST_NAME, source = "name")
     Target map(Source source);
 }
