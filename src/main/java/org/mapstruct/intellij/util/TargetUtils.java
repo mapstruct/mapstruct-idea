@@ -34,6 +34,7 @@ import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypes;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +78,7 @@ public class TargetUtils {
             return null;
         }
         PsiType psiType = mappingMethod.getReturnType();
-        if ( psiType == null || PsiType.VOID.equalsToText( psiType.getCanonicalText() ) ) {
+        if ( psiType == null || PsiTypes.voidType().equalsToText( psiType.getCanonicalText() ) ) {
             psiType = Stream.of( mappingMethod.getParameterList().getParameters() )
                 .filter( MapstructUtil::isMappingTarget )
                 .findAny()

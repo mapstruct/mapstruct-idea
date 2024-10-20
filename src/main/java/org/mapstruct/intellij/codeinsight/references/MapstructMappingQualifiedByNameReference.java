@@ -21,6 +21,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
@@ -97,7 +98,7 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     }
 
     private boolean methodHasReturnType(@NotNull PsiMethod psiMethod) {
-        return !PsiType.VOID.equals( psiMethod.getReturnType() );
+        return !PsiTypes.voidType().equals( psiMethod.getReturnType() );
     }
 
     @NotNull

@@ -5,7 +5,6 @@
  */
 package org.mapstruct.intellij.rename;
 
-import com.intellij.pom.java.LanguageLevel;
 import org.mapstruct.intellij.MapstructBaseCompletionTestCase;
 
 /**
@@ -16,11 +15,6 @@ public class RenameHandlerJdk17Test extends MapstructBaseCompletionTestCase {
     @Override
     protected String getTestDataPath() {
         return "testData/rename";
-    }
-
-    @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_17;
     }
 
     public void testRenameRecordSourceParameter() {

@@ -126,46 +126,6 @@ task libs(type: Sync) {
     rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
 }
 
-def mockJdkLocation = "https://github.com/JetBrains/intellij-community/raw/212.5712/java/mock"
-def mockJdkDest = layout.buildDirectory.dir("mock").get().asFile.toString()
-def downloadMockJdk(mockJdkLocation, mockJdkDest, mockJdkVersion) {
-    def location = mockJdkLocation + mockJdkVersion
-    def destination = mockJdkDest + mockJdkVersion
-    download.run {
-        src([
-            "$location/jre/lib/annotations.jar",
-            "$location/jre/lib/rt.jar"
-        ])
-        dest "$destination/jre/lib/"
-        overwrite false
-        quiet false
-    }
-}
-
-task downloadMockJdk7() {
-    def jdkVersion = "JDK-1.7"
-    def mockJdk7Location = mockJdkLocation + jdkVersion
-    def mockJdk7Dest = mockJdkDest + jdkVersion
-    downloadMockJdk(mockJdkLocation, mockJdkDest, jdkVersion)
-    download.run {
-        src([
-             "$mockJdk7Location/src.zip"
-        ])
-        dest "$mockJdk7Dest"
-        overwrite false
-        quiet false
-    }
-}
-
-task downloadMockJdk8() {
-    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-1.8")
-}
-
-task downloadMockJdk11() {
-    downloadMockJdk(mockJdkLocation, mockJdkDest, "JDK-11")
-}
-
-test.dependsOn( libs, downloadMockJdk7, downloadMockJdk8, downloadMockJdk11 )
 prepareSandbox.dependsOn( libs )
 composedJar.dependsOn( libs )
 

@@ -7,7 +7,6 @@ package org.mapstruct.intellij;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecordComponent;
 
@@ -30,11 +29,6 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
         super.setUp();
 
         addDirectoryToProject( "dto" );
-    }
-
-    @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_17;
     }
 
     private void assertCarDtoRecordAutoComplete() {
