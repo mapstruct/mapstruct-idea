@@ -30,6 +30,9 @@
        on how to target different products -->
   <depends>com.intellij.modules.java</depends>
   <depends optional="true" config-file="withKotlin.xml">org.jetbrains.kotlin</depends>
+  <extensions defaultExtensionNs="org.jetbrains.kotlin">
+    <supportsKotlinPluginMode supportsK2="true" />
+  </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->

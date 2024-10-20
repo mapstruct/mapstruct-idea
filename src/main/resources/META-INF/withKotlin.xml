@@ -6,9 +6,6 @@
 
 -->
 <idea-plugin>
-    <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <supportsKotlinPluginMode supportsK2="true" />
-    </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <psi.referenceContributor language="kotlin" implementation="org.mapstruct.intellij.codeinsight.references.MapstructKotlinReferenceContributor" />
     </extensions>
