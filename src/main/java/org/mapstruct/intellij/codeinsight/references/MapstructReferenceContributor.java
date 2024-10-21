@@ -10,6 +10,8 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import org.jetbrains.annotations.NotNull;
 
 import static org.mapstruct.intellij.util.MapstructElementUtils.beanMappingElementPattern;
+import static org.mapstruct.intellij.util.MapstructElementUtils.inheritConfigurationElementPattern;
+import static org.mapstruct.intellij.util.MapstructElementUtils.inheritInverseConfigurationElementPattern;
 import static org.mapstruct.intellij.util.MapstructElementUtils.mappingElementPattern;
 import static org.mapstruct.intellij.util.MapstructElementUtils.valueMappingElementPattern;
 
@@ -48,6 +50,16 @@ public class MapstructReferenceContributor extends PsiReferenceContributor {
             valueMappingElementPattern( "target" ),
             new MappingTargetReferenceProvider( ValueMappingTargetReference::create )
         );
+
+        registrar.registerReferenceProvider(
+            inheritConfigurationElementPattern( "name" ),
+            new MappingTargetReferenceProvider( MapstructMappingInheritConfigurationReference::create )
+        );
+        registrar.registerReferenceProvider(
+            inheritInverseConfigurationElementPattern( "name" ),
+            new MappingTargetReferenceProvider( MapstructMappingInheritInverseConfigurationReference::create )
+        );
+
     }
 
 }

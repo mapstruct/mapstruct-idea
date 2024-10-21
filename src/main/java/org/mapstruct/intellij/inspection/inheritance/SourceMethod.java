@@ -137,4 +137,12 @@ public class SourceMethod {
     public int hashCode() {
         return Objects.hash( method );
     }
+
+    @Override
+    public String toString() {
+        return "SourceMethod{" +
+            "method=" + method +
+            ", fullyInitialized=" + fullyInitialized +
+            '}';
+    }
 }
