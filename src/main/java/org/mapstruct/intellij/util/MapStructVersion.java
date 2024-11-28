@@ -10,16 +10,19 @@ package org.mapstruct.intellij.util;
  */
 public enum MapStructVersion {
 
-    V1_2_O( false, false ),
-    V1_3_O( true, false ),
-    V1_4_O( true, true );
+    V1_2_O( false, false, false ),
+    V1_3_O( true, false, false ),
+    V1_4_O( true, true, false ),
+    V1_7_O( true, true, true ),;
 
     private final boolean builderSupported;
     private final boolean constructorSupported;
+    private final boolean ignoringRemovers;
 
-    MapStructVersion(boolean builderSupported, boolean constructorSupported) {
+    MapStructVersion(boolean builderSupported, boolean constructorSupported, boolean ignoringRemovers) {
         this.builderSupported = builderSupported;
         this.constructorSupported = constructorSupported;
+        this.ignoringRemovers = ignoringRemovers;
     }
 
     public boolean isBuilderSupported() {
@@ -28,5 +31,9 @@ public enum MapStructVersion {
 
     public boolean isConstructorSupported() {
         return constructorSupported;
+    }
+
+    public boolean isIgnoringRemovers() {
+        return ignoringRemovers;
     }
 }
