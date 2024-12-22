@@ -39,6 +39,8 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
   * More than one default source in `@Mapping` annotation defined with quick fixes: Remove `defaultValue`. Remove `defaultExpression`.
   * `target` mapped more than once by `@Mapping` annotations with quick fixes: Remove annotation and change target property.
   * `*` used as a source in `@Mapping` annotation with quick fixes: Replace `*` with method parameter name.
+  * Unknown reference inspection for `source` and `target` in `@Mapping` and `@ValueMapping` annotation. 
+  * Unknown reference inspection for `qualifiedByName` in `@Mapping` annotation
  
 ## Requirements
 

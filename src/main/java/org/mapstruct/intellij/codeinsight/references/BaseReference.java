@@ -21,7 +21,7 @@ import org.jetbrains.uast.UastUtils;
  *
  * @author Filip Hrisafov
  */
-abstract class BaseReference extends PsiReferenceBase<PsiElement> {
+public abstract class BaseReference extends PsiReferenceBase<PsiElement> {
 
     /**
      * @param element the element for which a reference should be found
