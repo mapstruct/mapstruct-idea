@@ -147,6 +147,14 @@
             key="inspection.source.property.this.used"
             shortName="ThisUsedAsSourcePropertyInspection"
             implementationClass="org.mapstruct.intellij.inspection.ThisUsedAsSourcePropertyInspection"/>
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.mapstruct.references"
+            shortName="MapstructReferenceInspection"
+            implementationClass="org.mapstruct.intellij.inspection.MapstructReferenceInspection"/>
   </extensions>
 
   <actions>

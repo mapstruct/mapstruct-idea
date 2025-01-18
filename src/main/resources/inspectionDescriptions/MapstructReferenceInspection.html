@@ -1,0 +1,12 @@
+<html>
+<body>
+This inspection reports unresolved mapstruct references.
+<pre><code lang="java">
+@Mapper
+public interface EmployeeMapper {
+    @Mapping(target = "dto", source = "no_exists") // highlighted if source doesn't exist
+    Employee toEmployee(EmployeeDto employeeDto, @Context CycleAvoidingMappingContext context);
+}
+</code></pre>
+</body>
+</html>
