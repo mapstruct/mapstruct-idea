@@ -40,16 +40,21 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
     @NotNull
     @Override
     PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        return new MyJavaElementVisitor( holder, MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ) );
+        return new MyJavaElementVisitor(
+          holder, MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ),
+          MapstructUtil.getInstance( holder.getFile() ) );
     }
 
     private static class MyJavaElementVisitor extends JavaElementVisitor {
         private final ProblemsHolder holder;
         private final MapStructVersion mapStructVersion;
+        private final MapstructUtil mapstructUtil;
 
-        private MyJavaElementVisitor(ProblemsHolder holder, MapStructVersion mapStructVersion) {
-            this.holder = holder;
-            this.mapStructVersion = mapStructVersion;
+        private MyJavaElementVisitor(
+          ProblemsHolder holder, MapStructVersion mapStructVersion, MapstructUtil mapstructUtil) {
+          this.holder = holder;
+          this.mapStructVersion = mapStructVersion;
+          this.mapstructUtil = mapstructUtil;
         }
 
         @Override
@@ -73,7 +78,8 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             if (parameters == null)  {
                 return;
             }
-            Set<String> allTargetProperties = findAllTargetProperties( targetType, mapStructVersion, method );
+            Set<String> allTargetProperties = findAllTargetProperties(
+              targetType, mapStructVersion, mapstructUtil, method );
             if ( allTargetProperties.contains( fromMapMappingParameter.getName() ) ) {
                 return;
             }

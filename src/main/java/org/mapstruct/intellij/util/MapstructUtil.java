@@ -70,7 +70,7 @@ import static com.intellij.codeInsight.AnnotationUtil.isAnnotated;
 /**
  * @author Filip Hrisafov
  */
-public final class MapstructUtil {
+public class MapstructUtil {
 
     /**
      * The FQN of the {@link Mapper} annotation.
@@ -101,11 +101,27 @@ public final class MapstructUtil {
     private static final String CONTEXT_ANNOTATION_FQN = Context.class.getName();
     private static final String BUILDER_ANNOTATION_FQN = Builder.class.getName();
     private static final String ENUM_MAPPING_ANNOTATION_FQN = EnumMapping.class.getName();
+    private static final String IMMUTABLE_FQN = "org.immutables.value.Value.Immutable";
+    private static final String FREE_BUILDER_FQN = "org.inferred.freebuilder.FreeBuilder";
 
     /**
      * Hide constructor.
      */
-    private MapstructUtil() {
+    MapstructUtil() {
+    }
+
+    public static MapstructUtil getInstance(@Nullable PsiFile psiFile) {
+        MapstructUtil mapstructUtil = new DefaultMapstructUtil();
+        if (psiFile == null) {
+            return mapstructUtil;
+        }
+        if (MapstructUtil.immutablesOnClassPath( psiFile )) {
+            mapstructUtil = new ImmutablesMapstructUtil();
+        }
+        else if (MapstructUtil.freeBuilderOnClassPath( psiFile )) {
+            mapstructUtil = new FreeBuildersMapstructUtil();
+        }
+        return mapstructUtil;
     }
 
     public static LookupElement[] asLookup(Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors,
@@ -204,7 +220,7 @@ public final class MapstructUtil {
             !field.hasModifierProperty( PsiModifier.FINAL );
     }
 
-    public static boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
@@ -555,6 +571,36 @@ public final class MapstructUtil {
             }
             return CachedValueProvider.Result.createSingleDependency(
                 mapStructVersion,
+                ProjectRootManager.getInstance( module.getProject() )
+            );
+        } );
+    }
+
+    public static boolean immutablesOnClassPath(@NotNull PsiFile psiFile) {
+        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
+        if (module == null) {
+            return false;
+        }
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
+            boolean immutablesOnClassPath = JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( IMMUTABLE_FQN, module.getModuleRuntimeScope( false ) ) != null;
+            return CachedValueProvider.Result.createSingleDependency(
+                immutablesOnClassPath,
+                ProjectRootManager.getInstance( module.getProject() )
+            );
+        } );
+    }
+
+    public static boolean freeBuilderOnClassPath(@NotNull PsiFile psiFile) {
+        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
+        if (module == null) {
+            return false;
+        }
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
+            boolean freeBuilderOnClassPath = JavaPsiFacade.getInstance( module.getProject() )
+                .findClass( FREE_BUILDER_FQN, module.getModuleRuntimeScope( false ) ) != null;
+            return CachedValueProvider.Result.createSingleDependency(
+                freeBuilderOnClassPath,
                 ProjectRootManager.getInstance( module.getProject() )
             );
         } );
