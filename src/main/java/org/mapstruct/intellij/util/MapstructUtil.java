@@ -21,6 +21,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.EmptySubstitutor;
 import com.intellij.psi.JavaPsiFacade;
@@ -72,6 +73,8 @@ import static com.intellij.codeInsight.AnnotationUtil.isAnnotated;
  */
 public class MapstructUtil {
 
+    private static final MapstructUtil INSTANCE = new MapstructUtil();
+
     /**
      * The FQN of the {@link Mapper} annotation.
      */
@@ -111,17 +114,19 @@ public class MapstructUtil {
     }
 
     public static MapstructUtil getInstance(@Nullable PsiFile psiFile) {
-        MapstructUtil mapstructUtil = new DefaultMapstructUtil();
-        if (psiFile == null) {
-            return mapstructUtil;
+        if ( psiFile == null ) {
+            return MapstructUtil.INSTANCE;
         }
-        if (MapstructUtil.immutablesOnClassPath( psiFile )) {
-            mapstructUtil = new ImmutablesMapstructUtil();
+
+        if ( MapstructUtil.immutablesOnClassPath( psiFile ) ) {
+            return ImmutablesMapstructUtil.INSTANCE;
         }
-        else if (MapstructUtil.freeBuilderOnClassPath( psiFile )) {
-            mapstructUtil = new FreeBuildersMapstructUtil();
+
+        if ( MapstructUtil.freeBuilderOnClassPath( psiFile ) ) {
+            return FreeBuildersMapstructUtil.INSTANCE;
         }
-        return mapstructUtil;
+
+        return MapstructUtil.INSTANCE;
     }
 
     public static LookupElement[] asLookup(Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors,
@@ -576,9 +581,13 @@ public class MapstructUtil {
         } );
     }
 
-    public static boolean immutablesOnClassPath(@NotNull PsiFile psiFile) {
-        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
-        if (module == null) {
+    private static boolean immutablesOnClassPath(@NotNull PsiFile psiFile) {
+        VirtualFile virtualFile = psiFile.getVirtualFile();
+        if ( virtualFile == null ) {
+            return false;
+        }
+        Module module = ModuleUtilCore.findModuleForFile( virtualFile, psiFile.getProject() );
+        if ( module == null ) {
             return false;
         }
         return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
@@ -591,9 +600,13 @@ public class MapstructUtil {
         } );
     }
 
-    public static boolean freeBuilderOnClassPath(@NotNull PsiFile psiFile) {
-        Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
-        if (module == null) {
+    private static boolean freeBuilderOnClassPath(@NotNull PsiFile psiFile) {
+        VirtualFile virtualFile = psiFile.getVirtualFile();
+        if ( virtualFile == null ) {
+            return false;
+        }
+        Module module = ModuleUtilCore.findModuleForFile( virtualFile, psiFile.getProject() );
+        if ( module == null ) {
             return false;
         }
         return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {

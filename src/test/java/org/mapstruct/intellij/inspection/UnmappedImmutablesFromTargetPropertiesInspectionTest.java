@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class UnmappedImmutablesFromTargetPropertiesInspectionTest extends BaseInspectionTest {
 
+    private static final String BUILD_TEST_LIBS_DIRECTORY = "build/test-libs";
+
     @NotNull
     @Override
     protected Class<UnmappedTargetPropertiesInspection> getInspection() {
@@ -29,14 +31,15 @@ public class UnmappedImmutablesFromTargetPropertiesInspectionTest extends BaseIn
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final String immutablesLibPath = PathUtil.toSystemIndependentName( new File( BUILD_TEST_LIBS_DIRECTORY )
-          .getAbsolutePath() );
+        String immutablesLibPath = PathUtil.toSystemIndependentName(
+            new File( BUILD_TEST_LIBS_DIRECTORY ).getAbsolutePath()
+        );
         PsiTestUtil.addLibrary(
-          myFixture.getProjectDisposable(),
-          myFixture.getModule(),
-          "Immutables",
-          immutablesLibPath,
-          "immutables.jar"
+            myFixture.getProjectDisposable(),
+            myFixture.getModule(),
+            "Immutables",
+            immutablesLibPath,
+            "immutables.jar"
         );
         myFixture.copyFileToProject(
             "UnmappedImmutablesFromTargetPropertiesData.java",
@@ -53,20 +56,20 @@ public class UnmappedImmutablesFromTargetPropertiesInspectionTest extends BaseIn
             .extracting( IntentionAction::getText )
             .as( "Intent Text" )
             .containsExactly(
-              "Ignore unmapped target property: 'builderTestName'",
-        "Add unmapped target property: 'builderTestName'",
+                "Ignore unmapped target property: 'builderTestName'",
+                "Add unmapped target property: 'builderTestName'",
 
-        "Ignore unmapped target property: 'targetTestName'",
-        "Add unmapped target property: 'targetTestName'",
+                "Ignore unmapped target property: 'targetTestName'",
+                "Add unmapped target property: 'targetTestName'",
 
-        "Ignore unmapped target property: 'targetTestName'",
-        "Add unmapped target property: 'targetTestName'",
+                "Ignore unmapped target property: 'targetTestName'",
+                "Add unmapped target property: 'targetTestName'",
 
-        "Ignore unmapped target property: 'builderTestName'",
-        "Add unmapped target property: 'builderTestName'",
+                "Ignore unmapped target property: 'builderTestName'",
+                "Add unmapped target property: 'builderTestName'",
 
-        "Ignore unmapped target property: 'targetTestName'",
-        "Add unmapped target property: 'targetTestName'"
+                "Ignore unmapped target property: 'targetTestName'",
+                "Add unmapped target property: 'targetTestName'"
             );
 
         allQuickFixes.forEach( myFixture::launchAction );

@@ -15,14 +15,17 @@ import org.jetbrains.annotations.NotNull;
  * as a setter with a name {@code from}. Therefore, we are ignoring it.
  */
 public class ImmutablesMapstructUtil extends MapstructUtil {
-  /**
-   * Hide constructor.
-   */
-  protected ImmutablesMapstructUtil() {
-  }
 
-  @Override
-  public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
-    return super.isFluentSetter( method, psiType ) && !method.getName().equals( "from" );
-  }
+    static final MapstructUtil INSTANCE = new ImmutablesMapstructUtil();
+
+    /**
+     * Hide constructor.
+     */
+    private ImmutablesMapstructUtil() {
+    }
+
+    @Override
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+        return super.isFluentSetter( method, psiType ) && !method.getName().equals( "from" );
+    }
 }

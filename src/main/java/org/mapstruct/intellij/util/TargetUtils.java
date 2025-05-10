@@ -278,7 +278,11 @@ public class TargetUtils {
                 continue;
             }
             String propertyName = extractPublicSetterPropertyName(
-              method, typeToUse, mapstructUtil, builderSupportPresent );
+                method,
+                typeToUse,
+                mapstructUtil,
+                builderSupportPresent
+            );
 
             if ( propertyName != null &&
                 !overriddenMethods.contains( method ) ) {

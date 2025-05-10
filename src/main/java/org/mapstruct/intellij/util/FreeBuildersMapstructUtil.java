@@ -25,16 +25,19 @@ import org.jetbrains.annotations.NotNull;
  * start with {@code set}.
  */
 public class FreeBuildersMapstructUtil extends MapstructUtil {
-  /**
-   * Hide constructor.
-   */
-  protected FreeBuildersMapstructUtil() {
-  }
 
-  @Override
-  public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
-    // When using FreeBuilder one needs to use the JavaBean convention, which means that all setters will start
-    // with set
-    return false;
-  }
+    static final MapstructUtil INSTANCE = new FreeBuildersMapstructUtil();
+
+    /**
+     * Hide constructor.
+     */
+    private FreeBuildersMapstructUtil() {
+    }
+
+    @Override
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+        // When using FreeBuilder one needs to use the JavaBean convention,
+        // which means that all setters will start with set
+        return false;
+    }
 }

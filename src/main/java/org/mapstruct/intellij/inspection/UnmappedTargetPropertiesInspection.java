@@ -60,8 +60,10 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
     @Override
     PsiElementVisitor buildVisitorInternal(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
         return new MyJavaElementVisitor(
-          holder, MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ),
-          MapstructUtil.getInstance( holder.getFile() ) );
+            holder,
+            MapstructUtil.resolveMapStructProjectVersion( holder.getFile() ),
+            MapstructUtil.getInstance( holder.getFile() )
+        );
     }
 
     private static class MyJavaElementVisitor extends JavaElementVisitor {
@@ -69,8 +71,8 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
         private final MapStructVersion mapStructVersion;
         private final MapstructUtil mapstructUtil;
 
-        private MyJavaElementVisitor(
-          ProblemsHolder holder, MapStructVersion mapStructVersion, MapstructUtil mapstructUtil) {
+        private MyJavaElementVisitor(ProblemsHolder holder, MapStructVersion mapStructVersion,
+                                     MapstructUtil mapstructUtil) {
             this.holder = holder;
             this.mapStructVersion = mapStructVersion;
             this.mapstructUtil = mapstructUtil;
@@ -103,7 +105,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
 
             Set<String> allTargetProperties = findAllTargetProperties(
-              targetType, mapStructVersion, mapstructUtil, method );
+                targetType,
+                mapStructVersion,
+                mapstructUtil,
+                method
+            );
 
             // find and remove all defined mapping targets
             Set<String> definedTargets = findAllDefinedMappingTargets( method, mapStructVersion )
