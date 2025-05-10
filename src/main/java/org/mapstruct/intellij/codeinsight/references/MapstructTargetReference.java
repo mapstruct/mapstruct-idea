@@ -106,7 +106,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         if ( builderSupportPresent ) {
             for ( PsiMethod method : psiClass.findMethodsByName( value, true ) ) {
                 if ( method.getParameterList().getParametersCount() == 1 &&
-                    MapstructUtil.isFluentSetter( method, typeToUse ) ) {
+                    mapstructUtil.isFluentSetter( method, typeToUse ) ) {
                     return method;
                 }
             }
@@ -151,6 +151,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         Map<String, Pair<? extends PsiElement, PsiSubstitutor>> accessors = publicWriteAccessors(
             psiType,
             mapStructVersion,
+            mapstructUtil,
             mappingMethod
         );
 

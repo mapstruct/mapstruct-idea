@@ -34,6 +34,7 @@ abstract class MapstructBaseReference extends BaseReference {
 
     private final MapstructBaseReference previous;
     private final String value;
+    protected final MapstructUtil mapstructUtil;
 
     /**
      * Create a reference.
@@ -47,6 +48,7 @@ abstract class MapstructBaseReference extends BaseReference {
         super( element, rangeInElement );
         this.previous = previous;
         this.value = value;
+        this.mapstructUtil = MapstructUtil.getInstance( element.getContainingFile() );
     }
 
     @Override
