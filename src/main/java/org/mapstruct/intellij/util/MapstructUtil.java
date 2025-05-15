@@ -229,6 +229,7 @@ public class MapstructUtil {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
+            !isRemoverWithUpperCase7thCharacter( method ) &&
             isAssignableFromReturnTypeOrSuperTypes( psiType, method.getReturnType() );
     }
 
@@ -258,6 +259,13 @@ public class MapstructUtil {
         return methodName.startsWith( "add" ) &&
             methodName.length() > 3 &&
             Character.isUpperCase( methodName.charAt( 3 ) );
+    }
+
+    private static boolean isRemoverWithUpperCase7thCharacter(@NotNull PsiMethod method) {
+        String methodName = method.getName();
+        return methodName.startsWith( "remove" ) &&
+            methodName.length() > 6 &&
+            Character.isUpperCase( methodName.charAt( 6 ) );
     }
 
     /**
