@@ -18,6 +18,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiSubstitutor;
@@ -98,8 +99,15 @@ class MapstructTargetReference extends MapstructBaseReference {
             }
         }
 
-        PsiMethod[] methods = psiClass.findMethodsByName( "set" + MapstructUtil.capitalize( value ), true );
+        String capitalizedName = MapstructUtil.capitalize( value );
+        PsiMethod[] methods = psiClass.findMethodsByName( "set" + capitalizedName, true );
         if ( methods.length != 0 && isPublicNonStatic( methods[0] ) ) {
+            return methods[0];
+        }
+
+        // If there is no such setter we need to check if there is a collection getter
+        methods = psiClass.findMethodsByName( "get" + capitalizedName, true );
+        if ( methods.length != 0 && isCollectionGetterWriteAccessor( methods[0] ) ) {
             return methods[0];
         }
 
@@ -219,7 +227,7 @@ class MapstructTargetReference extends MapstructBaseReference {
 
     private static PsiType memberPsiType(PsiElement psiMember) {
         if ( psiMember instanceof PsiMethod psiMemberMethod ) {
-            return firstParameterPsiType( psiMemberMethod );
+            return resolveMethodType( psiMemberMethod );
         }
         else if ( psiMember instanceof PsiVariable psiMemberVariable ) {
             return psiMemberVariable.getType();
@@ -228,5 +236,24 @@ class MapstructTargetReference extends MapstructBaseReference {
             return null;
         }
 
+    }
+
+    private static boolean isCollectionGetterWriteAccessor(@NotNull PsiMethod method) {
+        if ( !isPublicNonStatic( method ) ) {
+            return false;
+        }
+        PsiParameterList parameterList = method.getParameterList();
+        if ( parameterList.getParametersCount() > 0 ) {
+            return false;
+        }
+        return TargetUtils.isMethodReturnTypeAssignableToCollectionOrMap( method );
+    }
+
+    private static PsiType resolveMethodType(PsiMethod psiMethod) {
+        PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
+        if ( psiParameters.length == 0 ) {
+            return psiMethod.getReturnType();
+        }
+        return psiParameters[0].getType();
     }
 }

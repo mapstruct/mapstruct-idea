@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMember;
@@ -295,6 +296,25 @@ public class TargetUtils {
         return publicSetters;
     }
 
+    public static boolean isMethodReturnTypeAssignableToCollectionOrMap(@NotNull PsiMethod method) {
+        PsiType returnType = method.getReturnType();
+        if ( returnType == null ) {
+            return false;
+        }
+        if ( getTypeByName( "java.util.Collection", method ).isAssignableFrom( returnType ) ) {
+            return true;
+        }
+        return getTypeByName( "java.util.Map", method ).isAssignableFrom( returnType );
+    }
+
+    private static PsiClassType getTypeByName(@NotNull String qName, @NotNull PsiMethod method) {
+        return PsiType.getTypeByName(
+            qName,
+            method.getProject(),
+            method.getResolveScope()
+        );
+    }
+
     @Nullable
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
                                                           MapstructUtil mapstructUtil, boolean builderSupportPresent) {
@@ -304,10 +324,10 @@ public class TargetUtils {
         }
         String methodName = method.getName();
         int parametersCount = method.getParameterList().getParametersCount();
-        PsiType returnType = method.getReturnType();
-        if (parametersCount == 0 && methodName.startsWith( "get" ) && returnType != null &&
-                returnType.isConvertibleFrom( PsiType.getTypeByName( "java.util.Collection",
-                        method.getProject(), method.getResolveScope() ) )) {
+
+        if ( parametersCount == 0 && methodName.startsWith( "get" ) &&
+            isMethodReturnTypeAssignableToCollectionOrMap( method ) ) {
+
             // If the methode returns a collection
             return Introspector.decapitalize( methodName.substring( 3 ) );
         }
