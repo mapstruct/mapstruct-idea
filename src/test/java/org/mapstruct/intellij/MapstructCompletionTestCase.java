@@ -700,6 +700,66 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             } );
     }
 
+    public void testTargetWithCollectionGetterMapper() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "myStringList",
+                "myStringSet"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "myStringList", "List<String>" ),
+                createVariable( "myStringSet", "Set<String>" )
+            );
+
+        PsiElement reference = myFixture.getElementAtCaret();
+        assertThat( reference )
+            .isInstanceOfSatisfying(
+                PsiMethod.class, method -> {
+                    assertThat( method.getName() ).isEqualTo( "getMyStringList" );
+                    assertThat( method.getPresentation() ).isNotNull();
+                    assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "getMyStringList()" );
+                    assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
+                    assertThat( method.getReturnType() ).isNotNull();
+                    assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "List<String>" );
+                }
+            );
+    }
+
+    public void testTargetWithMapGetterMapper() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "myMap"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "myMap", "Map<String, String>" )
+            );
+
+        PsiElement reference = myFixture.getElementAtCaret();
+        assertThat( reference )
+            .isInstanceOfSatisfying(
+                PsiMethod.class, method -> {
+                    assertThat( method.getName() ).isEqualTo( "getMyMap" );
+                    assertThat( method.getPresentation() ).isNotNull();
+                    assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "getMyMap()" );
+                    assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 0 );
+                    assertThat( method.getReturnType() ).isNotNull();
+                    assertThat( method.getReturnType().getPresentableText() ).isEqualTo( "Map<String, String>" );
+                }
+            );
+    }
+
     public void testCarMapperReferenceBooleanSourceCar() {
         myFixture.configureByFile( "CarMapperReferenceBooleanSourceCar.java" );
         PsiElement reference = myFixture.getElementAtCaret();

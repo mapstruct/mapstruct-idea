@@ -40,7 +40,7 @@ public class UnmappedCollectionGetterPropertiesData {
             return listTarget;
         }
 
-        public Set<Strinf> getSetTarget() {
+        public Set<String> getSetTarget() {
             return setTarget;
         }
 
@@ -50,6 +50,10 @@ public class UnmappedCollectionGetterPropertiesData {
 
         public String getStringTarget() {
             return stringTarget;
+        }
+
+        public Object getObjectTarget() {
+            return null;
         }
     }
 
