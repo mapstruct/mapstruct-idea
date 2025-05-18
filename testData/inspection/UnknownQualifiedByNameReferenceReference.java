@@ -37,7 +37,7 @@ class Target {
 @Mapper
 interface SingleMappingMapper {
 
-    @Mapping(target = "testName", source = "name", qualifiedByName ="<error descr="Cannot resolve symbol 'StringMapper'">StringMapper</error>")
+    @Mapping(target = "testName", source = "name", qualifiedByName ="<error descr="Unknown @Named reference 'StringMapper'">StringMapper</error>")
     Target map(Source source);
 }
 
@@ -45,7 +45,14 @@ interface SingleMappingMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-            @Mapping(target = "testName", source = "name", qualifiedByName ="<error descr="Cannot resolve symbol 'StringMapper'">StringMapper</error>")
+            @Mapping(target = "testName", source = "name", qualifiedByName ="<error descr="Unknown @Named reference 'StringMapper'">StringMapper</error>")
     })
+    Target map(Source source);
+}
+
+@Mapper
+interface EmptyMappingMapper {
+
+    @Mapping(target = "testName", source = "name", qualifiedByName =<error descr="Unknown @Named reference ''">""</error>)
     Target map(Source source);
 }

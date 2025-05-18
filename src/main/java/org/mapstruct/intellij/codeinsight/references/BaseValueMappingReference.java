@@ -13,6 +13,7 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.MapStructBundle;
 
 /**
  * Base Reference for {@link org.mapstruct.ValueMapping}(s).
@@ -107,6 +108,13 @@ public abstract class BaseValueMappingReference extends BaseReference {
 
     @NotNull
     abstract Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod, @NotNull PsiClass enumClass);
+
+    @NotNull
+    @Override
+    public String getUnresolvedMessagePattern() {
+        //noinspection UnresolvedPropertyKey
+        return MapStructBundle.message( "unknown.enum.constant" );
+    }
 
     private static boolean isNotValueMapping(@Nullable PsiMethod mappingMethod) {
         return mappingMethod == null || mappingMethod.getParameterList().getParametersCount() != 1;

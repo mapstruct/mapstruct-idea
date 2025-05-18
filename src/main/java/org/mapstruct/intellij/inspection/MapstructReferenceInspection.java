@@ -47,7 +47,7 @@ public class MapstructReferenceInspection extends InspectionBase {
                     if ( psiReference instanceof BaseReference baseReference && psiReference.resolve() == null ) {
                         TextRange range = psiReference.getRangeInElement();
                         if (range.isEmpty() && range.getStartOffset() == 1 && "\"\"".equals( element.getText() ) ) {
-                            String message = ProblemsHolder.unresolvedReferenceMessage( psiReference );
+                            String message = ProblemsHolder.unresolvedReferenceMessage( baseReference );
                             holder.registerProblem( element, message, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                                     TextRange.create( 0, 2 ) );
                         }

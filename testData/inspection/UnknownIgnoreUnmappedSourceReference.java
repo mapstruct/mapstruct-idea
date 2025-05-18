@@ -39,7 +39,7 @@ class Target {
 interface SingleMappingMapper {
 
     @Mapping(target = "testName", ignore = true)
-    @BeanMapping(ignoreUnmappedSourceProperties = {"<error descr="Cannot resolve symbol 'testName'">testName</error>"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"<error descr="Unknown property 'testName'">testName</error>"})
     Target map(Source source);
 }
 
@@ -49,6 +49,6 @@ interface SingleMappingsMapper {
     @Mappings({
         @Mapping(target = "testName", ignore = true)
     })
-    @BeanMapping(ignoreUnmappedSourceProperties = {"<error descr="Cannot resolve symbol 'testName'">testName</error>"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"<error descr="Unknown property 'testName'">testName</error>"})
     Target map(Source source);
 }

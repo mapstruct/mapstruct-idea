@@ -49,7 +49,7 @@ import static org.mapstruct.intellij.util.TypeUtils.firstParameterPsiType;
  *
  * @author Filip Hrisafov
  */
-class MapstructTargetReference extends MapstructBaseReference {
+class MapstructTargetReference extends BaseMappingReference {
 
     private final MapStructVersion mapStructVersion;
 
