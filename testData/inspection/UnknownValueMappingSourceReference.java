@@ -36,3 +36,10 @@ interface SingleValueMappingsMapper {
 Target map(Source source);
 }
 
+@Mapper
+interface StringToEnumMapper {
+
+    @ValueMapping(target = "FIST", source = "OTHER")
+    Target map(String source);
+}
+
