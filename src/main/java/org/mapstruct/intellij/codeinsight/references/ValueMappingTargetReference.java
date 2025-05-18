@@ -11,7 +11,6 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiEnumConstant;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiUtil;
@@ -34,31 +33,14 @@ public class ValueMappingTargetReference extends BaseValueMappingReference {
         super( element );
     }
 
-    @Nullable
     @Override
-    PsiElement resolveInternal(@NotNull String value, @NotNull PsiMethod mappingMethod) {
-        //TODO should we resolve and suggest MappingConstants as well?
-        PsiClass targetClass = methodReturnClass( mappingMethod );
-        if ( targetClass == null || !targetClass.isEnum() ) {
-            return null;
-        }
-        PsiField field = targetClass.findFieldByName( value, false );
-
-        if ( field instanceof PsiEnumConstant ) {
-            return field;
-        }
-
-        return null;
+    PsiClass determineEnumClass(@NotNull PsiMethod mappingMethod) {
+        return methodReturnClass( mappingMethod );
     }
 
     @NotNull
     @Override
-    Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod) {
-        PsiClass targetClass = methodReturnClass( mappingMethod );
-        if ( targetClass == null || !targetClass.isEnum() ) {
-            return LookupElement.EMPTY_ARRAY;
-        }
-
+    Object[] getVariantsInternal(@NotNull PsiMethod mappingMethod, @NotNull PsiClass targetClass) {
         return Stream.of( targetClass.getFields() )
             .filter( psiField -> psiField instanceof PsiEnumConstant )
             .map( psiEnumConstant -> asLookup( (PsiEnumConstant) psiEnumConstant ) )

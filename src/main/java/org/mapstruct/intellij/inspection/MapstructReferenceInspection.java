@@ -15,6 +15,7 @@ import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.codeinsight.references.BaseReference;
+import org.mapstruct.intellij.codeinsight.references.BaseValueMappingReference;
 
 /**
  * Inspection that checks if mapstruct references can be resolved.
@@ -43,20 +44,27 @@ public class MapstructReferenceInspection extends InspectionBase {
         public void visitElement(@NotNull PsiElement element) {
             if (element instanceof ContributedReferenceHost r && element instanceof PsiLanguageInjectionHost) {
                 for (PsiReference psiReference : r.getReferences()) {
-                    if (psiReference instanceof BaseReference && psiReference.resolve() == null) {
+                    if ( psiReference instanceof BaseReference baseReference && psiReference.resolve() == null ) {
                         TextRange range = psiReference.getRangeInElement();
                         if (range.isEmpty() && range.getStartOffset() == 1 && "\"\"".equals( element.getText() ) ) {
                             String message = ProblemsHolder.unresolvedReferenceMessage( psiReference );
                             holder.registerProblem( element, message, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                                     TextRange.create( 0, 2 ) );
                         }
-                        else {
+                        else if ( shouldRegisterProblem( baseReference ) ) {
                             holder.registerProblem( psiReference );
                         }
                     }
                 }
             }
             super.visitElement( element );
+        }
+
+        private boolean shouldRegisterProblem(BaseReference reference) {
+            if ( reference instanceof BaseValueMappingReference valueMappingReference ) {
+                return valueMappingReference.getEnumClass() != null;
+            }
+            return true;
         }
     }
 }
