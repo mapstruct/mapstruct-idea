@@ -23,7 +23,7 @@ enum Source {
 @Mapper
 interface SingleValueMappingMapper {
 
-    @ValueMapping(target = "<error descr="Cannot resolve symbol 'OTHER'">OTHER</error>", source = "FIST")
+    @ValueMapping(target = "<error descr="Unknown enum constant 'OTHER'">OTHER</error>", source = "FIST")
     Target map(Source source);
 }
 
@@ -31,7 +31,7 @@ interface SingleValueMappingMapper {
 interface SingleValueMappingsMapper {
 
     @ValueMappings({
-        @ValueMapping(target = "<error descr="Cannot resolve symbol 'OTHER'">OTHER</error>", source = "FIST")
+        @ValueMapping(target = "<error descr="Unknown enum constant 'OTHER'">OTHER</error>", source = "FIST")
 })
 Target map(Source source);
 }
@@ -41,4 +41,11 @@ interface EnumToStringMapper {
 
     @ValueMapping(target = "OTHER", source = "FIST")
     String map(Source source);
+}
+
+@Mapper
+interface EmptyValueMappingMapper {
+
+    @ValueMapping(target = <error descr="Unknown enum constant ''">""</error>, source = "FIST")
+    Target map(Source source);
 }

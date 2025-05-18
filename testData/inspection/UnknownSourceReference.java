@@ -37,7 +37,7 @@ class Target {
 @Mapper
 interface SingleMappingMapper {
 
-    @Mapping(target = "testName", source="<error descr="Cannot resolve symbol 'testName'">testName</error>")
+    @Mapping(target = "testName", source="<error descr="Unknown property 'testName'">testName</error>")
     Target map(Source source);
 }
 
@@ -45,7 +45,7 @@ interface SingleMappingMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-        @Mapping(target = "testName", source="<error descr="Cannot resolve symbol 'testName'">testName</error>")
+        @Mapping(target = "testName", source="<error descr="Unknown property 'testName'">testName</error>")
     })
     Target map(Source source);
 }

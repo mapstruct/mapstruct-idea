@@ -5,6 +5,7 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import com.intellij.codeInsight.daemon.EmptyResolveMessageProvider;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
@@ -21,7 +22,7 @@ import org.jetbrains.uast.UastUtils;
  *
  * @author Filip Hrisafov
  */
-public abstract class BaseReference extends PsiReferenceBase<PsiElement> {
+public abstract class BaseReference extends PsiReferenceBase<PsiElement> implements EmptyResolveMessageProvider {
 
     /**
      * @param element the element for which a reference should be found

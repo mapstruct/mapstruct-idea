@@ -35,7 +35,7 @@ import static org.mapstruct.intellij.util.SourceUtils.publicReadAccessors;
  *
  * @author Filip Hrisafov
  */
-class MapstructSourceReference extends MapstructBaseReference {
+class MapstructSourceReference extends BaseMappingReference {
 
     /**
      * Create a new {@link MapstructSourceReference} with the provided parameters.

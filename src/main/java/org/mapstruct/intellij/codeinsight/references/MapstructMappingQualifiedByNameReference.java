@@ -24,6 +24,7 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
@@ -165,6 +166,13 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
     @Override
     PsiType resolvedType() {
         return null;
+    }
+
+    @NotNull
+    @Override
+    public String getUnresolvedMessagePattern() {
+        //noinspection UnresolvedPropertyKey
+        return MapStructBundle.message( "unknown.qualifiedByName.reference" );
     }
 
     /**
