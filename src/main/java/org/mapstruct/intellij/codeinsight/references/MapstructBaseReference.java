@@ -26,7 +26,7 @@ import org.mapstruct.intellij.util.MapstructUtil;
 import static org.mapstruct.intellij.util.MapstructUtil.canDescendIntoType;
 
 /**
- * A base reference to target / source annotation.
+ * A base reference to annotations holding a reference and possibly nested types.
  *
  * @author Filip Hrisafov
  */

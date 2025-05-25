@@ -6,11 +6,14 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.Icon;
 
@@ -159,6 +162,29 @@ public class MapstructUtil {
 
     public static LookupElement asLookup(PsiEnumConstant enumConstant) {
         return asLookup( enumConstant.getName(), enumConstant, PsiField::getType, PlatformIcons.FIELD_ICON );
+    }
+
+    public static LookupElement asLookup(@NotNull PsiMethod method, @NotNull String lookupString,
+                                         @NotNull String representableText) {
+        return asLookupWithRepresentableText(
+            method,
+            lookupString,
+            representableText,
+            String.format(
+                " %s#%s(%s)",
+                Objects.requireNonNull( method.getContainingClass() ).getName(),
+                method.getName(),
+                formatParameters( method )
+            )
+        );
+    }
+
+    @NotNull
+    private static String formatParameters(@NotNull PsiMethod method) {
+        return Arrays.stream( method.getParameterList().getParameters() )
+            .map( PsiParameter::getType )
+            .map( PsiType::getPresentableText )
+            .collect( Collectors.joining( ", " ) );
     }
 
     public static LookupElement asLookupWithRepresentableText(PsiMethod method, String lookupString,
@@ -316,7 +342,7 @@ public class MapstructUtil {
     @NotNull
     @NonNls
     public static String getPropertyName(@NotNull String methodName) {
-        String name = "";
+        String name;
         if ( methodName.startsWith( "is" ) ) {
             name = Introspector.decapitalize( methodName.substring( 2 ) );
         }

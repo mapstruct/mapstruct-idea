@@ -69,6 +69,25 @@ public final class MapstructElementUtils {
         return elementPattern( parameterName, MapstructUtil.BEAN_MAPPING_FQN );
     }
 
+    /**
+     * @param parameterName the name of the parameter in the {@code @InheritConfiguration} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @InheritConfiguration} annotation
+     */
+    public static PsiJavaElementPattern.Capture<PsiElement> inheritConfigurationElementPattern(String parameterName) {
+        return elementPattern( parameterName, MapstructUtil.INHERIT_CONFIGURATION_FQN );
+    }
+
+    /**
+     * @param parameterName the name of the parameter in the {@code @InheritInverseConfiguration} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @InheritInverseConfiguration} annotation
+     */
+    public static PsiJavaElementPattern.Capture<PsiElement> inheritInverseConfigurationElementPattern(
+        String parameterName) {
+        return elementPattern( parameterName, MapstructUtil.INHERIT_INVERSE_CONFIGURATION_FQN );
+    }
+
     private static PsiJavaElementPattern.Capture<PsiElement> elementPattern(String parameterName,
         String annotationFQN) {
         return psiElement()
