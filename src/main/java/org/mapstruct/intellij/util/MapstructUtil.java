@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.swing.Icon;
@@ -39,6 +40,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.impl.PsiClassImplUtil;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
@@ -229,10 +231,12 @@ public class MapstructUtil {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
-            isAssignableFromReturnTypeOrSuperTypes( psiType, method.getReturnType() );
+            isAssignableFromReturnTypeOrSuperTypesOrGenericBuilder( psiType, method );
     }
 
-    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, PsiType returnType) {
+    private static boolean isAssignableFromReturnTypeOrSuperTypesOrGenericBuilder(PsiType psiType, PsiMethod method) {
+
+        PsiType returnType = method.getReturnType();
 
         if ( isAssignableFrom( psiType, returnType ) ) {
             return true;
@@ -243,7 +247,42 @@ public class MapstructUtil {
                 return true;
             }
         }
+
+        return isAssignableFromGenericBuilder( returnType, method.getContainingClass() );
+    }
+
+    private static boolean isAssignableFromGenericBuilder(PsiType returnType, PsiClass containingClass) {
+
+        if ( returnType == null || containingClass == null ) {
+            return false;
+        }
+
+        // Generic types (FooBuilder<C, B>)
+        PsiTypeParameter[] typeParameters = containingClass.getTypeParameters();
+        if ( typeParameters.length < 2 ) {
+            return false;
+        }
+
+        for ( PsiTypeParameter typeParameter : typeParameters ) {
+            PsiClassType[] superTypes = typeParameter.getExtendsListTypes();
+            for ( PsiClassType superType : superTypes ) {
+                // Check if the return value is derivable from a builder type
+                if ( classNameEndsWithBuilder( superType )
+                    && superType.isAssignableFrom( returnType ) ) {
+                    return true;
+                }
+            }
+        }
+
         return false;
+    }
+
+    private static boolean classNameEndsWithBuilder(PsiClassType psiClassType) {
+
+        return Optional.ofNullable( psiClassType.resolve() )
+            .map( PsiClass::getQualifiedName )
+            .map( name -> name.endsWith( "Builder" ) )
+            .orElse( false );
     }
 
     private static boolean isAssignableFrom(PsiType psiType, @Nullable PsiType returnType) {
