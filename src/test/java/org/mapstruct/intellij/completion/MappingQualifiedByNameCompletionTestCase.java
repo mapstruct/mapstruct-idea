@@ -100,9 +100,11 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
             .extracting( LookupElement::getLookupString )
             .containsExactlyInAnyOrder(
                 "internalModifierPackagePrivate",
-                "internalModifierPrivate",
                 "internalModifierProtected",
                 "internalModifierPublic",
+                "superClassModifierPackagePrivate",
+                "superClassModifierProtected",
+                "superClassModifierPublic",
                 "samePackageModifierPackagePrivate",
                 "samePackageModifierPublic",
                 "externalPackageModifierPublic"
@@ -117,9 +119,19 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
                     "String",
                     " CarMapper#internalModifierPackagePrivate(String)"
                 ),
-                createMethod( "internalModifierPrivate", "String", " CarMapper#internalModifierPrivate(String)" ),
                 createMethod( "internalModifierProtected", "String", " CarMapper#internalModifierProtected(String)" ),
                 createMethod( "internalModifierPublic", "String", " CarMapper#internalModifierPublic(String)" ),
+                createMethod(
+                    "superClassModifierPackagePrivate",
+                    "String",
+                    " BaseMapper#superClassModifierPackagePrivate(String)"
+                ),
+                createMethod(
+                    "superClassModifierProtected",
+                    "String",
+                    " BaseMapper#superClassModifierProtected(String)"
+                ),
+                createMethod( "superClassModifierPublic", "String", " BaseMapper#superClassModifierPublic(String)" ),
                 createMethod(
                     "samePackageModifierPackagePrivate",
                     "String",

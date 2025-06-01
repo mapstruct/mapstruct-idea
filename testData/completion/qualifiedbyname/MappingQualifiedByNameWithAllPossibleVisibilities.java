@@ -10,14 +10,15 @@ import org.example.dto.CarDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ap.test.complex.BaseMapper;
 import org.mapstruct.ap.test.complex.SamePackageMapper;
 import org.mapstruct.helper.qualifiedbyname.external.ExternalMapper;
 
 @Mapper(uses = { ExternalMapper.class, SamePackageMapper.class })
-public interface CarMapper {
+public abstract class CarMapper extends BaseMapper {
 
     @Mapping(target = "make", qualifiedByName = "<caret>")
-    CarDto carToCarDto(Car car);
+    public abstract CarDto carToCarDto(Car car);
 
     @Named("internalModifierPackagePrivate")
     String internalModifierPackagePrivate(String value) {

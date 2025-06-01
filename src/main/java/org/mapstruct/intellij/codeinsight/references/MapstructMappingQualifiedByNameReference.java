@@ -111,8 +111,9 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
             return Stream.empty();
         }
 
-        Stream<PsiMethod> internalMethods = Stream.of( containingClass.getMethods() )
-            .filter( MapstructUtil::isNamedMethod );
+        Stream<PsiMethod> internalMethods = Stream.of( containingClass.getAllMethods() )
+            .filter( MapstructUtil::isNamedMethod )
+            .filter( m -> !m.hasModifierProperty( PsiModifier.PRIVATE ) );
 
         Stream<PsiMethod> externalMethods = findNamedMethodsInUsedMappers( containingClass )
             .filter( method -> methodIsAccessibleFrom( method, containingClass ) );
