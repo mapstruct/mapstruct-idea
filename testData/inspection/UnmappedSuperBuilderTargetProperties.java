@@ -22,7 +22,8 @@ interface NotMapStructMapper {
 interface SingleMappingsMapper {
 
     @Mappings({
-        @Mapping(target = "moreTarget", source = "moreSource")
+        @Mapping(target = "moreTarget", source = "moreSource"),
+        @Mapping(target = "baseValue", source = "name")
     })
     Target <warning descr="Unmapped target property: testName">map</warning>(Source source);
 }
@@ -31,13 +32,14 @@ interface SingleMappingsMapper {
 interface SingleMappingMapper {
 
     @Mapping(target = "testName", source = "name")
+    @Mapping(target = "baseValue", source = "name")
     Target <warning descr="Unmapped target property: moreTarget">map</warning>(Source source);
 }
 
 @Mapper
 interface NoMappingMapper {
 
-    Target <warning descr="Unmapped target properties: moreTarget, testName">map</warning>(Source source);
+    Target <warning descr="Unmapped target properties: baseValue, moreTarget, testName">map</warning>(Source source);
 
     @InheritInverseConfiguration
     Source reverse(Target target);
@@ -48,6 +50,7 @@ interface AllMappingMapper {
 
     @Mapping(target = "testName", source = "name")
     @Mapping(target = "moreTarget", source = "moreSource")
+    @Mapping(target = "baseValue", source = "name")
     Target mapWithAllMapping(Source source);
 }
 
@@ -55,11 +58,12 @@ interface AllMappingMapper {
 interface UpdateMapper {
 
     @Mapping(target = "moreTarget", source = "moreSource")
+    @Mapping(target = "baseValue", source = "name")
     void <warning descr="Unmapped target property: testName">update</warning>(@MappingTarget Target target, Source source);
 }
 
 @Mapper
 interface MultiSourceUpdateMapper {
 
-    void <warning descr="Unmapped target property: moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
+    void <warning descr="Unmapped target properties: baseValue, moreTarget">update</warning>(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }
