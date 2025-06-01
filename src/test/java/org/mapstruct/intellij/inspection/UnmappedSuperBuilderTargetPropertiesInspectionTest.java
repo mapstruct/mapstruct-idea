@@ -45,6 +45,8 @@ public class UnmappedSuperBuilderTargetPropertiesInspectionTest extends BaseInsp
                 "Add unmapped target property: 'testName'",
                 "Ignore unmapped target property: 'moreTarget'",
                 "Add unmapped target property: 'moreTarget'",
+                "Ignore unmapped target property: 'baseValue'",
+                "Add unmapped target property: 'baseValue'",
                 "Ignore unmapped target property: 'moreTarget'",
                 "Add unmapped target property: 'moreTarget'",
                 "Ignore unmapped target property: 'testName'",
@@ -52,8 +54,11 @@ public class UnmappedSuperBuilderTargetPropertiesInspectionTest extends BaseInsp
                 "Ignore all unmapped target properties",
                 "Ignore unmapped target property: 'testName'",
                 "Add unmapped target property: 'testName'",
+                "Ignore unmapped target property: 'baseValue'",
+                "Add unmapped target property: 'baseValue'",
                 "Ignore unmapped target property: 'moreTarget'",
-                "Add unmapped target property: 'moreTarget'"
+                "Add unmapped target property: 'moreTarget'",
+                "Ignore all unmapped target properties"
             );
 
         allQuickFixes.forEach( myFixture::launchAction );

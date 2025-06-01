@@ -46,13 +46,38 @@ public class UnmappedSuperBuilderTargetPropertiesData {
         }
     }
 
-    public static class Target {
+    public static abstract class Base {
+
+        private final String baseValue;
+
+        protected Base(BaseBuilder<?, ?> b) {
+            this.baseValue = b.baseValue;
+        }
+
+        public static abstract class BaseBuilder<C extends Base, B extends BaseBuilder<C, B>> {
+
+            private String baseValue;
+
+            public B baseValue(String baseValue) {
+                this.baseValue = baseValue;
+                return self();
+            }
+
+            protected abstract B self();
+
+            public abstract C build();
+
+        }
+    }
+
+    public static class Target extends Base {
 
         private String testName;
         private String matching;
         private String moreTarget;
 
         protected Target(TargetBuilder<?, ?> b) {
+            super(b);
             this.testName = b.testName;
             this.matching = b.matching;
             this.moreTarget = b.moreTarget;
@@ -86,7 +111,7 @@ public class UnmappedSuperBuilderTargetPropertiesData {
             this.moreTarget = moreTarget;
         }
 
-        public static abstract class TargetBuilder<C extends Target, B extends TargetBuilder<C, B>> {
+        public static abstract class TargetBuilder<C extends Target, B extends TargetBuilder<C, B>> extends BaseBuilder<C, B> {
             private String testName;
             private String matching;
             private String moreTarget;

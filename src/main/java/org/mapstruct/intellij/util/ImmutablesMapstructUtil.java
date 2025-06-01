@@ -6,6 +6,7 @@
 package org.mapstruct.intellij.util;
 
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,7 @@ public class ImmutablesMapstructUtil extends MapstructUtil {
     }
 
     @Override
-    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
-        return super.isFluentSetter( method, psiType ) && !method.getName().equals( "from" );
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType, @NotNull PsiSubstitutor substitutor) {
+        return super.isFluentSetter( method, psiType, substitutor ) && !method.getName().equals( "from" );
     }
 }

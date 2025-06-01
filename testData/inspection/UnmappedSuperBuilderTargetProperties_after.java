@@ -23,6 +23,7 @@ interface SingleMappingsMapper {
 
     @Mappings({
             @Mapping(target = "moreTarget", source = "moreSource"),
+            @Mapping(target = "baseValue", source = "name"),
             @Mapping(target = "testName", ignore = true),
             @Mapping(target = "testName", source = "")
     })
@@ -35,6 +36,7 @@ interface SingleMappingMapper {
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
     @Mapping(target = "testName", source = "name")
+    @Mapping(target = "baseValue", source = "name")
     Target map(Source source);
 }
 
@@ -43,10 +45,13 @@ interface NoMappingMapper {
 
     @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "baseValue", ignore = true)
     @Mapping(target = "testName", source = "")
     @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "baseValue", source = "")
+    @Mapping(target = "baseValue", ignore = true)
     Target map(Source source);
 
     @InheritInverseConfiguration
@@ -58,6 +63,7 @@ interface AllMappingMapper {
 
     @Mapping(target = "testName", source = "name")
     @Mapping(target = "moreTarget", source = "moreSource")
+    @Mapping(target = "baseValue", source = "name")
     Target mapWithAllMapping(Source source);
 }
 
@@ -67,13 +73,18 @@ interface UpdateMapper {
     @Mapping(target = "testName", source = "")
     @Mapping(target = "testName", ignore = true)
     @Mapping(target = "moreTarget", source = "moreSource")
+    @Mapping(target = "baseValue", source = "name")
     void update(@MappingTarget Target target, Source source);
 }
 
 @Mapper
 interface MultiSourceUpdateMapper {
 
+    @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "baseValue", ignore = true)
     @Mapping(target = "moreTarget", source = "")
     @Mapping(target = "moreTarget", ignore = true)
+    @Mapping(target = "baseValue", source = "")
+    @Mapping(target = "baseValue", ignore = true)
     void update(@MappingTarget Target moreTarget, Source source, String testName, @Context String matching);
 }

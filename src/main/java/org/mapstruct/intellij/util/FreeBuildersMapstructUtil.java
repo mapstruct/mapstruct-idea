@@ -6,6 +6,7 @@
 package org.mapstruct.intellij.util;
 
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public class FreeBuildersMapstructUtil extends MapstructUtil {
     }
 
     @Override
-    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType, @NotNull PsiSubstitutor substitutor) {
         // When using FreeBuilder one needs to use the JavaBean convention,
         // which means that all setters will start with set
         return false;

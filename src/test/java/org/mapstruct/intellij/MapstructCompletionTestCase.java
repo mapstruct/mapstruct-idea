@@ -988,6 +988,28 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testMapperWithSuperBuilder() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "baseValue",
+                "value"
+            );
+
+        PsiElement reference = myFixture.getElementAtCaret();
+
+        assertThat( reference )
+            .isInstanceOfSatisfying( PsiMethod.class, method -> {
+                assertThat( method.getName() ).isEqualTo( "baseValue" );
+                assertThat( method.getPresentation() ).isNotNull();
+                assertThat( method.getPresentation().getPresentableText() ).isEqualTo( "baseValue(String)" );
+                assertThat( method.getParameterList().getParametersCount() ).isEqualTo( 1 );
+                assertThat( method.getReturnType() ).isNotNull();
+            } );
+    }
+
     public void testMapperWithBuilderAndBeanMappingDisabledBuilder() {
         configureByTestName();
 

@@ -112,9 +112,13 @@ class MapstructTargetReference extends BaseMappingReference {
         }
 
         if ( builderSupportPresent ) {
-            for ( PsiMethod method : psiClass.findMethodsByName( value, true ) ) {
+            for ( Pair<PsiMethod, PsiSubstitutor> builderPair : psiClass.findMethodsAndTheirSubstitutorsByName(
+                value,
+                true
+            ) ) {
+                PsiMethod method = builderPair.getFirst();
                 if ( method.getParameterList().getParametersCount() == 1 &&
-                    mapstructUtil.isFluentSetter( method, typeToUse ) ) {
+                    mapstructUtil.isFluentSetter( method, typeToUse, builderPair.getSecond() ) ) {
                     return method;
                 }
             }
