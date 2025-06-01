@@ -281,6 +281,7 @@ public class TargetUtils {
             String propertyName = extractPublicSetterPropertyName(
                 method,
                 typeToUse,
+                pair.getSecond(),
                 mapstructUtil,
                 builderSupportPresent
             );
@@ -317,6 +318,7 @@ public class TargetUtils {
 
     @Nullable
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
+                                                          PsiSubstitutor psiTypeSubstitutor,
                                                           MapstructUtil mapstructUtil, boolean builderSupportPresent) {
         if (!MapstructUtil.isPublicNonStatic( method )) {
             // If the method is not public then there is no property
@@ -337,7 +339,7 @@ public class TargetUtils {
         }
 
         // This logic is aligned with the DefaultAccessorNamingStrategy
-        if ( builderSupportPresent && mapstructUtil.isFluentSetter( method, typeToUse )) {
+        if ( builderSupportPresent && mapstructUtil.isFluentSetter( method, typeToUse, psiTypeSubstitutor ) ) {
             if ( methodName.startsWith( "set" )
                 && methodName.length() > 3
                 && Character.isUpperCase( methodName.charAt( 3 ) ) ) {
@@ -401,8 +403,11 @@ public class TargetUtils {
             return false;
         }
 
-        for ( PsiMethod buildMethod : builderClass.getAllMethods() ) {
-            if ( MapstructUtil.isBuildMethod( buildMethod, type ) ) {
+        for ( Pair<PsiMethod, PsiSubstitutor> pair : builderClass.getAllMethodsAndTheirSubstitutors() ) {
+            PsiMethod buildMethod = pair.getFirst();
+            PsiSubstitutor buildMethodSubstitutor = pair.getSecond();
+
+            if ( MapstructUtil.isBuildMethod( buildMethod, buildMethodSubstitutor, type ) ) {
                 return true;
             }
         }

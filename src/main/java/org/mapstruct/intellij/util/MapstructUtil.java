@@ -225,14 +225,14 @@ public class MapstructUtil {
             !field.hasModifierProperty( PsiModifier.FINAL );
     }
 
-    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType) {
+    public boolean isFluentSetter(@NotNull PsiMethod method, PsiType psiType, @NotNull PsiSubstitutor substitutor) {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
-            isAssignableFromReturnTypeOrSuperTypes( psiType, method.getReturnType() );
+            isAssignableFromReturnTypeOrSuperTypes( psiType, substitutor.substitute( method.getReturnType() ) );
     }
 
-    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, PsiType returnType) {
+    private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, @NotNull PsiType returnType) {
 
         if ( isAssignableFrom( psiType, returnType ) ) {
             return true;
@@ -246,7 +246,7 @@ public class MapstructUtil {
         return false;
     }
 
-    private static boolean isAssignableFrom(PsiType psiType, @Nullable PsiType returnType) {
+    private static boolean isAssignableFrom(PsiType psiType, @NotNull PsiType returnType) {
         return TypeConversionUtil.isAssignable(
             psiType,
             PsiUtil.resolveGenericsClassInType( psiType ).getSubstitutor().substitute( returnType )
@@ -298,11 +298,15 @@ public class MapstructUtil {
      * @return {@code true} if the {@code buildMethod} is a build method for {@code typeToBuild}, {@code false}
      * otherwise
      */
-    public static boolean isBuildMethod(@NotNull PsiMethod buildMethod, @NotNull PsiType typeToBuild) {
+    public static boolean isBuildMethod(@NotNull PsiMethod buildMethod, @NotNull PsiSubstitutor buildMethodSubstitutor,
+                                        @NotNull PsiType typeToBuild) {
         return buildMethod.getParameterList().isEmpty() &&
             isPublic( buildMethod ) &&
             buildMethod.getReturnType() != null &&
-            TypeConversionUtil.isAssignable( typeToBuild, buildMethod.getReturnType() );
+            TypeConversionUtil.isAssignable(
+                typeToBuild,
+                buildMethodSubstitutor.substitute( buildMethod.getReturnType() )
+            );
     }
 
     @NotNull
