@@ -83,9 +83,76 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
+            .describedAs( "methods of mappers from @MapperConfig(uses = ...)" )
             .containsOnly(
-                // methods of mappers from @MapperConfig(uses = ...)
                 createMethod( "unwrapOptional", "T", " OptionalMapper#unwrapOptional(Optional<T>)" )
+            );
+    }
+
+    public void testMappingQualifiedByNameWithAllPossibleVisibilities() {
+        configureByTestName();
+        assertAutoCompleteOfValidVisibilities();
+    }
+
+    private void assertAutoCompleteOfValidVisibilities() {
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "internalModifierPackagePrivate",
+                "internalModifierProtected",
+                "internalModifierPublic",
+                "superClassModifierPackagePrivate",
+                "superClassModifierProtected",
+                "superClassModifierPublic",
+                "samePackageModifierPackagePrivate",
+                "samePackageModifierProtected",
+                "samePackageModifierPublic",
+                "externalPackageModifierPublic"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createMethod(
+                    "internalModifierPackagePrivate",
+                    "String",
+                    " CarMapper#internalModifierPackagePrivate(String)"
+                ),
+                createMethod( "internalModifierProtected", "String", " CarMapper#internalModifierProtected(String)" ),
+                createMethod( "internalModifierPublic", "String", " CarMapper#internalModifierPublic(String)" ),
+                createMethod(
+                    "superClassModifierPackagePrivate",
+                    "String",
+                    " BaseMapper#superClassModifierPackagePrivate(String)"
+                ),
+                createMethod(
+                    "superClassModifierProtected",
+                    "String",
+                    " BaseMapper#superClassModifierProtected(String)"
+                ),
+                createMethod( "superClassModifierPublic", "String", " BaseMapper#superClassModifierPublic(String)" ),
+                createMethod(
+                    "samePackageModifierPackagePrivate",
+                    "String",
+                    " SamePackageMapper#samePackageModifierPackagePrivate(String)"
+                ),
+                createMethod(
+                    "samePackageModifierProtected",
+                    "String",
+                    " SamePackageMapper#samePackageModifierProtected(String)"
+                ),
+                createMethod(
+                    "samePackageModifierPublic",
+                    "String",
+                    " SamePackageMapper#samePackageModifierPublic(String)"
+                ),
+                createMethod(
+                    "externalPackageModifierPublic",
+                    "String",
+                    " ExternalMapper#externalPackageModifierPublic(String)"
+                )
             );
     }
 
