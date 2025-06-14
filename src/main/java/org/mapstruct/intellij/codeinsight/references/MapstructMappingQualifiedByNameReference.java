@@ -136,10 +136,6 @@ class MapstructMappingQualifiedByNameReference extends MapstructBaseReference {
             return true;
         }
 
-        if ( method.hasModifierProperty( PsiModifier.PROTECTED ) ) {
-            return methodClass.equals( containingClass );
-        }
-
         return haveSamePackage( containingClass, methodClass );
     }
 

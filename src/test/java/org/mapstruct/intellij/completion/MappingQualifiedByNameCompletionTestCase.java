@@ -106,6 +106,7 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
                 "superClassModifierProtected",
                 "superClassModifierPublic",
                 "samePackageModifierPackagePrivate",
+                "samePackageModifierProtected",
                 "samePackageModifierPublic",
                 "externalPackageModifierPublic"
             );
@@ -136,6 +137,11 @@ public class MappingQualifiedByNameCompletionTestCase extends MapstructBaseCompl
                     "samePackageModifierPackagePrivate",
                     "String",
                     " SamePackageMapper#samePackageModifierPackagePrivate(String)"
+                ),
+                createMethod(
+                    "samePackageModifierProtected",
+                    "String",
+                    " SamePackageMapper#samePackageModifierProtected(String)"
                 ),
                 createMethod(
                     "samePackageModifierPublic",
