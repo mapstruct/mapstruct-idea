@@ -5,8 +5,6 @@
  */
 package org.mapstruct.intellij.inspection;
 
-import java.util.Optional;
-
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.util.TextRange;
@@ -73,9 +71,14 @@ public class MapstructReferenceInspection extends InspectionBase {
         }
 
         private boolean containingClassIsAnnotationType(PsiElement element) {
-            return Optional.ofNullable( PsiTreeUtil.getParentOfType( element, PsiClass.class ) )
-                .map( PsiClass::isAnnotationType )
-                .orElse( false );
+
+            PsiClass containingClass = PsiTreeUtil.getParentOfType( element, PsiClass.class );
+
+            if ( containingClass == null ) {
+                return false;
+            }
+
+            return containingClass.isAnnotationType();
         }
     }
 }
