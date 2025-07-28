@@ -113,13 +113,13 @@ public class TargetUtils {
         TargetType targetType = classAndType.getSecond();
         PsiType typeToUse = targetType.type();
 
-        if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
-            publicWriteAccessors.putAll( constructorParameters( psiClass ) );
-        }
-
         if ( !psiClass.isRecord() ) {
             publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, mapstructUtil, builderPresent ) );
             publicWriteAccessors.putAll( publicFields( psiClass ) );
+        }
+
+        if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
+            publicWriteAccessors.putAll( constructorParameters( psiClass ) );
         }
 
         return publicWriteAccessors;
