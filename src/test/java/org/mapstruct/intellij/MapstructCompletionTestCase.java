@@ -206,7 +206,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
-            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
@@ -234,7 +234,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
-            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
@@ -327,7 +327,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
-            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
             .containsExactlyInAnyOrder(
                 createParameter( "make", "String" ),
                 createParameter( "seatCount", "int" ),
@@ -401,7 +401,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
-            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
             .containsExactlyInAnyOrder(
                 createParameter( "name", "String" )
             );
@@ -451,7 +451,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             //For some reason the icon is empty in the returned items. However, in actual completion it is OK
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .containsExactlyInAnyOrder(
                 createParameter( "source1", "Car" ),
                 createParameter( "source2", "Car" ),

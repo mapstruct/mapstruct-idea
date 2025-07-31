@@ -90,8 +90,8 @@ public class TargetUtils {
     }
 
     /**
-     * Extract all public write accessors (public setters and fields)
-     * with their psi substitutors from the given {@code psiType}
+     * Extract all public write accessors with their psi substitutors from the given {@code psiType}.
+     * These accessors are constructor parameters and, if it is not a record, also public fields and setters.
      *
      * @param psiType to use to extract the accessors
      * @param mapStructVersion the MapStruct project version
@@ -101,11 +101,8 @@ public class TargetUtils {
      */
     public static Map<String, Pair<? extends PsiElement, PsiSubstitutor>> publicWriteAccessors(@NotNull PsiType psiType,
         MapStructVersion mapStructVersion, MapstructUtil mapstructUtil, PsiMethod mappingMethod) {
-        boolean builderSupportPresent = mapStructVersion.isBuilderSupported();
-        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass(
-            psiType,
-            builderSupportPresent && isBuilderEnabled( mappingMethod )
-        );
+        boolean builderPresent = mapStructVersion.isBuilderSupported() && isBuilderEnabled( mappingMethod );
+        Pair<PsiClass, TargetType> classAndType = resolveBuilderOrSelfClass( psiType, builderPresent );
         if ( classAndType == null ) {
             return Collections.emptyMap();
         }
@@ -116,9 +113,10 @@ public class TargetUtils {
         TargetType targetType = classAndType.getSecond();
         PsiType typeToUse = targetType.type();
 
-        publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, mapstructUtil,
-            builderSupportPresent && isBuilderEnabled( mappingMethod ) ) );
-        publicWriteAccessors.putAll( publicFields( psiClass ) );
+        if ( !psiClass.isRecord() ) {
+            publicWriteAccessors.putAll( publicSetters( psiClass, typeToUse, mapstructUtil, builderPresent ) );
+            publicWriteAccessors.putAll( publicFields( psiClass ) );
+        }
 
         if ( mapStructVersion.isConstructorSupported() && !targetType.builder() ) {
             publicWriteAccessors.putAll( constructorParameters( psiClass ) );

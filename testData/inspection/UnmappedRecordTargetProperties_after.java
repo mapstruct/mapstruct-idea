@@ -12,7 +12,13 @@ import org.mapstruct.Mappings;
 
 record Source(String name, String matching, String moreSource, String onlyInSource) { }
 
-record Target(String testName, String matching, String moreTarget) { }
+record Target(String testName, String matching, String moreTarget) {
+
+    public Target restrict(Target target) {
+        return this;
+    }
+
+}
 
 interface NotMapStructMapper {
 
