@@ -9,10 +9,12 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ContributedReferenceHost;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.codeinsight.references.BaseReference;
 import org.mapstruct.intellij.codeinsight.references.BaseValueMappingReference;
@@ -64,7 +66,19 @@ public class MapstructReferenceInspection extends InspectionBase {
             if ( reference instanceof BaseValueMappingReference valueMappingReference ) {
                 return valueMappingReference.getEnumClass() != null;
             }
-            return true;
+
+            return !containingClassIsAnnotationType( reference.getElement() );
+        }
+
+        private boolean containingClassIsAnnotationType(PsiElement element) {
+
+            PsiClass containingClass = PsiTreeUtil.getParentOfType( element, PsiClass.class );
+
+            if ( containingClass == null ) {
+                return false;
+            }
+
+            return containingClass.isAnnotationType();
         }
     }
 }
