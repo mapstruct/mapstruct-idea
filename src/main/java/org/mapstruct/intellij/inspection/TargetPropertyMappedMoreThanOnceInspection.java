@@ -149,7 +149,7 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
             PsiAnnotationMemberValue value = psiAnnotation.findDeclaredAttributeValue( "target" );
             if (value != null) {
                 String target = getStringAttributeValue( value );
-                if (target != null) {
+                if (target != null && !target.equals( "." )) {
                     problemMap.computeIfAbsent( target, k -> new ArrayList<>() ).add( value );
                 }
             }

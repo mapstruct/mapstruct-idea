@@ -44,6 +44,57 @@ class Source {
     }
 }
 
+class ComplexSource {
+    private Source source;
+    private Target target;
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
+    public Target getTarget() {
+        return target;
+    }
+
+    public void setTarget(Target target) {
+        this.target = target;
+    }
+}
+
+class ComplexTarget {
+    private String testName;
+    private String name;
+    private String lastName;
+
+    public String getTestName() {
+        return testName;
+    }
+
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+}
+
 @Retention(RetentionPolicy.CLASS)
 @Mapping(target = "testName", source = "name")
 @interface MyMappingAnnotation {
@@ -94,4 +145,12 @@ interface TargetMappedMoreThanOnceByMyMappingAnnotationAndMappingsAnnotationMapp
     })
     <error descr="Target property 'testName' must not be mapped more than once.">@MyMappingAnnotation</error>
     Target map(Source source);
+}
+
+@Mapper
+interface MultipleTargetDotMapper {
+
+    @Mapping(target = ".", source = "source")
+    @Mapping(target = ".", source = "target")
+    ComplexTarget map(ComplexSource source);
 }
