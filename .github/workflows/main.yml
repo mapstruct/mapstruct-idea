@@ -12,6 +12,7 @@ jobs:
           - { jdk: 21, idea: 2024.2 }
           - { jdk: 21, idea: 2024.3 }
           - { jdk: 21, idea: 2025.1 }
+          - { jdk: 21, idea: 2025.2 }
           - { jdk: 21, idea: LATEST-EAP-SNAPSHOT }
     name: 'IDEA ${{ matrix.version.idea }}'
     env:
