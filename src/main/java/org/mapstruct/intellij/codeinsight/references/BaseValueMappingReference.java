@@ -47,7 +47,7 @@ public abstract class BaseValueMappingReference extends BaseReference {
 
     @Override
     @Nullable
-    PsiMethod getMappingMethod() {
+    public PsiMethod getMappingMethod() {
         PsiMethod mappingMethod = super.getMappingMethod();
         if ( isNotValueMapping( mappingMethod ) ) {
             return null;
