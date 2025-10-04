@@ -43,7 +43,7 @@ public abstract class BaseReference extends PsiReferenceBase<PsiElement> impleme
      * @return The mapping method that this reference belongs to
      */
     @Nullable
-    PsiMethod getMappingMethod() {
+    public PsiMethod getMappingMethod() {
         PsiElement element = getElement();
         UExpression expression = UastContextKt.toUElement( element, UExpression.class );
         if ( expression != null ) {
