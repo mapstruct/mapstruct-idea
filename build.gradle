@@ -34,12 +34,6 @@ repositories {
 intellijPlatform {
     instrumentCode = false
     projectName = 'MapStruct-Intellij-Plugin'
-    pluginConfiguration {
-        ideaVersion {
-            sinceBuild = "241"
-            untilBuild = provider { null } as Provider<? extends String>
-        }
-    }
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
