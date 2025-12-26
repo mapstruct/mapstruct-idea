@@ -89,7 +89,11 @@ def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
 def useInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
-        ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useInstaller) : intellijIdeaUltimate(versionToUse, useInstaller)
+        if (('2025.3' <=> versionToUse) <= 0 ){
+            intellijIdea(versionToUse)
+        } else {
+            ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useInstaller) : intellijIdeaUltimate(versionToUse, useInstaller)
+        }
 
         jetbrainsRuntime()
 
@@ -123,7 +127,7 @@ tasks.register('libs', Sync) {
 
 tasks.register('testLibs', Sync) {
     from(configurations.testRuntimeClasspath)
-    into("$buildDir/test-libs")
+    into("$layout.buildDirectory/test-libs")
     rename('value-2.10.1.jar', 'immutables.jar')
 }
 
