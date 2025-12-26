@@ -3,7 +3,7 @@ import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id "org.jetbrains.intellij.platform" version "2.6.0"
+    id "org.jetbrains.intellij.platform" version "2.7.0"
     id "com.github.hierynomus.license" version "0.16.1"
 }
 
@@ -84,6 +84,7 @@ checkstyle {
 }
 
 jacocoTestReport {
+    classDirectories.setFrom(instrumentCode)
     reports {
         xml.required = true
         html.required = true
