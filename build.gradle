@@ -3,8 +3,8 @@ import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id "org.jetbrains.intellij.platform" version "2.9.0"
-    id "com.github.hierynomus.license" version "0.16.1"
+    id("org.jetbrains.intellij.platform") version "2.9.0"
+    id("com.github.hierynomus.license") version "0.16.1"
 }
 
 
@@ -19,8 +19,8 @@ apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaLanguageVersion.of(17)
+    targetCompatibility = JavaLanguageVersion.of(17)
 }
 
 repositories {
