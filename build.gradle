@@ -50,11 +50,11 @@ patchPluginXml {
     pluginDescription = htmlFixer('description.html')
 }
 
-task licenseTestData(type: LicenseCheck) {
+tasks.register('licenseTestData', LicenseCheck) {
     source = fileTree(dir: "testData").include("**/*")
 }
 
-task licenseFormatForKotlin(type: LicenseFormat) {
+tasks.register('licenseFormatForKotlin', LicenseFormat) {
     source = fileTree(dir: "src/main").include("**/*.kt").include("**/*.xml")
 }
 
@@ -117,7 +117,7 @@ dependencies {
     testRuntimeOnly('org.immutables:value:2.10.1')
 }
 
-task libs(type: Sync) {
+tasks.register('libs', Sync) {
     from(configurations.runtimeClasspath)
     into(layout.buildDirectory.dir("libs"))
     preserve {
@@ -127,10 +127,10 @@ task libs(type: Sync) {
     rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
 }
 
-task testLibs(type: Sync) {
-  from(configurations.testRuntimeClasspath)
-  into("$buildDir/test-libs")
-  rename('value-2.10.1.jar', 'immutables.jar')
+tasks.register('testLibs', Sync) {
+    from(configurations.testRuntimeClasspath)
+    into("$buildDir/test-libs")
+    rename('value-2.10.1.jar', 'immutables.jar')
 }
 
 test.dependsOn( libs, testLibs )
