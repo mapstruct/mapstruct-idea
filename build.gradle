@@ -19,8 +19,8 @@ apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 
 java {
-    sourceCompatibility = JavaLanguageVersion.of(17)
-    targetCompatibility = JavaLanguageVersion.of(17)
+    sourceCompatibility = JavaLanguageVersion.of(21)
+    targetCompatibility = JavaLanguageVersion.of(21)
 }
 
 repositories {
@@ -86,13 +86,15 @@ jacocoTestReport {
 }
 
 def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
-def useInstaller = !versionToUse.containsIgnoreCase( "EAP" )
+def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
         if (('2025.3' <=> versionToUse) <= 0 ){
-            intellijIdea(versionToUse)
+            intellijIdea(versionToUse) {
+                useInstaller = useIdeaInstaller
+            }
         } else {
-            ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useInstaller) : intellijIdeaUltimate(versionToUse, useInstaller)
+            ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useIdeaInstaller) : intellijIdeaUltimate(versionToUse, useIdeaInstaller)
         }
 
         jetbrainsRuntime()
@@ -127,7 +129,7 @@ tasks.register('libs', Sync) {
 
 tasks.register('testLibs', Sync) {
     from(configurations.testRuntimeClasspath)
-    into("$layout.buildDirectory/test-libs")
+    into(layout.buildDirectory.dir("test-libs"))
     rename('value-2.10.1.jar', 'immutables.jar')
 }
 
