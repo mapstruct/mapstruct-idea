@@ -8,8 +8,8 @@ plugins {
 }
 
 
-group pluginGroup
-version pluginVersion
+group = pluginGroup
+version = pluginVersion
 
 apply plugin: 'idea'
 apply plugin: 'java'
@@ -59,8 +59,8 @@ task licenseFormatForKotlin(type: LicenseFormat) {
 }
 
 license {
-    header rootProject.file('etc/license.txt')
-    strictCheck true
+    header = rootProject.file('etc/license.txt')
+    strictCheck = true
     mapping {
         java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
     }
@@ -75,8 +75,8 @@ licenseFormat.dependsOn licenseFormatForKotlin
 licenseTest.dependsOn licenseTestData
 
 checkstyle {
-    toolVersion '8.36.1'
-    config resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
+    toolVersion = '8.36.1'
+    config = resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
     configProperties = [
             'checkstyle.cache.file': rootProject.layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),
             'basedir': 'https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config',
@@ -118,19 +118,19 @@ dependencies {
 }
 
 task libs(type: Sync) {
-    from configurations.runtimeClasspath
-    into layout.buildDirectory.dir("libs")
+    from(configurations.runtimeClasspath)
+    into(layout.buildDirectory.dir("libs"))
     preserve {
-        include 'mapstruct-intellij-*.jar'
-        include 'MapStruct-Intellij-*.jar'
+        include('mapstruct-intellij-*.jar')
+        include('MapStruct-Intellij-*.jar')
     }
-    rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
+    rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
 }
 
 task testLibs(type: Sync) {
-  from configurations.testRuntimeClasspath
-  into "$buildDir/test-libs"
-  rename 'value-2.10.1.jar', 'immutables.jar'
+  from(configurations.testRuntimeClasspath)
+  into("$buildDir/test-libs")
+  rename('value-2.10.1.jar', 'immutables.jar')
 }
 
 test.dependsOn( libs, testLibs )
