@@ -34,6 +34,12 @@ repositories {
 intellijPlatform {
     instrumentCode = false
     projectName = 'MapStruct-Intellij-Plugin'
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "242"
+            untilBuild = provider { null } as Provider<? extends String>
+        }
+    }
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
@@ -96,8 +102,6 @@ dependencies {
         } else {
             ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useIdeaInstaller) : intellijIdeaUltimate(versionToUse, useIdeaInstaller)
         }
-
-        jetbrainsRuntime()
 
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
