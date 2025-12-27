@@ -53,7 +53,7 @@ tasks.register('licenseFormatForKotlin', LicenseFormat) {
 }
 
 license {
-    header = rootProject.file('etc/license.txt')
+    header = file('etc/license.txt')
     strictCheck = true
     mapping {
         java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
@@ -72,7 +72,7 @@ checkstyle {
     toolVersion = '8.36.1'
     config = resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
     configProperties = [
-            'checkstyle.cache.file': rootProject.layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),
+            'checkstyle.cache.file': layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),
             'basedir': 'https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config',
     ]
 }
