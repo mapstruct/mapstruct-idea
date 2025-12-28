@@ -95,6 +95,8 @@ def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
 def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
+        // When versionToUse is 2025.3 or later then there is only a single distribution of IntelliJ
+        // This comparison can be removed if the oldest supported version of idea is 2025.3 (253) or later
         if (('2025.3' <=> versionToUse) <= 0 ){
             intellijIdea(versionToUse) {
                 useInstaller = useIdeaInstaller
