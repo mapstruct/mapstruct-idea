@@ -3,13 +3,13 @@ import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id "org.jetbrains.intellij.platform" version "2.6.0"
-    id "com.github.hierynomus.license" version "0.16.1"
+    id("org.jetbrains.intellij.platform") version "2.10.5"
+    id("com.github.hierynomus.license") version "0.16.1"
 }
 
 
-group pluginGroup
-version pluginVersion
+group = pluginGroup
+version = pluginVersion
 
 apply plugin: 'idea'
 apply plugin: 'java'
@@ -19,8 +19,8 @@ apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaLanguageVersion.of(21)
+    targetCompatibility = JavaLanguageVersion.of(21)
 }
 
 repositories {
@@ -36,7 +36,7 @@ intellijPlatform {
     projectName = 'MapStruct-Intellij-Plugin'
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "241"
+            sinceBuild = "242"
             untilBuild = provider { null } as Provider<? extends String>
         }
     }
@@ -50,17 +50,17 @@ patchPluginXml {
     pluginDescription = htmlFixer('description.html')
 }
 
-task licenseTestData(type: LicenseCheck) {
+tasks.register('licenseTestData', LicenseCheck) {
     source = fileTree(dir: "testData").include("**/*")
 }
 
-task licenseFormatForKotlin(type: LicenseFormat) {
+tasks.register('licenseFormatForKotlin', LicenseFormat) {
     source = fileTree(dir: "src/main").include("**/*.kt").include("**/*.xml")
 }
 
 license {
-    header rootProject.file('etc/license.txt')
-    strictCheck true
+    header = file('etc/license.txt')
+    strictCheck = true
     mapping {
         java = 'SLASHSTAR_STYLE' // IntelliJ reports the JAVADOC_STYLE as a dangling comment
     }
@@ -75,15 +75,16 @@ licenseFormat.dependsOn licenseFormatForKotlin
 licenseTest.dependsOn licenseTestData
 
 checkstyle {
-    toolVersion '8.36.1'
-    config resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
+    toolVersion = '8.36.1'
+    config = resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
     configProperties = [
-            'checkstyle.cache.file': rootProject.layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),
+            'checkstyle.cache.file': layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),
             'basedir': 'https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config',
     ]
 }
 
 jacocoTestReport {
+    classDirectories.setFrom(instrumentCode)
     reports {
         xml.required = true
         html.required = true
@@ -91,12 +92,18 @@ jacocoTestReport {
 }
 
 def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
-def useInstaller = !versionToUse.containsIgnoreCase( "EAP" )
+def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
-        ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useInstaller) : intellijIdeaUltimate(versionToUse, useInstaller)
-
-        jetbrainsRuntime()
+        // When versionToUse is 2025.3 or later then there is only a single distribution of IntelliJ
+        // This comparison can be removed if the oldest supported version of idea is 2025.3 (253) or later
+        if (('2025.3' <=> versionToUse) <= 0 ){
+            intellijIdea(versionToUse) {
+                useInstaller = useIdeaInstaller
+            }
+        } else {
+            ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useIdeaInstaller) : intellijIdeaUltimate(versionToUse, useIdeaInstaller)
+        }
 
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
@@ -116,20 +123,20 @@ dependencies {
     testRuntimeOnly('org.immutables:value:2.10.1')
 }
 
-task libs(type: Sync) {
-    from configurations.runtimeClasspath
-    into layout.buildDirectory.dir("libs")
+tasks.register('libs', Sync) {
+    from(configurations.runtimeClasspath)
+    into(layout.buildDirectory.dir("libs"))
     preserve {
-        include 'mapstruct-intellij-*.jar'
-        include 'MapStruct-Intellij-*.jar'
+        include('mapstruct-intellij-*.jar')
+        include('MapStruct-Intellij-*.jar')
     }
-    rename 'mapstruct-1.5.3.Final.jar', 'mapstruct.jar'
+    rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
 }
 
-task testLibs(type: Sync) {
-  from configurations.testRuntimeClasspath
-  into "$buildDir/test-libs"
-  rename 'value-2.10.1.jar', 'immutables.jar'
+tasks.register('testLibs', Sync) {
+    from(configurations.testRuntimeClasspath)
+    into(layout.buildDirectory.dir("test-libs"))
+    rename('value-2.10.1.jar', 'immutables.jar')
 }
 
 test.dependsOn( libs, testLibs )
