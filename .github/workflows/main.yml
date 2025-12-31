@@ -33,7 +33,7 @@ jobs:
       - name: 'Generate coverage report'
         run: ./gradlew --warning-mode=all jacocoTestReport
       - name: 'Upload coverage to Codecov'
-        if: github.repository == 'mapstruct/mapstruct-idea'
+        if: github.repository == 'mapstruct/mapstruct-idea' &&  matrix.version.idea  == '2024.2'
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
