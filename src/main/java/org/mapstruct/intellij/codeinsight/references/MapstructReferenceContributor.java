@@ -10,6 +10,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import org.jetbrains.annotations.NotNull;
 
 import static org.mapstruct.intellij.util.MapstructElementUtils.beanMappingElementPattern;
+import static org.mapstruct.intellij.util.MapstructElementUtils.ignoredElementPattern;
 import static org.mapstruct.intellij.util.MapstructElementUtils.mappingElementPattern;
 import static org.mapstruct.intellij.util.MapstructElementUtils.valueMappingElementPattern;
 
@@ -33,6 +34,14 @@ public class MapstructReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
             mappingElementPattern( "source" ),
             new MappingTargetReferenceProvider( MapstructSourceReference::create )
+        );
+        registrar.registerReferenceProvider(
+            ignoredElementPattern( "prefix" ),
+            new MappingTargetReferenceProvider( MapstructTargetReference::create )
+        );
+        registrar.registerReferenceProvider(
+            ignoredElementPattern( "targets" ),
+            new MappingTargetReferenceProvider( MapstructIgnoredTargetReference::create )
         );
 
         registrar.registerReferenceProvider(

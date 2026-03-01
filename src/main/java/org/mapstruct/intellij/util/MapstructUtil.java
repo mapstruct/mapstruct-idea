@@ -53,6 +53,8 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Builder;
 import org.mapstruct.Context;
 import org.mapstruct.EnumMapping;
+import org.mapstruct.Ignored;
+import org.mapstruct.IgnoredList;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -97,6 +99,9 @@ public class MapstructUtil {
     public static final String INHERIT_INVERSE_CONFIGURATION_FQN = InheritInverseConfiguration.class.getName();
 
     public static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
+
+    public static final String IGNORED_ANNOTATION_FQN = Ignored.class.getName();
+    public static final String IGNORED_LIST_ANNOTATION_FQN = IgnoredList.class.getName();
 
     static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
@@ -567,12 +572,16 @@ public class MapstructUtil {
         }
         return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
             MapStructVersion mapStructVersion;
-            if ( JavaPsiFacade.getInstance( module.getProject() )
-                .findClass( ENUM_MAPPING_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
+            JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance( module.getProject() );
+            GlobalSearchScope moduleRuntimeScope = module.getModuleRuntimeScope( false );
+            if ( javaPsiFacade.findClass( IGNORED_ANNOTATION_FQN, moduleRuntimeScope ) != null ) {
+                mapStructVersion = MapStructVersion.V1_7_O;
+            }
+            else if ( javaPsiFacade.findClass( ENUM_MAPPING_ANNOTATION_FQN, moduleRuntimeScope ) != null ) {
                 mapStructVersion = MapStructVersion.V1_4_O;
             }
-            else if ( JavaPsiFacade.getInstance( module.getProject() )
-                .findClass( BUILDER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
+            else if ( javaPsiFacade
+                .findClass( BUILDER_ANNOTATION_FQN, moduleRuntimeScope ) != null ) {
                 mapStructVersion = MapStructVersion.V1_3_O;
             }
             else {

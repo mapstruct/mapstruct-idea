@@ -298,26 +298,26 @@ public class MapstructAnnotationUtils {
                                                                           boolean includeMetaAnnotations) {
         //TODO cache
         PsiAnnotation mappings = findAnnotation( owner, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
-        Stream<PsiAnnotation> mappingsAnnotations = extractMappingAnnotationsFromMappings( mappings );
+        Stream<PsiAnnotation> mappingsAnnotations = extractRepeatableAnnotations( mappings );
         Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
         return Stream.concat( mappingAnnotations, mappingsAnnotations );
     }
 
     @NotNull
-    public static Stream<PsiAnnotation> extractMappingAnnotationsFromMappings(@Nullable PsiAnnotation mappings) {
-        if (mappings == null) {
+    public static Stream<PsiAnnotation> extractRepeatableAnnotations(@Nullable PsiAnnotation annotation) {
+        if ( annotation == null ) {
             return Stream.empty();
         }
         //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
-        PsiAnnotationMemberValue mappingsValue = mappings.findDeclaredAttributeValue( null );
-        if ( mappingsValue instanceof PsiArrayInitializerMemberValue mappingsArrayInitializerMemberValue) {
-            return Stream.of( mappingsArrayInitializerMemberValue
+        PsiAnnotationMemberValue value = annotation.findDeclaredAttributeValue( null );
+        if ( value instanceof PsiArrayInitializerMemberValue arrayInitializerMemberValue ) {
+            return Stream.of( arrayInitializerMemberValue
                             .getInitializers() )
-                    .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
+                    .filter( PsiAnnotation.class::isInstance )
                     .map( PsiAnnotation.class::cast );
         }
-        else if ( mappingsValue instanceof PsiAnnotation mappingsAnnotation ) {
+        else if ( value instanceof PsiAnnotation mappingsAnnotation ) {
             return Stream.of( mappingsAnnotation );
         }
         return Stream.empty();
@@ -394,17 +394,6 @@ public class MapstructAnnotationUtils {
     private static Stream<PsiAnnotation> findValueMappingAnnotations(@NotNull PsiMethod method) {
         return Stream.of( method.getModifierList().getAnnotations() )
             .filter( MapstructAnnotationUtils::isValueMappingAnnotation );
-    }
-
-    /**
-     * @param memberValue that needs to be checked
-     *
-     * @return {@code true} if the {@code memberValue} is the {@link org.mapstruct.Mapping} {@link PsiAnnotation},
-     * {@code false} otherwise
-     */
-    private static boolean isMappingPsiAnnotation(PsiAnnotationMemberValue memberValue) {
-        return memberValue instanceof PsiAnnotation
-            && isMappingAnnotation( (PsiAnnotation) memberValue );
     }
 
     /**

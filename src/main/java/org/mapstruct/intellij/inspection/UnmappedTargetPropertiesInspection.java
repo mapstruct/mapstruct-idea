@@ -46,6 +46,7 @@ import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
 import static org.mapstruct.intellij.util.SourceUtils.findAllSourceProperties;
 import static org.mapstruct.intellij.util.SourceUtils.getGenericTypes;
 import static org.mapstruct.intellij.util.TargetUtils.findAllDefinedMappingTargets;
+import static org.mapstruct.intellij.util.TargetUtils.findAllIgnoredTargets;
 import static org.mapstruct.intellij.util.TargetUtils.findAllSourcePropertiesForCurrentTarget;
 import static org.mapstruct.intellij.util.TargetUtils.findAllTargetProperties;
 import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
@@ -116,6 +117,12 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
                 .map( MyJavaElementVisitor::getBaseTarget )
                 .collect( Collectors.toSet() );
             allTargetProperties.removeAll( definedTargets );
+
+            // find and remove all @Ignored targets
+            Set<String> ignoredTargets = findAllIgnoredTargets( method )
+                .map( MyJavaElementVisitor::getBaseTarget )
+                .collect( Collectors.toSet() );
+            allTargetProperties.removeAll( ignoredTargets );
 
             // find and remove all inherited target properties
             Set<String> inheritedTargetProperties = findInheritedTargetProperties( method, mapStructVersion )

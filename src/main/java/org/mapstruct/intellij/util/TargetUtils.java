@@ -431,6 +431,58 @@ public class TargetUtils {
     }
 
     /**
+     * Find all target properties that are ignored via {@link org.mapstruct.Ignored} annotations for the given method.
+     * This considers both directly placed {@code @Ignored} annotations and those wrapped in {@code @IgnoredList},
+     * and prepends the {@code prefix} attribute value (if any) to each target.
+     *
+     * @param method that needs to be checked
+     *
+     * @return a stream of all ignored target property names (with prefix applied)
+     */
+    @NotNull
+    public static Stream<String> findAllIgnoredTargets(@NotNull PsiMethod method) {
+        Stream<PsiAnnotation> ignoredAnnotations = findIgnoredAnnotations( method );
+        return ignoredAnnotations.flatMap( TargetUtils::extractIgnoredTargets );
+    }
+
+    @NotNull
+    private static Stream<PsiAnnotation> findIgnoredAnnotations(@NotNull PsiMethod method) {
+        PsiAnnotation ignoredList = AnnotationUtil.findAnnotation(
+            method,
+            true,
+            MapstructUtil.IGNORED_LIST_ANNOTATION_FQN
+        );
+
+        Stream<PsiAnnotation> fromList = MapstructAnnotationUtils.extractRepeatableAnnotations( ignoredList );
+
+        Stream<PsiAnnotation> direct = Stream.of( method.getModifierList().getAnnotations() )
+            .filter( a -> MapstructUtil.IGNORED_ANNOTATION_FQN.equals( a.getQualifiedName() ) );
+
+        return Stream.concat( direct, fromList );
+    }
+
+    @NotNull
+    private static Stream<String> extractIgnoredTargets(@NotNull PsiAnnotation ignoredAnnotation) {
+
+        String prefixDot = getIgnoredPrefix( ignoredAnnotation );
+
+        return AnnotationUtil.arrayAttributeValues( ignoredAnnotation.findDeclaredAttributeValue( "targets" ) )
+            .stream()
+            .map( AnnotationUtil::getStringAttributeValue )
+            .filter( Objects::nonNull )
+            .filter( s -> !s.isEmpty() )
+            .map( target -> prefixDot + target );
+    }
+
+    public static String getIgnoredPrefix(@Nullable PsiAnnotation ignoredAnnotation) {
+        if ( ignoredAnnotation == null ) {
+            return "";
+        }
+        String prefix = AnnotationUtil.getDeclaredStringAttributeValue( ignoredAnnotation, "prefix" );
+        return ( prefix != null && !prefix.isEmpty() ) ? prefix + "." : "";
+    }
+
+    /**
      * Find all implicit source properties for all targets mapping to the current target, i.e. ".".
      *
      * @param method that needs to be checked

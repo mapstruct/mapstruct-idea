@@ -24,6 +24,10 @@ public class TargetPropertyMappedMoreThanOnceInspectionTest extends BaseInspecti
         return TargetPropertyMappedMoreThanOnceInspection.class;
     }
 
+    public void testTargetPropertyMappedMoreThanOnceWithIgnored() {
+        doTest();
+    }
+
     public void testTargetPropertyMappedMoreThanOnce() {
         doTest();
         String testName = getTestName( false );

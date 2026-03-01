@@ -43,6 +43,15 @@ public final class MapstructElementUtils {
     }
 
     /**
+     * @param parameterName the name of the parameter in the {@code @Ignored} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @Ignored} annotation
+     */
+    public static PsiJavaElementPattern.Capture<PsiElement> ignoredElementPattern(String parameterName) {
+        return elementPattern( parameterName, MapstructUtil.IGNORED_ANNOTATION_FQN );
+    }
+
+    /**
      * @param parameterName the name of the parameter in the {@code @Mapper} annotation
      *
      * @return an element pattern for a parameter in the {@code @Mapper} annotation
