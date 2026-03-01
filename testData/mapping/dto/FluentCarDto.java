@@ -75,6 +75,13 @@ public class FluentCarDto {
         return this;
     }
 
+    public FluentCarDto removePassenger(PersonDto passenger) {
+        if ( this.passengers != null ) {
+            this.passengers.remove( passenger );
+        }
+        return this;
+    }
+
     public Long getPrice() {
         return price;
     }

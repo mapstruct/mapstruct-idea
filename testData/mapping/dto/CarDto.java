@@ -83,6 +83,12 @@ public class CarDto {
         this.passengers.add( passenger );
     }
 
+    public void removePassenger(PersonDTO passenger) {
+        if ( this.passengers != null ) {
+            this.passengers.remove( passenger );
+        }
+    }
+
     public Long getPrice() {
         return price;
     }
