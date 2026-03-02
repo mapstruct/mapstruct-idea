@@ -5,6 +5,14 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement;
@@ -38,15 +46,10 @@ import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
-import static org.mapstruct.intellij.util.MapstructAnnotationUtils.extractMappingAnnotationsFromMappings;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.extractRepeatableAnnotations;
+import static org.mapstruct.intellij.util.MapstructUtil.IGNORED_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.IGNORED_LIST_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPINGS_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.TargetUtils.getTargetType;
@@ -87,8 +90,15 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
                     handleMappingAnnotation( psiAnnotation, problemMap );
                 }
                 else if (MAPPINGS_ANNOTATION_FQN.equals( qualifiedName )) {
-                    extractMappingAnnotationsFromMappings( psiAnnotation )
+                    extractRepeatableAnnotations( psiAnnotation )
                             .forEach( a -> handleMappingAnnotation( a, problemMap ) );
+                }
+                else if ( IGNORED_ANNOTATION_FQN.equals( qualifiedName ) ) {
+                    handleIgnoredAnnotation( psiAnnotation, problemMap );
+                }
+                else if ( IGNORED_LIST_ANNOTATION_FQN.equals( qualifiedName ) ) {
+                    extractRepeatableAnnotations( psiAnnotation )
+                        .forEach( a -> handleIgnoredAnnotation( a, problemMap ) );
                 }
                 else {
                     // Handle annotations containing at least one Mapping annotation
@@ -152,6 +162,26 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
                 if (target != null && !target.equals( "." )) {
                     problemMap.computeIfAbsent( target, k -> new ArrayList<>() ).add( value );
                 }
+            }
+        }
+
+        private static void handleIgnoredAnnotation(PsiAnnotation psiAnnotation,
+                                                     Map<String, List<PsiElement>> problemMap) {
+            String prefixDot = TargetUtils.getIgnoredPrefix( psiAnnotation );
+
+            PsiAnnotationMemberValue targetsValue = psiAnnotation.findDeclaredAttributeValue( "targets" );
+            for ( PsiAnnotationMemberValue value : AnnotationUtil.arrayAttributeValues( targetsValue ) ) {
+                addIgnoredTarget( value, prefixDot, problemMap );
+            }
+
+        }
+
+        private static void addIgnoredTarget(PsiAnnotationMemberValue value, String prefixDot,
+                                              Map<String, List<PsiElement>> problemMap) {
+            String target = getStringAttributeValue( value );
+            if ( target != null && !target.isEmpty() ) {
+                problemMap.computeIfAbsent( prefixDot + target, k -> new ArrayList<>() )
+                    .add( value );
             }
         }
 

@@ -49,4 +49,8 @@ public class MapstructReferenceInspectionTest extends BaseInspectionTest {
     public void testUnknownQualifiedByNameReferenceReference() {
         doTest();
     }
+
+    public void testUnknownIgnoredTargetReference() {
+        doTest();
+    }
 }

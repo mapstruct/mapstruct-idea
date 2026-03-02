@@ -62,6 +62,19 @@ public final class MapstructKotlinElementUtils {
         );
     }
 
+    /**
+     * @param parameterName the name of the parameter in the {@code @Ignored} annotation
+     *
+     * @return an element pattern for a parameter in the {@code @Ignored} annotation
+     */
+    public static KotlinElementPattern.Capture<? extends PsiElement> ignoredElementPattern(String parameterName) {
+        return elementPattern(
+            parameterName,
+            MapstructUtil.IGNORED_ANNOTATION_FQN,
+            MapstructUtil.IGNORED_LIST_ANNOTATION_FQN
+        );
+    }
+
     private static KotlinElementPattern.Capture<? extends PsiElement> elementPattern(String parameterName,
         String annotationFQN,
         String annotationHolderFQN

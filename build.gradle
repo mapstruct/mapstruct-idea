@@ -111,13 +111,13 @@ dependencies {
         testFramework( TestFrameworkType.Platform.INSTANCE )
         testFramework( TestFrameworkType.Bundled.INSTANCE )
     }
-    implementation('org.mapstruct:mapstruct:1.5.3.Final')
+    implementation('org.mapstruct:mapstruct:1.7.0.Beta1')
     testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation('org.junit.platform:junit-platform-launcher')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
     testImplementation('org.junit.jupiter:junit-jupiter-engine')
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine')
-    testImplementation('org.assertj:assertj-core:3.26.3')
+    testImplementation('org.assertj:assertj-core:3.27.7')
     testImplementation('org.apache.commons:commons-text:1.15.0')
     testImplementation( 'junit:junit:4.13.2' )
     testRuntimeOnly('org.immutables:value:2.10.1')
@@ -130,7 +130,9 @@ tasks.register('libs', Sync) {
         include('mapstruct-intellij-*.jar')
         include('MapStruct-Intellij-*.jar')
     }
-    rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
+    rename { String fileName ->
+        return fileName.startsWith('mapstruct-') ? 'mapstruct.jar' : fileName
+    }
 }
 
 tasks.register('testLibs', Sync) {

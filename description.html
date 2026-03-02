@@ -23,12 +23,14 @@ If you want to discuss specific topics, then ping me (@filiphr) in the MapStruct
     <ul>
         <li>Completion of <code>target</code> and <code>source</code> properties in <code>@Mapping</code> annotation (nested properties also work)</li>
         <li>Completion of <code>target</code> and <code>source</code> properties in <code>@ValueMapping</code> annotation</li>
+        <li>Completion of <code>targets</code> in <code>@Ignored</code> annotation with <code>prefix</code> support</li>
         <li>Completion of <code>componentModel</code> in <code>@Mapper</code> and <code>@MapperConfig</code> annotations</li>
         <li>Completion of <code>qualifiedByName</code> in <code>@Mapping</code> annotation</li>
     </ul>
     </li>
     <li>Go To Declaration for properties in <code>target</code> and <code>source</code> to setters / getters</li>
-    <li>Find usages of properties in <code>target</code> and <code>source</code> and find usages of setters / getters in <code>@Mapping</code> annotations</li>
+    <li>Go To Declaration for <code>targets</code> in <code>@Ignored</code> annotation</li>
+    <li>Find usages of properties in <code>target</code> and <code>source</code> and find usages of setters / getters in <code>@Mapping</code> and <code>@Ignored</code> annotations</li>
     <li>Go To Declaration for <code>Mapping#qualifiedByName</code></li>
     <li>Highlighting properties in <code>target</code> and <code>source</code></li>
     <li>Refactoring support for properties and methods renaming</li>
@@ -41,9 +43,10 @@ If you want to discuss specific topics, then ping me (@filiphr) in the MapStruct
         <li>No <code>source</code> defined in <code>@Mapping</code> annotation</li>
         <li>More than one <code>source</code> in <code>@Mapping</code> annotation defined with quick fixes: Remove <code>source</code>. Remove <code>constant</code>. Remove <code>expression</code>. Use <code>constant</code> as <code>defaultValue</code>. Use <code>expression</code> as <code>defaultExpression</code>.</li>
         <li>More than one default source in <code>@Mapping</code> annotation defined with quick fixes: Remove <code>defaultValue</code>. Remove <code>defaultExpression</code>.</li>
-        <li><code>target</code> mapped more than once by <code>@Mapping</code> annotations with quick fixes: Remove annotation and change target property.</li>
+        <li><code>target</code> mapped more than once by <code>@Mapping</code> and/or <code>@Ignored</code> annotations with quick fixes: Remove annotation and change target property.</li>
         <li><code>*</code> used as a source in <code>@Mapping</code> annotations with quick fixes: Replace <code>*</code> with method parameter name.</li>
-        <li>Unknown reference inspection for <code>source</code> and <code>target</code> in <code>@Mapping</code> and <code>@ValueMapping</code> annotation. </li>
+        <li>Unknown reference inspection for <code>source</code> and <code>target</code> in <code>@Mapping</code> and <code>@ValueMapping</code> annotation.</li>
+        <li>Unknown reference inspection for <code>targets</code> and <code>prefix</code> in <code>@Ignored</code> annotation.</li>
         <li>Unknown reference inspection for <code>qualifiedByName</code> in <code>@Mapping</code> annotation. </li>
     </ul>
     </li>

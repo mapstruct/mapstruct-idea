@@ -271,6 +271,20 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
         assertCarDtoAutoComplete();
     }
 
+    public void testCarMapperReturnTargetCarDtoWithIgnored() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+    }
+
     public void testCarMapperReturnTargetFluentCarDto() {
         configureByTestName();
         assertCarDtoAutoComplete();

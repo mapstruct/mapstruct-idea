@@ -12,7 +12,8 @@ public enum MapStructVersion {
 
     V1_2_O( false, false ),
     V1_3_O( true, false ),
-    V1_4_O( true, true );
+    V1_4_O( true, true ),
+    V1_7_O( true, true );
 
     private final boolean builderSupported;
     private final boolean constructorSupported;
