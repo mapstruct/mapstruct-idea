@@ -70,7 +70,8 @@ public final class MapstructKotlinElementUtils {
     public static KotlinElementPattern.Capture<? extends PsiElement> ignoredElementPattern(String parameterName) {
         return elementPattern(
             parameterName,
-            MapstructUtil.IGNORED_ANNOTATION_FQN
+            MapstructUtil.IGNORED_ANNOTATION_FQN,
+            MapstructUtil.IGNORED_LIST_ANNOTATION_FQN
         );
     }
 

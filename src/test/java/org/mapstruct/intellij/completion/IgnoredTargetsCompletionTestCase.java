@@ -173,4 +173,37 @@ public class IgnoredTargetsCompletionTestCase extends MapstructBaseCompletionTes
                 "available"
             );
     }
+
+    public void testIgnoredTargetsWithIgnoredList() {
+        configureByTestName();
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+    }
+
+    public void testIgnoredTargetsNoPrefixKotlin() {
+        configureByFile( "/" + getTestName( false ) + ".kt" );
+        assertCarDtoAutoComplete();
+    }
+
+    public void testIgnoredTargetsWithIgnoredListKotlin() {
+        configureByFile( "/" + getTestName( false ) + ".kt" );
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "manufacturingYear",
+                "myDriver",
+                "passengers",
+                "price",
+                "category",
+                "available"
+            );
+    }
 }

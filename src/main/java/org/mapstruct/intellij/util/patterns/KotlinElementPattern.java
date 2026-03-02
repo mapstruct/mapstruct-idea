@@ -37,12 +37,14 @@ public class KotlinElementPattern<T extends PsiElement, Self extends KotlinEleme
 
         KtValueArgumentPattern ktValueArgumentPattern = ktValueArgument().withName( parameterName );
         return withElementType( KtStubElementTypes.STRING_TEMPLATE ).andOr(
-            withParent(
+            withAncestor(
+                2,
                 ktValueArgumentPattern
                     .withAncestor( 5, ktAnnotation().qName( annotationHolderQualifiedName ) )
             ),
 
-            withParent(
+            withAncestor(
+                2,
                 ktValueArgumentPattern
                     .withSuperParent( 2, ktAnnotation().qName( annotationQualifiedName ) )
             )
