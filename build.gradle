@@ -97,7 +97,7 @@ def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
         intellijIdea(versionToUse) {
-            useInstaller = false
+            useInstaller = useIdeaInstaller
         }
 
         bundledPlugin( 'com.intellij.java' )
