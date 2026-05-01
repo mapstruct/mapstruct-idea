@@ -30,7 +30,7 @@ public class NoSourcePropertyDefinedInspection extends MappingAnnotationInspecti
                                  @NotNull MappingAnnotation mappingAnnotation ) {
         PsiNameValuePair targetProperty = mappingAnnotation.getTargetProperty();
         PsiMethod annotatedMethod = getAnnotatedMethod( psiAnnotation );
-        if (targetProperty != null && annotatedMethod != null && mappingAnnotation.hasNoSourceProperties()
+        if ( targetProperty != null && annotatedMethod != null && mappingAnnotation.hasNoSourceProperties()
                 && !isIgnoreByDefaultEnabled( annotatedMethod ) &&
                 !hasMatchingSourceProperty( annotatedMethod, targetProperty ) ) {
             problemsHolder.registerProblem( psiAnnotation,
@@ -41,7 +41,7 @@ public class NoSourcePropertyDefinedInspection extends MappingAnnotationInspecti
     private boolean hasMatchingSourceProperty( @NotNull PsiMethod annotatedMethod,
                                                @NotNull PsiNameValuePair targetProperty ) {
         String targetValue = targetProperty.getLiteralValue();
-        if (targetValue == null) {
+        if ( targetValue == null ) {
             return false;
         }
         return  SourceUtils.findAllSourceProperties( annotatedMethod ).contains( targetValue );
@@ -49,7 +49,7 @@ public class NoSourcePropertyDefinedInspection extends MappingAnnotationInspecti
 
     private static boolean isIgnoreByDefaultEnabled( @NotNull PsiMethod annotatedMethod ) {
         PsiAnnotation beanMappingAnnotation = annotatedMethod.getAnnotation( MapstructUtil.BEAN_MAPPING_FQN );
-        if (beanMappingAnnotation == null) {
+        if ( beanMappingAnnotation == null ) {
             return false;
         }
         PsiAnnotationMemberValue ignoreByDefault =

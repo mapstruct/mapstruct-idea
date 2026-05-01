@@ -216,8 +216,8 @@ public class SourceUtils {
 
     @Nullable
     public static PsiType[] getGenericTypes(@Nullable PsiParameter fromMapMappingParameter) {
-        if (fromMapMappingParameter == null ||
-                !(fromMapMappingParameter.getType() instanceof PsiClassReferenceType)) {
+        if ( fromMapMappingParameter == null ||
+                !(fromMapMappingParameter.getType() instanceof PsiClassReferenceType) ) {
             return null;
         }
         return ((PsiClassReferenceType) fromMapMappingParameter.getType()).getParameters();

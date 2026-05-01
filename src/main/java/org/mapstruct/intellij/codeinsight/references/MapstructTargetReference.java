@@ -167,7 +167,7 @@ class MapstructTargetReference extends BaseMappingReference {
             mappingMethod
         );
 
-        if (mappingMethod != null) {
+        if ( mappingMethod != null ) {
             Stream<String> allDefinedMappingTargets = findAllDefinedMappingTargets( mappingMethod );
             allDefinedMappingTargets.forEach( accessors::remove );
         }

@@ -31,9 +31,9 @@ import org.mapstruct.intellij.util.MapstructUtil;
 import static com.intellij.codeInsight.AnnotationUtil.findAnnotation;
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findReferencedMapperClasses;
-import static org.mapstruct.intellij.util.MapstructUtil.NAMED_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.MAPPER_CONFIG_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.NAMED_ANNOTATION_FQN;
 import static org.mapstruct.intellij.util.MapstructUtil.asLookupWithRepresentableText;
 
 /**

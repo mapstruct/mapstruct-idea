@@ -5,12 +5,12 @@
  */
 package org.mapstruct.intellij.bugs._180;
 
+import java.util.List;
+
 import com.intellij.codeInsight.intention.IntentionAction;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.inspection.BaseInspectionTest;
 import org.mapstruct.intellij.inspection.WrongUsageOfMappersFactoryInspection;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

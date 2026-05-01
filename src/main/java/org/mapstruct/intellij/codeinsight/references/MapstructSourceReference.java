@@ -5,6 +5,9 @@
  */
 package org.mapstruct.intellij.codeinsight.references;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
@@ -20,9 +23,6 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
-
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.findRecordComponent;

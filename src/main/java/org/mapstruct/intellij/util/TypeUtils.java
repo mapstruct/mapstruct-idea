@@ -23,7 +23,7 @@ public final class TypeUtils {
      */
     public static PsiType firstParameterPsiType(PsiMethod psiMethod) {
         PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
-        if ( psiParameters.length == 0) {
+        if ( psiParameters.length == 0 ) {
             return null;
         }
         return psiParameters[0].getType();

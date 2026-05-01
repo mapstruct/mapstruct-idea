@@ -40,13 +40,13 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         @Override
         public void visitAnnotation(@NotNull PsiAnnotation annotation ) {
             super.visitAnnotation( annotation );
-            if (annotation.hasQualifiedName( MapstructUtil.MAPPING_ANNOTATION_FQN )) {
+            if ( annotation.hasQualifiedName( MapstructUtil.MAPPING_ANNOTATION_FQN ) ) {
                 MappingAnnotation mappingAnnotation = new MappingAnnotation();
-                for (JvmAnnotationAttribute annotationAttribute : annotation.getAttributes()) {
+                for ( JvmAnnotationAttribute annotationAttribute : annotation.getAttributes() ) {
                     // exclude not written attributes. They result in a syntax error
-                    if (annotationAttribute instanceof PsiNameValuePair nameValuePair
-                            && annotationAttribute.getAttributeValue() != null) {
-                        switch (nameValuePair.getAttributeName()) {
+                    if ( annotationAttribute instanceof PsiNameValuePair nameValuePair
+                            && annotationAttribute.getAttributeValue() != null ) {
+                        switch ( nameValuePair.getAttributeName() ) {
                             case "target" :
                                 mappingAnnotation.setTargetProperty( nameValuePair );
                                 break;
@@ -284,7 +284,7 @@ public abstract class MappingAnnotationInspectionBase extends InspectionBase {
         @Override
         public void invoke( @NotNull Project project, @NotNull PsiFile file, @NotNull PsiElement startElement,
                             @NotNull PsiElement endElement ) {
-            if (endElement instanceof PsiNameValuePair end) {
+            if ( endElement instanceof PsiNameValuePair end ) {
                 PsiAnnotationParamListImpl parent = (PsiAnnotationParamListImpl) end.getParent();
                 PsiElement parent1 = parent.getParent();
 
