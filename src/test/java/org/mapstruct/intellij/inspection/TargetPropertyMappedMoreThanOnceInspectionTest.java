@@ -5,12 +5,12 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.List;
+
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.openapi.editor.Caret;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

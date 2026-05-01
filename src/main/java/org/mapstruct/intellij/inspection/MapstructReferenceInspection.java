@@ -44,11 +44,11 @@ public class MapstructReferenceInspection extends InspectionBase {
          */
         @Override
         public void visitElement(@NotNull PsiElement element) {
-            if (element instanceof ContributedReferenceHost r && element instanceof PsiLanguageInjectionHost) {
-                for (PsiReference psiReference : r.getReferences()) {
+            if ( element instanceof ContributedReferenceHost r && element instanceof PsiLanguageInjectionHost ) {
+                for ( PsiReference psiReference : r.getReferences() ) {
                     if ( psiReference instanceof BaseReference baseReference && psiReference.resolve() == null ) {
                         TextRange range = psiReference.getRangeInElement();
-                        if (range.isEmpty() && range.getStartOffset() == 1 && "\"\"".equals( element.getText() ) ) {
+                        if ( range.isEmpty() && range.getStartOffset() == 1 && "\"\"".equals( element.getText() ) ) {
                             String message = ProblemsHolder.unresolvedReferenceMessage( baseReference );
                             holder.registerProblem( element, message, ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                                     TextRange.create( 0, 2 ) );

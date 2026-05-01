@@ -100,7 +100,7 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
             }
 
             ReportingPolicy reportingPolicy = getUnmappedTargetPolicy( method );
-            if (reportingPolicy == ReportingPolicy.IGNORE) {
+            if ( reportingPolicy == ReportingPolicy.IGNORE ) {
                 return;
             }
 
@@ -200,11 +200,11 @@ public class UnmappedTargetPropertiesInspection extends InspectionBase {
 
         private static boolean isFromMapMapping(@NotNull PsiMethod method) {
             PsiParameter[]  sourceParameters = getSourceParameters( method );
-            for (PsiParameter parameter : sourceParameters) {
-                if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+            for ( PsiParameter parameter : sourceParameters ) {
+                if ( parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
                         method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
                     PsiType[] generics = getGenericTypes( parameter );
-                    if (generics != null && generics.length > 0) {
+                    if ( generics != null && generics.length > 0 ) {
                         return  generics[0].equalsToText( "java.lang.String" );
                     }
                 }

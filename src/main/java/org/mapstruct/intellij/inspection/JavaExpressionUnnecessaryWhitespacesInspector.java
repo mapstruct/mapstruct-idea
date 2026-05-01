@@ -44,7 +44,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         if ( !JAVA_EXPRESSION.matcher( text ).matches() ) {
             return;
         }
-        if ( text.charAt( 1 ) == '"') {
+        if ( text.charAt( 1 ) == '"' ) {
             // Text-Block
             return;
         }
@@ -54,7 +54,7 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
                             "before", property.getAttributeName() ),
                     ProblemHighlightType.WEAK_WARNING, new RemoveWhitespacesBefore(property) );
         }
-        if ( text.lastIndexOf( ')' ) < text.length() - 2) {
+        if ( text.lastIndexOf( ')' ) < text.length() - 2 ) {
             problemsHolder.registerProblem( property,
                     MapStructBundle.message( "inspection.java.expression.unnecessary.whitespace",
                     "after", property.getAttributeName() ),
@@ -80,9 +80,9 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         @Override
         public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                            @NotNull PsiElement psiElement1) {
-            if (psiElement instanceof PsiNameValuePair psiNameValuePair) {
+            if ( psiElement instanceof PsiNameValuePair psiNameValuePair ) {
                 PsiAnnotationMemberValue value = psiNameValuePair.getValue();
-                if (value != null) {
+                if ( value != null ) {
                     String text = value.getText();
                     psiNameValuePair.setValue( getInstance( project )
                             .createExpressionFromText( "\"" + text.substring( text.indexOf( "java(" ) ), value ) );
@@ -125,9 +125,9 @@ public class JavaExpressionUnnecessaryWhitespacesInspector extends MappingAnnota
         @Override
         public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                            @NotNull PsiElement psiElement1) {
-            if (psiElement instanceof PsiNameValuePair psiNameValuePair) {
+            if ( psiElement instanceof PsiNameValuePair psiNameValuePair ) {
                 PsiAnnotationMemberValue value = psiNameValuePair.getValue();
-                if (value != null) {
+                if ( value != null ) {
                     String text = value.getText();
                     psiNameValuePair.setValue( getInstance( project ).createExpressionFromText(
                             text.substring( 0, text.lastIndexOf( ')' ) + 1 ) + "\"", value ) );

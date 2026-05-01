@@ -5,13 +5,13 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.io.File;
+import java.util.List;
+
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

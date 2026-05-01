@@ -18,10 +18,10 @@ public class TargetThisMappingNoSourcePropertyInspection extends MappingAnnotati
     @Override
     void visitMappingAnnotation(@NotNull ProblemsHolder problemsHolder, @NotNull PsiAnnotation psiAnnotation,
                                 @NotNull MappingAnnotation mappingAnnotation) {
-        if ( mappingAnnotation.isNotThisTarget() || mappingAnnotation.getIgnoreProperty() != null)  {
+        if ( mappingAnnotation.isNotThisTarget() || mappingAnnotation.getIgnoreProperty() != null )  {
             return;
         }
-        if (mappingAnnotation.getSourceProperty() == null ) {
+        if ( mappingAnnotation.getSourceProperty() == null ) {
             problemsHolder.registerProblem( psiAnnotation,
                     MapStructBundle.message( "inspection.this.target.mapping.no.source.property" ) );
         }

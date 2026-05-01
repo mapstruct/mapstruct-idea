@@ -5,6 +5,8 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.Set;
+
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.util.IntentionFamilyName;
@@ -22,8 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
-
-import java.util.Set;
 
 import static com.intellij.psi.PsiElementFactory.getInstance;
 import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
@@ -63,21 +63,21 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
         public void visitMethod(@NotNull PsiMethod method) {
             super.visitMethod( method );
 
-            if (!MapstructUtil.isMapper( method.getContainingClass() ) ) {
+            if ( !MapstructUtil.isMapper( method.getContainingClass() ) ) {
                 return;
             }
 
             PsiType targetType = getTargetType( method );
-            if (targetType == null) {
+            if ( targetType == null ) {
                 return;
             }
 
             PsiParameter fromMapMappingParameter = getFromMapMappingParameter( method );
-            if (fromMapMappingParameter == null) {
+            if ( fromMapMappingParameter == null ) {
                 return;
             }
             PsiType[] parameters = getGenericTypes( fromMapMappingParameter );
-            if (parameters == null)  {
+            if ( parameters == null )  {
                 return;
             }
             Set<String> allTargetProperties = findAllTargetProperties(
@@ -93,13 +93,13 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
                     .anyMatch( source -> fromMapMappingParameter.getName().equals( source ) ) ) {
                 return;
             }
-            if (parameters.length == 0) {
+            if ( parameters.length == 0 ) {
                 // handle raw type
                 holder.registerProblem( fromMapMappingParameter,
                         MapStructBundle.message( "inspection.wrong.map.mapping.map.type.raw" ),
                         new ReplaceByStringStringMapTypeFix( fromMapMappingParameter ) );
             }
-            else if (parameters.length == 2) {
+            else if ( parameters.length == 2 ) {
                 // only if both parameters of the map are set
                 PsiType keyParameter = parameters[0];
                 if ( !keyParameter.equalsToText( "java.lang.String" ) ) {
@@ -114,9 +114,9 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
         @Nullable
         private static  PsiParameter getFromMapMappingParameter(@NotNull PsiMethod method) {
             PsiParameter[]  sourceParameters = getSourceParameters( method );
-            if (sourceParameters.length == 1) {
+            if ( sourceParameters.length == 1 ) {
                 PsiParameter parameter = sourceParameters[0];
-                if (parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
+                if ( parameter != null && PsiType.getTypeByName( "java.util.Map", method.getProject(),
                         method.getResolveScope() ).isAssignableFrom( parameter.getType() ) ) {
                     return parameter;
                 }
@@ -142,10 +142,10 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             @Override
             public boolean isAvailable(@NotNull Project project, @NotNull PsiFile file,
                                        @NotNull PsiElement startElement, @NotNull PsiElement endElement) {
-                if (!super.isAvailable( project, file, startElement, endElement ) ) {
+                if ( !super.isAvailable( project, file, startElement, endElement ) ) {
                     return false;
                 }
-                if (startElement instanceof PsiParameter parameter) {
+                if ( startElement instanceof PsiParameter parameter ) {
                     PsiType[] parameters = getGenericTypes( parameter );
                     return parameters != null && parameters.length == 0;
                 }
@@ -155,7 +155,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             @Override
             public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                                @NotNull PsiElement psiElement1) {
-                if (psiElement instanceof PsiParameter) {
+                if ( psiElement instanceof PsiParameter ) {
                     String mapText = psiElement.getText();
                     String prefix = mapText.substring( 0, mapText.indexOf( ' ' ) );
                     String end = mapText.substring( mapText.lastIndexOf( ' ' ) );
@@ -187,12 +187,12 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             @Override
             public boolean isAvailable(@NotNull Project project, @NotNull PsiFile file,
                                        @NotNull PsiElement startElement, @NotNull PsiElement endElement) {
-                if (!super.isAvailable( project, file, startElement, endElement ) ) {
+                if ( !super.isAvailable( project, file, startElement, endElement ) ) {
                     return false;
                 }
-                if (startElement instanceof PsiParameter parameter) {
+                if ( startElement instanceof PsiParameter parameter ) {
                     PsiType[] parameters = getGenericTypes( parameter );
-                    if (parameters == null || parameters.length != 2) {
+                    if ( parameters == null || parameters.length != 2 ) {
                         return false;
                     }
                     return !parameters[0].equalsToText( "java.lang.String" );
@@ -203,7 +203,7 @@ public class FromMapMappingMapTypeInspection extends InspectionBase {
             @Override
             public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                                @NotNull PsiElement psiElement1) {
-                if (psiElement instanceof PsiParameter) {
+                if ( psiElement instanceof PsiParameter ) {
                     String mapText = psiElement.getText();
                     String prefix = mapText.substring( 0, mapText.indexOf( '<' ) + 1 );
                     String end = mapText.substring( mapText.indexOf( ',' ) );

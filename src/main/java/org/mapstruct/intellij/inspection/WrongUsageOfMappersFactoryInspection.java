@@ -5,6 +5,9 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.daemon.impl.quickfix.SafeDeleteFix;
 import com.intellij.codeInsight.intention.AddAnnotationPsiFix;
@@ -31,9 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapstructAnnotationUtils;
 import org.mapstruct.intellij.util.MapstructUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Inspection that checks that Mappers factory is correctly used
@@ -107,7 +107,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                     );
                     PsiAnnotationMemberValue memberValue;
 
-                    if (componentModelAttribute != null) {
+                    if ( componentModelAttribute != null ) {
                         memberValue = componentModelAttribute.getDetachedValue();
                     }
                     else {
@@ -118,7 +118,7 @@ public class WrongUsageOfMappersFactoryInspection extends InspectionBase {
                             AnnotationUtil.getStringAttributeValue(  memberValue );
                     if ( componentModel != null && !componentModel.equals( "default" ) ) {
                         List<LocalQuickFix> fixes = new ArrayList<>(2);
-                        if (componentModelAttribute != null) {
+                        if ( componentModelAttribute != null ) {
                             fixes.add(  createRemoveComponentModelFix( componentModelAttribute, mapperClass ) );
                         }
                         LocalQuickFix removeMappersFix = createRemoveMappersFix( expression );

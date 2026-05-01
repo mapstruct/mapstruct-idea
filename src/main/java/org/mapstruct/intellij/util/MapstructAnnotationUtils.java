@@ -306,12 +306,12 @@ public class MapstructAnnotationUtils {
 
     @NotNull
     public static Stream<PsiAnnotation> extractMappingAnnotationsFromMappings(@Nullable PsiAnnotation mappings) {
-        if (mappings == null) {
+        if ( mappings == null ) {
             return Stream.empty();
         }
         //TODO maybe there is a better way to do this, but currently I don't have that much knowledge
         PsiAnnotationMemberValue mappingsValue = mappings.findDeclaredAttributeValue( null );
-        if ( mappingsValue instanceof PsiArrayInitializerMemberValue mappingsArrayInitializerMemberValue) {
+        if ( mappingsValue instanceof PsiArrayInitializerMemberValue mappingsArrayInitializerMemberValue ) {
             return Stream.of( mappingsArrayInitializerMemberValue
                             .getInitializers() )
                     .filter( MapstructAnnotationUtils::isMappingPsiAnnotation )
@@ -573,7 +573,7 @@ public class MapstructAnnotationUtils {
     private static ReportingPolicy getUnmappedTargetPolicyFromMapperConfig(@NotNull PsiAnnotation mapperAnnotation) {
         PsiAnnotationMemberValue configValue = findConfigValueFromMapperConfig( mapperAnnotation,
                 UNMAPPED_TARGET_POLICY );
-        if (configValue == null) {
+        if ( configValue == null ) {
             return ReportingPolicy.WARN;
         }
         return getUnmappedTargetPolicyPolicyFromAnnotation( configValue );
@@ -612,7 +612,7 @@ public class MapstructAnnotationUtils {
     @NotNull
     private static ReportingPolicy getUnmappedTargetPolicyPolicyFromAnnotation(
         @NotNull PsiAnnotationMemberValue configValue) {
-        return switch (configValue.getText()) {
+        return switch ( configValue.getText() ) {
             case "IGNORE", "ReportingPolicy.IGNORE" -> ReportingPolicy.IGNORE;
             case "ERROR", "ReportingPolicy.ERROR" -> ReportingPolicy.ERROR;
             default -> ReportingPolicy.WARN;
@@ -622,40 +622,40 @@ public class MapstructAnnotationUtils {
     @Nullable
     public static PsiMethod getAnnotatedMethod(@NotNull PsiAnnotation psiAnnotation) {
         PsiElement psiAnnotationParent = psiAnnotation.getParent();
-        if (psiAnnotationParent == null) {
+        if ( psiAnnotationParent == null ) {
             return null;
         }
         PsiElement psiAnnotationParentParent = psiAnnotationParent.getParent();
-        if (psiAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+        if ( psiAnnotationParentParent instanceof PsiMethod annotatedPsiMethod ) {
             // directly annotated with @Mapping
             return annotatedPsiMethod;
         }
 
         PsiElement psiAnnotationParentParentParent = psiAnnotationParentParent.getParent();
-        if (psiAnnotationParentParentParent instanceof PsiAnnotation) {
+        if ( psiAnnotationParentParentParent instanceof PsiAnnotation ) {
             // inside @Mappings without array
             PsiElement mappingsAnnotationParent = psiAnnotationParentParentParent.getParent();
-            if (mappingsAnnotationParent == null) {
+            if ( mappingsAnnotationParent == null ) {
                 return null;
             }
             PsiElement mappingsAnnotationParentParent = mappingsAnnotationParent.getParent();
-            if (mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+            if ( mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod ) {
                 return annotatedPsiMethod;
             }
             return null;
         }
-        else if (psiAnnotationParentParentParent instanceof PsiAnnotationParamListImpl) {
+        else if ( psiAnnotationParentParentParent instanceof PsiAnnotationParamListImpl ) {
             // inside @Mappings wit array
             PsiElement mappingsArray = psiAnnotationParentParentParent.getParent();
-            if (mappingsArray == null) {
+            if ( mappingsArray == null ) {
                 return null;
             }
             PsiElement mappingsAnnotationParent = mappingsArray.getParent();
-            if (mappingsAnnotationParent == null) {
+            if ( mappingsAnnotationParent == null ) {
                 return null;
             }
             PsiElement mappingsAnnotationParentParent = mappingsAnnotationParent.getParent();
-            if (mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod) {
+            if ( mappingsAnnotationParentParent instanceof PsiMethod annotatedPsiMethod ) {
                 return annotatedPsiMethod;
             }
             return null;

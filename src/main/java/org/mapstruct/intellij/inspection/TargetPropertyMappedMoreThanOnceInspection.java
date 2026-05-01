@@ -5,6 +5,13 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import com.intellij.codeInsight.intention.QuickFixFactory;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement;
@@ -37,13 +44,6 @@ import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.extractMappingAnnotationsFromMappings;
@@ -81,12 +81,12 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
                 return;
             }
             Map<String, List<PsiElement>> problemMap = new HashMap<>();
-            for (PsiAnnotation psiAnnotation : method.getAnnotations()) {
+            for ( PsiAnnotation psiAnnotation : method.getAnnotations() ) {
                 String qualifiedName = psiAnnotation.getQualifiedName();
                 if ( MAPPING_ANNOTATION_FQN.equals( qualifiedName ) ) {
                     handleMappingAnnotation( psiAnnotation, problemMap );
                 }
-                else if (MAPPINGS_ANNOTATION_FQN.equals( qualifiedName )) {
+                else if ( MAPPINGS_ANNOTATION_FQN.equals( qualifiedName ) ) {
                     extractMappingAnnotationsFromMappings( psiAnnotation )
                             .forEach( a -> handleMappingAnnotation( a, problemMap ) );
                 }
@@ -96,10 +96,10 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
                 }
             }
             QuickFixFactory quickFixFactory = QuickFixFactory.getInstance();
-            for (Map.Entry<String, List<PsiElement>> problem : problemMap.entrySet()) {
+            for ( Map.Entry<String, List<PsiElement>> problem : problemMap.entrySet() ) {
                 List<PsiElement> problemElements = problem.getValue();
-                if (problemElements.size() > 1) {
-                    for (PsiElement problemElement : problemElements) {
+                if ( problemElements.size() > 1 ) {
+                    for ( PsiElement problemElement : problemElements ) {
                         LocalQuickFix[] quickFixes = getLocalQuickFixes( problemElement, quickFixFactory );
                         holder.registerProblem( problemElement,
                                MapStructBundle.message( "inspection.target.property.mapped.more.than.once",
@@ -112,10 +112,10 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
         private static @NotNull  LocalQuickFix[] getLocalQuickFixes(PsiElement problemElement,
                                                                        QuickFixFactory quickFixFactory) {
             List<LocalQuickFix> quickFixes = new ArrayList<>(2);
-            if (problemElement instanceof PsiAnnotation) {
+            if ( problemElement instanceof PsiAnnotation ) {
                 quickFixes.add( getDeleteFix( problemElement, quickFixFactory ) );
             }
-            else if (problemElement instanceof PsiAnnotationMemberValue problemPsiAnnotationMemberValue) {
+            else if ( problemElement instanceof PsiAnnotationMemberValue problemPsiAnnotationMemberValue ) {
                 Optional.ofNullable( problemElement.getParent() ).map( PsiElement::getParent )
                         .map( PsiElement::getParent ).filter( PsiAnnotation.class::isInstance )
                         .ifPresent( annotation -> quickFixes.add(
@@ -136,7 +136,7 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
         private void handleAnnotationWithMappingAnnotation(PsiAnnotation psiAnnotation,
                                                            Map<String, List<PsiElement>> problemMap) {
             PsiClass annotationClass = psiAnnotation.resolveAnnotationType();
-            if (annotationClass == null) {
+            if ( annotationClass == null ) {
                 return;
             }
             TargetUtils.findAllDefinedMappingTargets( annotationClass, mapStructVersion )
@@ -147,9 +147,9 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
         private static void handleMappingAnnotation(PsiAnnotation psiAnnotation,
                                                     Map<String, List<PsiElement>> problemMap) {
             PsiAnnotationMemberValue value = psiAnnotation.findDeclaredAttributeValue( "target" );
-            if (value != null) {
+            if ( value != null ) {
                 String target = getStringAttributeValue( value );
-                if (target != null && !target.equals( "." )) {
+                if ( target != null && !target.equals( "." ) ) {
                     problemMap.computeIfAbsent( target, k -> new ArrayList<>() ).add( value );
                 }
             }
@@ -176,7 +176,7 @@ public class TargetPropertyMappedMoreThanOnceInspection extends InspectionBase {
             public void invoke(@NotNull Project project, @NotNull PsiFile psiFile, @NotNull PsiElement psiElement,
                                @NotNull PsiElement psiElement1) {
                 FileEditor selectedEditor = FileEditorManager.getInstance( project ).getSelectedEditor();
-                if ( selectedEditor instanceof TextEditor textEditor) {
+                if ( selectedEditor instanceof TextEditor textEditor ) {
                     Editor editor = textEditor.getEditor();
 
                     TextRange textRange = psiElement.getTextRange();

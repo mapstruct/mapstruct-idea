@@ -180,7 +180,7 @@ public class JavaExpressionInjector implements MultiHostInjector {
                             if ( resolved instanceof PsiMethod resolvedPsiMethod ) {
                                 PsiParameter[] psiParameters =
                                         resolvedPsiMethod.getParameterList().getParameters();
-                                if ( psiParameters.length > 0) {
+                                if ( psiParameters.length > 0 ) {
                                     targetType = psiParameters[0].getType();
                                 }
                             }

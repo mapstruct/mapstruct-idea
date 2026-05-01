@@ -5,6 +5,9 @@
  */
 package org.mapstruct.intellij.inspection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -21,9 +24,6 @@ import com.intellij.psi.impl.source.tree.java.PsiAnnotationParamListImpl;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapStructBundle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.intellij.psi.PsiElementFactory.getInstance;
 import static org.mapstruct.intellij.util.MapstructAnnotationUtils.getAnnotatedMethod;
 import static org.mapstruct.intellij.util.MapstructUtil.getSourceParameters;
@@ -36,7 +36,7 @@ public class ThisUsedAsSourcePropertyInspection extends MappingAnnotationInspect
     void visitMappingAnnotation(@NotNull ProblemsHolder problemsHolder, @NotNull PsiAnnotation psiAnnotation,
                                 @NotNull MappingAnnotation mappingAnnotation) {
         PsiNameValuePair sourceProperty = mappingAnnotation.getSourceProperty();
-        if (sourceProperty == null || sourceProperty.getValue() == null) {
+        if ( sourceProperty == null || sourceProperty.getValue() == null ) {
             return;
         }
         if ( !".".equals( sourceProperty.getLiteralValue() ) ) {
@@ -44,8 +44,8 @@ public class ThisUsedAsSourcePropertyInspection extends MappingAnnotationInspect
         }
         List<LocalQuickFix>  fixes = new ArrayList<>();
         PsiMethod annotatedMethod = getAnnotatedMethod( psiAnnotation );
-        if (annotatedMethod != null) {
-            for (PsiParameter sourceParameter : getSourceParameters( annotatedMethod )) {
+        if ( annotatedMethod != null ) {
+            for ( PsiParameter sourceParameter : getSourceParameters( annotatedMethod ) ) {
                 fixes.add( new ReplaceSourceParameterValueQuickFix(sourceProperty, sourceParameter.getName() ) );
             }
         }
@@ -86,7 +86,7 @@ public class ThisUsedAsSourcePropertyInspection extends MappingAnnotationInspect
         @Override
         public void invoke( @NotNull Project project, @NotNull PsiFile file, @NotNull PsiElement startElement,
                             @NotNull PsiElement endElement ) {
-            if (endElement instanceof PsiNameValuePair end) {
+            if ( endElement instanceof PsiNameValuePair end ) {
                 PsiAnnotationParamListImpl parent = (PsiAnnotationParamListImpl) end.getParent();
                 PsiElement parent1 = parent.getParent();
 

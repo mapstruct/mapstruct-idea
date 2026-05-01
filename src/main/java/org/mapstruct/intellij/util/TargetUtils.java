@@ -318,7 +318,7 @@ public class TargetUtils {
     private static String extractPublicSetterPropertyName(PsiMethod method, @NotNull PsiType typeToUse,
                                                           PsiSubstitutor psiTypeSubstitutor,
                                                           MapstructUtil mapstructUtil, boolean builderSupportPresent) {
-        if (!MapstructUtil.isPublicNonStatic( method )) {
+        if ( !MapstructUtil.isPublicNonStatic( method ) ) {
             // If the method is not public then there is no property
             return null;
         }
@@ -331,7 +331,7 @@ public class TargetUtils {
             // If the methode returns a collection
             return Introspector.decapitalize( methodName.substring( 3 ) );
         }
-        if (parametersCount != 1) {
+        if ( parametersCount != 1 ) {
             // If the method does not have 1 parameter
             return null;
         }
