@@ -103,8 +103,8 @@ dependencies {
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
 
-        testFramework(TestFrameworkType.Platform.INSTANCE)
-        testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+        testFramework( TestFrameworkType.Platform.INSTANCE )
+        testFramework( TestFrameworkType.Plugin.Java.INSTANCE )
     }
     implementation('org.mapstruct:mapstruct:1.5.3.Final')
     testImplementation(platform('org.junit:junit-bom:5.11.0'))
