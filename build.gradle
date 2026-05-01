@@ -93,9 +93,12 @@ jacocoTestReport {
 }
 
 def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
+def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
-        intellijIdea(versionToUse)
+        intellijIdea(versionToUse) {
+            useInstaller = false
+        }
 
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
