@@ -3,7 +3,8 @@ import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id("org.jetbrains.intellij.platform") version "2.10.5"
+    id('java')
+    id("org.jetbrains.intellij.platform") version "2.15.0"
     id("com.github.hierynomus.license") version "0.16.1"
 }
 
@@ -36,7 +37,7 @@ intellijPlatform {
     projectName = 'MapStruct-Intellij-Plugin'
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "242"
+            sinceBuild = "251"
             untilBuild = provider { null } as Provider<? extends String>
         }
     }
@@ -95,21 +96,15 @@ def versionToUse = System.getenv().getOrDefault( 'IDEA_VERSION', ideaVersion )
 def useIdeaInstaller = !versionToUse.containsIgnoreCase( "EAP" )
 dependencies {
     intellijPlatform {
-        // When versionToUse is 2025.3 or later then there is only a single distribution of IntelliJ
-        // This comparison can be removed if the oldest supported version of idea is 2025.3 (253) or later
-        if (('2025.3' <=> versionToUse) <= 0 ){
-            intellijIdea(versionToUse) {
-                useInstaller = useIdeaInstaller
-            }
-        } else {
-            ideaType == 'IC' ? intellijIdeaCommunity(versionToUse, useIdeaInstaller) : intellijIdeaUltimate(versionToUse, useIdeaInstaller)
+        intellijIdea(versionToUse) {
+            useInstaller = useIdeaInstaller
         }
 
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
 
         testFramework( TestFrameworkType.Platform.INSTANCE )
-        testFramework( TestFrameworkType.Bundled.INSTANCE )
+        testFramework( TestFrameworkType.Plugin.Java.INSTANCE )
     }
     implementation('org.mapstruct:mapstruct:1.5.3.Final')
     testImplementation(platform('org.junit:junit-bom:5.11.0'))
