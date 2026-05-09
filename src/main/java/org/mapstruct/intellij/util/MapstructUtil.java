@@ -6,11 +6,15 @@
 package org.mapstruct.intellij.util;
 
 import java.beans.Introspector;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.jar.Manifest;
 import java.util.stream.Stream;
 import javax.swing.Icon;
 
@@ -21,6 +25,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.Version;
+import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.EmptySubstitutor;
@@ -61,6 +67,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
+//import org.mapstruct.PrimaryMappingSource;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
 import org.mapstruct.factory.Mappers;
@@ -229,7 +236,13 @@ public class MapstructUtil {
         return !psiType.getCanonicalText().startsWith( "java.lang" ) &&
             method.getReturnType() != null &&
             !isAdderWithUpperCase4thCharacter( method ) &&
+            !isIgnoredRemover( method ) &&
             isAssignableFromReturnTypeOrSuperTypes( psiType, substitutor.substitute( method.getReturnType() ) );
+    }
+
+    private static boolean isIgnoredRemover(@NotNull PsiMethod method) {
+        return isRemoverWithUpperCase7thCharacter( method )
+                && resolveMapStructProjectVersion( method.getContainingFile() ).isIgnoringRemovers();
     }
 
     private static boolean isAssignableFromReturnTypeOrSuperTypes(PsiType psiType, @NotNull PsiType returnType) {
@@ -258,6 +271,13 @@ public class MapstructUtil {
         return methodName.startsWith( "add" ) &&
             methodName.length() > 3 &&
             Character.isUpperCase( methodName.charAt( 3 ) );
+    }
+
+    private static boolean isRemoverWithUpperCase7thCharacter(@NotNull PsiMethod method) {
+        String methodName = method.getName();
+        return methodName.startsWith( "remove" ) &&
+            methodName.length() > 6 &&
+            Character.isUpperCase( methodName.charAt( 6 ) );
     }
 
     /**
@@ -567,7 +587,12 @@ public class MapstructUtil {
         }
         return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
             MapStructVersion mapStructVersion;
-            if ( JavaPsiFacade.getInstance( module.getProject() )
+
+            Version version = resolveImplementationVersion( module );
+            if ( version != null && version.isOrGreaterThan( 1, 7 ) ) {
+                mapStructVersion = MapStructVersion.V1_7_O;
+            }
+            else if ( JavaPsiFacade.getInstance( module.getProject() )
                 .findClass( ENUM_MAPPING_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
                 mapStructVersion = MapStructVersion.V1_4_O;
             }
@@ -657,6 +682,41 @@ public class MapstructUtil {
      */
     public static boolean isInheritInverseConfiguration(PsiMethod method) {
         return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION_FQN, AnnotationUtil.CHECK_TYPE );
+    }
+
+    @Nullable
+    private static Version resolveImplementationVersion(Module module) {
+        JarFileSystem jarFileSystem = JarFileSystem.getInstance();
+        return Optional.ofNullable( JavaPsiFacade
+                        .getInstance( module.getProject() )
+                        .findClass( MAPPER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) )
+                .map( PsiClass::getContainingFile )
+                .map( PsiFile::getVirtualFile )
+                .map( jarFileSystem::getVirtualFileForJar )
+                .map( jarFileSystem::getJarRootForLocalFile )
+                .map( jarRoot -> jarRoot.findFileByRelativePath( "META-INF/MANIFEST.MF" ) )
+                .map( MapstructUtil::resolveManifest )
+                .map( MapstructUtil::resolveVersionString )
+                .map( Version::parseVersion )
+                .orElse( null );
+    }
+
+    private static @Nullable Manifest resolveManifest(VirtualFile manifestFile) {
+        try ( InputStream is = manifestFile.getInputStream() ) {
+            return new Manifest(is);
+        }
+        catch ( IOException e ) {
+            return null;
+        }
+    }
+
+    private static @Nullable String resolveVersionString(Manifest manifest) {
+        if ( manifest.getMainAttributes().containsKey( "Implementation-Version" ) ) {
+            return manifest.getMainAttributes().getValue( "Implementation-Version" );
+        }
+        else {
+            return manifest.getMainAttributes().getValue( "Bundle-Version" );
+        }
     }
 
 }
