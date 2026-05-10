@@ -8,7 +8,6 @@ package org.mapstruct.intellij.inspection;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.ContributedReferenceHost;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -19,11 +18,11 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.codeinsight.references.BaseReference;
 import org.mapstruct.intellij.codeinsight.references.BaseValueMappingReference;
+import org.mapstruct.intellij.util.MapstructUtil;
 
 /**
  * Inspection that checks if mapstruct references can be resolved.
@@ -76,32 +75,26 @@ public class MapstructReferenceInspection extends InspectionBase {
                 return valueMappingReference.getEnumClass() != null;
             }
 
-            if ( singleSourceParameterIsOfTypeMap( reference.getMappingMethod() ) ) {
+            if ( hasSingleStringKeyMapSourceParameter( reference.getMappingMethod() ) ) {
+                // MapStruct allows source values as map keys, even if they are not resolvable as Java properties.
+                // Therefore, we don't report an unresolved reference problem here.
                 return false;
             }
 
             return !containingClassIsAnnotationType( reference.getElement() );
         }
 
-        private boolean singleSourceParameterIsOfTypeMap(@Nullable PsiMethod mappingMethod) {
+        private boolean hasSingleStringKeyMapSourceParameter(@Nullable PsiMethod mappingMethod) {
 
             if ( mappingMethod != null ) {
-                PsiParameter[] parameters = mappingMethod.getParameterList().getParameters();
-                if ( parameters.length > 0 ) {
+                PsiParameter[] parameters = MapstructUtil.getSourceParameters( mappingMethod );
+                if ( parameters.length == 1 ) {
                     PsiType parameterType = parameters[0].getType();
-                    return isMapType( parameterType );
+                    return MapstructUtil.isMapWithStringKeyType( parameterType );
                 }
             }
 
             return false;
-        }
-
-        private boolean isMapType(PsiType type) {
-            PsiClass psiClass = PsiUtil.resolveClassInType( type );
-            if ( psiClass == null ) {
-                return false;
-            }
-            return CommonClassNames.JAVA_UTIL_MAP.equals( psiClass.getQualifiedName() );
         }
 
         private boolean containingClassIsAnnotationType(PsiElement element) {

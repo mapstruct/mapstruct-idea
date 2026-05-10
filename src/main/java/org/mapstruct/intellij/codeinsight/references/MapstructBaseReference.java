@@ -69,13 +69,18 @@ abstract class MapstructBaseReference extends BaseReference {
         }
 
         if ( previous != null ) {
-            PsiType psiType = canDescendIntoType( previous.resolvedType() ) ? previous.resolvedType() : null;
+            PsiType previousResolvedType = previous.resolvedType();
+            PsiType psiType = supportsNestedReferenceForType( previousResolvedType ) ? previousResolvedType : null;
             return psiType == null ? null : resolveInternal( value, psiType );
         }
 
         PsiMethod mappingMethod = getMappingMethod();
 
         return mappingMethod == null ? null : resolveInternal( value, mappingMethod );
+    }
+
+    protected boolean supportsNestedReferenceForType(@Nullable PsiType psiType) {
+        return canDescendIntoType( psiType );
     }
 
     /**

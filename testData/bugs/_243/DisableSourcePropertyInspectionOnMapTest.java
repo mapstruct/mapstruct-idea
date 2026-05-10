@@ -9,20 +9,46 @@ import java.util.Map;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper
 abstract class Issue243Mapper {
 
-    @Mapping(source = "exDate", target = "exDate", dateFormat = "yyyy-MM-dd")
-    @Mapping(source = "payDate", target = "payDate", dateFormat = "yyyy-MM-dd")
-    @Mapping(source = "recordDate", target = "recordDate", dateFormat = "yyyy-MM-dd")
-    @Mapping(source = "annDate", target = "annDate", dateFormat = "yyyy-MM-dd")
-    public abstract CorporateAction toCorporateAction(Map<String, String> rowValues);
+    @Mapping(source = "exDate", target = "exDate")
+    @Mapping(source = "payDate", target = "payDate")
+    public abstract CorporateAction mapWithStringKeyMap(Map<String, String> rowValues);
+
+    @Mapping(source = "exDate", target = "exDate")
+    public abstract void updateWithStringKeyMap(Map<String, String> rowValues, @MappingTarget CorporateAction target);
+
+    @Mapping(source = "exDate", target = "exDate")
+    public abstract CorporateAction mapWithObjectValueMap(Map<String, Object> rowValues);
+
+    @Mapping(source = "<error descr="Unknown property 'exDate'">exDate</error>", target = "exDate")
+    public abstract CorporateAction mapWithIntegerKeyMap(Map<Integer, String> rowValues);
+
+    @Mapping(source = "<error descr="Unknown property 'exDate'">exDate</error>", target = "exDate")
+    public abstract void updateWithIntegerKeyMap(
+        Map<Integer, String> rowValues,
+        @MappingTarget CorporateAction target
+    );
+
+    @Mapping(source = "<error descr="Unknown property 'exDate'">exDate</error>", target = "exDate")
+    @Mapping(source = "payDate", target = "payDate")
+    public abstract CorporateAction mapWithMultipleSources(
+        Map<String, String> rowValues,
+        LocalDate payDate
+    );
+
+    @Mapping(source = "rowValues.exDate", target = "exDate")
+    @Mapping(source = "payDate", target = "payDate")
+    public abstract CorporateAction mapWithMultipleSourcesAndMapName(
+        Map<String, String> rowValues,
+        LocalDate payDate
+    );
 }
 
 class CorporateAction {
     public LocalDate exDate;
     public LocalDate payDate;
-    public LocalDate recordDate;
-    public LocalDate annDate;
 }
