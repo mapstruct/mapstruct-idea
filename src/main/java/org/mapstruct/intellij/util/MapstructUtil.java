@@ -682,7 +682,7 @@ public class MapstructUtil {
         }
 
         PsiType[] parameters = ct.getParameters();
-        if ( parameters.length == 0 ) {
+        if ( parameters.length != 2 ) {
             return false;
         }
 

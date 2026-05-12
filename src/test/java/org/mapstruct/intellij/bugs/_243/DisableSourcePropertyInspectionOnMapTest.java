@@ -25,7 +25,11 @@ public class DisableSourcePropertyInspectionOnMapTest extends BaseInspectionTest
         return MapstructReferenceInspection.class;
     }
 
-    public void testDisableSourcePropertyInspectionOnMapTest() {
+    public void testDisableSourcePropertyInspectionOnMap() {
+        doTest();
+    }
+
+    public void testDisableSourcePropertyInspectionOnMapErroneous() {
         doTest();
     }
 }
