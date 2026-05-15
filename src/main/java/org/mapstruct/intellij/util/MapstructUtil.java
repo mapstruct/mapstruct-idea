@@ -659,4 +659,33 @@ public class MapstructUtil {
         return isAnnotated( method, INHERIT_INVERSE_CONFIGURATION_FQN, AnnotationUtil.CHECK_TYPE );
     }
 
+    /**
+     * Checks if the given type is a {@link java.util.Map} with a {@link String} key type.
+     *
+     * @param type to be checked
+     * @return {@code true} if the {@code type} is a {@link java.util.Map} with a {@link String} key type,
+     * {@code false} otherwise
+     */
+    public static boolean isMapWithStringKeyType(@Nullable PsiType type) {
+        if ( type == null ) {
+            return false;
+        }
+
+        PsiClass psiClass = PsiUtil.resolveClassInType( type );
+        if ( psiClass == null ||
+            !CommonClassNames.JAVA_UTIL_MAP.equals( psiClass.getQualifiedName() ) ) {
+            return false;
+        }
+
+        if ( !( type instanceof PsiClassType ct ) ) {
+            return false;
+        }
+
+        PsiType[] parameters = ct.getParameters();
+        if ( parameters.length != 2 ) {
+            return false;
+        }
+
+        return parameters[0].equalsToText( CommonClassNames.JAVA_LANG_STRING );
+    }
 }

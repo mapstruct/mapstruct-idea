@@ -57,6 +57,10 @@ class MapstructSourceReference extends BaseMappingReference {
             return null;
         }
 
+        if ( MapstructUtil.isMapWithStringKeyType( psiType ) ) {
+            return psiClass;
+        }
+
         PsiRecordComponent recordComponent = findRecordComponent( value, psiClass );
         if ( recordComponent != null ) {
             return recordComponent;
@@ -76,6 +80,11 @@ class MapstructSourceReference extends BaseMappingReference {
             return field;
         }
         return null;
+    }
+
+    @Override
+    protected boolean supportsNestedReferenceForType(@Nullable PsiType psiType) {
+        return super.supportsNestedReferenceForType( psiType ) || MapstructUtil.isMapWithStringKeyType( psiType );
     }
 
     @Override
