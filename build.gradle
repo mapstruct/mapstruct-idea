@@ -85,7 +85,6 @@ checkstyle {
 }
 
 jacocoTestReport {
-    classDirectories.setFrom(instrumentCode)
     reports {
         xml.required = true
         html.required = true
