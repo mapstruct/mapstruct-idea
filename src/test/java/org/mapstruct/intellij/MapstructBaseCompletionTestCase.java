@@ -27,7 +27,7 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         @Override
         public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model,
                                     @NotNull ContentEntry contentEntry) {
-            super.configureModule(module, model, contentEntry);
+            super.configureModule( module, model, contentEntry );
             MavenDependencyUtil.addFromMaven( model, "org.mapstruct:mapstruct:1.5.3.Final",
                     false, DependencyScope.PROVIDED );
         }
