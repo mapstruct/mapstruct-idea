@@ -5,12 +5,12 @@
  */
 package org.mapstruct.intellij.inspection;
 
-import java.io.File;
 import java.util.List;
 
 import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.testFramework.PsiTestUtil;
-import com.intellij.util.PathUtil;
+import com.intellij.openapi.roots.DependencyScope;
+import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.testFramework.fixtures.MavenDependencyUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,8 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Stephan Leicht Vogt
  */
 public class UnmappedImmutablesFromTargetPropertiesInspectionTest extends BaseInspectionTest {
-
-    private static final String BUILD_TEST_LIBS_DIRECTORY = "build/test-libs";
 
     @NotNull
     @Override
@@ -31,16 +29,10 @@ public class UnmappedImmutablesFromTargetPropertiesInspectionTest extends BaseIn
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        String immutablesLibPath = PathUtil.toSystemIndependentName(
-            new File( BUILD_TEST_LIBS_DIRECTORY ).getAbsolutePath()
-        );
-        PsiTestUtil.addLibrary(
-            myFixture.getProjectDisposable(),
-            myFixture.getModule(),
-            "Immutables",
-            immutablesLibPath,
-            "immutables.jar"
-        );
+        ModuleRootModificationUtil.updateModel( getModule(), model -> {
+            MavenDependencyUtil.addFromMaven( model, "org.immutables:value:2.10.1", false, DependencyScope.PROVIDED );
+        } );
+
         myFixture.copyFileToProject(
             "UnmappedImmutablesFromTargetPropertiesData.java",
             "org/example/data/UnmappedImmutablesFromTargetPropertiesData.java"

@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.jar.Attributes;
 import java.util.stream.Stream;
 import javax.swing.Icon;
 
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.java.library.JavaLibraryUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -106,6 +108,7 @@ public class MapstructUtil {
     private static final String ENUM_MAPPING_ANNOTATION_FQN = EnumMapping.class.getName();
     private static final String IMMUTABLE_FQN = "org.immutables.value.Value.Immutable";
     private static final String FREE_BUILDER_FQN = "org.inferred.freebuilder.FreeBuilder";
+    public static final Attributes.Name VERSION_ATTRIBUTE = new Attributes.Name("Bundle-Version");
 
     /**
      * Hide constructor.
@@ -563,26 +566,15 @@ public class MapstructUtil {
     public static MapStructVersion resolveMapStructProjectVersion(@NotNull PsiFile psiFile) {
         Module module = ModuleUtilCore.findModuleForFile( psiFile.getVirtualFile(), psiFile.getProject() );
         if ( module == null ) {
-            return MapStructVersion.V1_2_O;
+            return MapStructVersion.DEFAULT_VERSION;
         }
-        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module, () -> {
-            MapStructVersion mapStructVersion;
-            if ( JavaPsiFacade.getInstance( module.getProject() )
-                .findClass( ENUM_MAPPING_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
-                mapStructVersion = MapStructVersion.V1_4_O;
-            }
-            else if ( JavaPsiFacade.getInstance( module.getProject() )
-                .findClass( BUILDER_ANNOTATION_FQN, module.getModuleRuntimeScope( false ) ) != null ) {
-                mapStructVersion = MapStructVersion.V1_3_O;
-            }
-            else {
-                mapStructVersion = MapStructVersion.V1_2_O;
-            }
-            return CachedValueProvider.Result.createSingleDependency(
-                mapStructVersion,
-                ProjectRootManager.getInstance( module.getProject() )
-            );
-        } );
+        return CachedValuesManager.getManager( module.getProject() ).getCachedValue( module,
+                () -> CachedValueProvider.Result.createSingleDependency(
+                        MapStructVersion.fromVersionString(
+                                JavaLibraryUtil.getLibraryVersion( module, "org.mapstruct:mapstruct",
+                                        VERSION_ATTRIBUTE ) ),
+                        ProjectRootManager.getInstance( module.getProject() )
+                ) );
     }
 
     private static boolean immutablesOnClassPath(@NotNull PsiFile psiFile) {
