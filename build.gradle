@@ -124,16 +124,9 @@ tasks.register('libs', Sync) {
         include('mapstruct-intellij-*.jar')
         include('MapStruct-Intellij-*.jar')
     }
-    rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
 }
 
-tasks.register('testLibs', Sync) {
-    from(configurations.testRuntimeClasspath)
-    into(layout.buildDirectory.dir("test-libs"))
-    rename('value-2.10.1.jar', 'immutables.jar')
-}
-
-test.dependsOn( libs, testLibs )
+test.dependsOn( libs )
 prepareSandbox.dependsOn( libs )
 composedJar.dependsOn( libs )
 

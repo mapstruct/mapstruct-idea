@@ -5,14 +5,12 @@
  */
 package org.mapstruct.intellij;
 
-import java.io.File;
-
 import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
+import com.intellij.openapi.roots.DependencyScope;
+import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.LightProjectDescriptor;
-import com.intellij.testFramework.PsiTestUtil;
-import com.intellij.util.PathUtil;
+import com.intellij.testFramework.fixtures.MavenDependencyUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,21 +20,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
-    private static final String BUILD_LIBS_DIRECTORY = "build/libs";
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        final String mapstructLibPath = PathUtil.toSystemIndependentName( new File( BUILD_LIBS_DIRECTORY )
-            .getAbsolutePath() );
-        VfsRootAccess.allowRootAccess( getTestRootDisposable(), mapstructLibPath );
-        PsiTestUtil.addLibrary(
-            myFixture.getProjectDisposable(),
-            myFixture.getModule(),
-            "Mapstruct",
-            mapstructLibPath,
-            "mapstruct.jar"
-        );
+        ModuleRootModificationUtil.updateModel( getModule(), model -> {
+            MavenDependencyUtil.addFromMaven( model, "org.mapstruct:mapstruct:1.5.3.Final",
+                    false, DependencyScope.PROVIDED );
+        } );
     }
 
     protected void addDirectoryToProject(@NotNull String directory) {
