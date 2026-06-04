@@ -52,9 +52,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.BeanMapping;
-import org.mapstruct.Builder;
 import org.mapstruct.Context;
-import org.mapstruct.EnumMapping;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -104,8 +102,6 @@ public class MapstructUtil {
     static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     private static final String CONTEXT_ANNOTATION_FQN = Context.class.getName();
-    private static final String BUILDER_ANNOTATION_FQN = Builder.class.getName();
-    private static final String ENUM_MAPPING_ANNOTATION_FQN = EnumMapping.class.getName();
     private static final String IMMUTABLE_FQN = "org.immutables.value.Value.Immutable";
     private static final String FREE_BUILDER_FQN = "org.inferred.freebuilder.FreeBuilder";
     public static final Attributes.Name VERSION_ATTRIBUTE = new Attributes.Name("Bundle-Version");
