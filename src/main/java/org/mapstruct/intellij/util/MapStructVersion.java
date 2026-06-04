@@ -17,8 +17,8 @@ public class MapStructVersion implements Comparable<MapStructVersion> {
 
     public static final MapStructVersion DEFAULT_VERSION = fromVersionString( "1.2.0.Final" );
 
-    private static final MapStructVersion BUILDER_SUPPORTED = fromVersionString( "1.3.0.Final" );
-    private static final MapStructVersion CONSTRUCTOR_SUPPORTED = fromVersionString( "1.4.0.Final" );
+    private static final MapStructVersion BUILDER_SUPPORTED = fromVersionString( "1.3.0.Beta1" );
+    private static final MapStructVersion CONSTRUCTOR_SUPPORTED = fromVersionString( "1.4.0.Beta1" );
 
     private final int major;
     private final int minor;
