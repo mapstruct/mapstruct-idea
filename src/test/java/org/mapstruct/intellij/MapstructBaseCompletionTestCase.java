@@ -6,9 +6,12 @@
 package org.mapstruct.intellij;
 
 import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.DependencyScope;
-import com.intellij.openapi.roots.ModuleRootModificationUtil;
+import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.pom.java.LanguageLevel;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.MavenDependencyUtil;
 import org.jetbrains.annotations.NotNull;
@@ -20,14 +23,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        ModuleRootModificationUtil.updateModel( getModule(), model -> {
+    public static final LightProjectDescriptor WITH_MAPSTRUCT_JAVA17 = new ProjectDescriptor(LanguageLevel.JDK_17) {
+        @Override
+        public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model,
+                                    @NotNull ContentEntry contentEntry) {
+            super.configureModule(module, model, contentEntry);
             MavenDependencyUtil.addFromMaven( model, "org.mapstruct:mapstruct:1.5.3.Final",
                     false, DependencyScope.PROVIDED );
-        } );
-    }
+        }
+    };
 
     protected void addDirectoryToProject(@NotNull String directory) {
         myFixture.copyDirectoryToProject( directory, StringUtil.getShortName( directory, '/' ) );
@@ -36,6 +40,6 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
     @NotNull
     @Override
     protected LightProjectDescriptor getProjectDescriptor() {
-        return JAVA_17;
+        return WITH_MAPSTRUCT_JAVA17;
     }
 }
