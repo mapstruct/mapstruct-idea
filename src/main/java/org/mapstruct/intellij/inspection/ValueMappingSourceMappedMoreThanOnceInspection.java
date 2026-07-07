@@ -17,46 +17,42 @@ import org.mapstruct.intellij.MapStructBundle;
 import org.mapstruct.intellij.util.MapStructVersion;
 
 import static com.intellij.codeInsight.AnnotationUtil.getStringAttributeValue;
-import static org.mapstruct.intellij.util.MapstructAnnotationUtils.extractMappingAnnotationsFromMappings;
-import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedMappingAnnotations;
-import static org.mapstruct.intellij.util.MapstructUtil.MAPPINGS_ANNOTATION_FQN;
-import static org.mapstruct.intellij.util.MapstructUtil.MAPPING_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.extractValueMappingAnnotationsFromMappings;
+import static org.mapstruct.intellij.util.MapstructAnnotationUtils.findAllDefinedValueMappingAnnotations;
+import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPINGS_ANNOTATION_FQN;
+import static org.mapstruct.intellij.util.MapstructUtil.VALUE_MAPPING_ANNOTATION_FQN;
 
-/**
- * @author hduelme
- */
-public class TargetPropertyMappedMoreThanOnceInspection extends MoreThanOnceMappedAnnotationInspectionBase<String> {
+public class ValueMappingSourceMappedMoreThanOnceInspection extends MoreThanOnceMappedAnnotationInspectionBase<String> {
 
     @NotNull
     @Override
     protected String getSingleMappingAnnotationFqn() {
-        return MAPPING_ANNOTATION_FQN;
+        return VALUE_MAPPING_ANNOTATION_FQN;
     }
 
     @NotNull
     @Override
     protected String getRepeatableMappingsAnnotationFqn() {
-        return MAPPINGS_ANNOTATION_FQN;
+        return VALUE_MAPPINGS_ANNOTATION_FQN;
     }
 
     @NotNull
     @Override
     protected String getAttributeName() {
-        return "target";
+        return "source";
     }
 
     @NotNull
     @Override
     protected Stream<PsiAnnotation> findAllDefinedMappings(@NotNull PsiModifierListOwner owner,
                                                            @NotNull MapStructVersion mapStructVersion) {
-        return findAllDefinedMappingAnnotations( owner, mapStructVersion );
+        return findAllDefinedValueMappingAnnotations( owner );
     }
 
     @Override
     protected Optional<String> extractCompareKeyFromAnnotationMember(
             @NotNull PsiAnnotationMemberValue annotationMemberValue) {
-        return Optional.ofNullable( getStringAttributeValue( annotationMemberValue ) )
-                .filter( target -> !target.equals( "." ) );
+        return Optional.ofNullable( getStringAttributeValue( annotationMemberValue ) );
     }
 
     @Override
@@ -66,14 +62,14 @@ public class TargetPropertyMappedMoreThanOnceInspection extends MoreThanOnceMapp
 
     @Override
     protected String getProblemDescription(@NotNull String problemKey) {
-        return MapStructBundle.message( "inspection.target.property.mapped.more.than.once", problemKey );
+        return MapStructBundle.message( "inspection.value.mapping.source.mapped.more.than.once", problemKey );
     }
 
     @NotNull
     @Override
     protected Stream<PsiAnnotation> extractAnnotationsFromRepeatableMappingsAnnotation(
             @NotNull PsiAnnotation mappings) {
-        return extractMappingAnnotationsFromMappings( mappings );
+        return extractValueMappingAnnotationsFromMappings( mappings );
     }
 
     private static class ChangeTargetQuickFix extends ChangeTargetStringQuickFixBase {
@@ -81,8 +77,8 @@ public class TargetPropertyMappedMoreThanOnceInspection extends MoreThanOnceMapp
         private ChangeTargetQuickFix(@NotNull PsiAnnotationMemberValue element) {
             super(
                     element,
-                    MapStructBundle.message( "intention.change.target.property" ),
-                    MapStructBundle.message( "inspection.target.property.mapped.more.than.once",
+                    MapStructBundle.message( "intention.change.source.property" ),
+                    MapStructBundle.message( "inspection.value.mapping.source.mapped.more.than.once",
                             element.getText() )
             );
         }
