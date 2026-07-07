@@ -1,0 +1,33 @@
+<html>
+<body>
+<p>
+    This inspection reports when a value mapping source property is mapped more than once
+</p>
+<p>
+<pre><code>
+//wrong
+@Mapper
+public interface OrderMapper {
+
+    @ValueMapping(target = "SPECIAL", source = "EXTRA")
+    @ValueMapping(target = "DEFAULT", source = "EXTRA")
+    @ValueMapping(target = "DEFAULT", source = "NORMAL")
+    ExternalOrderType orderTypeToExternalOrderType(OrderType orderType);
+}
+</code></pre>
+</p>
+<p>
+<pre><code>
+//correct
+@Mapper
+public interface OrderMapper {
+
+    @ValueMapping(target = "SPECIAL", source = "EXTRA")
+    @ValueMapping(target = "DEFAULT", source = "NORMAL")
+    Fruit map( FruitDto source );
+}
+</code></pre>
+</p>
+<!-- tooltip end -->
+</body>
+</html>
