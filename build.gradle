@@ -105,7 +105,7 @@ dependencies {
         testFramework( TestFrameworkType.Platform.INSTANCE )
         testFramework( TestFrameworkType.Plugin.Java.INSTANCE )
     }
-    implementation('org.mapstruct:mapstruct:1.5.3.Final')
+    implementation('org.mapstruct:mapstruct:1.6.3')
     testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation('org.junit.platform:junit-platform-launcher')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
@@ -124,7 +124,7 @@ tasks.register('libs', Sync) {
         include('mapstruct-intellij-*.jar')
         include('MapStruct-Intellij-*.jar')
     }
-    rename('mapstruct-1.5.3.Final.jar', 'mapstruct.jar')
+    rename('mapstruct-1.6.3.jar', 'mapstruct.jar')
 }
 
 tasks.register('testLibs', Sync) {
