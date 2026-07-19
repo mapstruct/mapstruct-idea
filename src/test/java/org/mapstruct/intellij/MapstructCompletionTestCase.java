@@ -488,6 +488,36 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testGenericCarWrapperSourceAutoCompleteAfterCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "winCode"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "winCode", "String" )
+            );
+    }
+
+    public void testGenericCarWrapperTargetAutoCompleteAfterCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
     public void testVariantsCarMapperNoSourceClass() {
         myFixture.configureByFile( "CarMapperNoSourceClass.java" );
         complete();

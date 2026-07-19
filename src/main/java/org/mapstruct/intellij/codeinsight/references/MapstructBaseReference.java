@@ -18,6 +18,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -147,6 +148,24 @@ abstract class MapstructBaseReference extends BaseReference {
      */
     @Nullable
     abstract PsiType resolvedType();
+
+    /**
+     * Substitutes type parameters in {@code memberType} using the generic context from the previous reference in the
+     * property chain.
+     */
+    @Nullable
+    protected PsiType substituteMemberType(@Nullable PsiType memberType) {
+        if ( memberType == null || previous == null ) {
+            return memberType;
+        }
+
+        PsiType ownerType = previous.resolvedType();
+        if ( ownerType == null ) {
+            return memberType;
+        }
+
+        return PsiUtil.resolveGenericsClassInType( ownerType ).getSubstitutor().substitute( memberType );
+    }
 
     @Override
     public PsiElement handleElementRename(@NotNull String newElementName) throws IncorrectOperationException {
