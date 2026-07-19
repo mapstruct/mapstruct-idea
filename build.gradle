@@ -76,7 +76,7 @@ licenseFormat.dependsOn licenseFormatForKotlin
 licenseTest.dependsOn licenseTestData
 
 checkstyle {
-    toolVersion = '8.36.1'
+    toolVersion = '10.12.0'
     config = resources.text.fromUri("https://raw.githubusercontent.com/mapstruct/mapstruct/master/build-config/src/main/resources/build-config/checkstyle.xml")
     configProperties = [
             'checkstyle.cache.file': layout.buildDirectory.get().asFile.toPath(  ).resolve( 'checkstyle-cachefile').toString(),

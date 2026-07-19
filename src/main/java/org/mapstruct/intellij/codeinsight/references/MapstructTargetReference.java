@@ -7,6 +7,7 @@ package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.AnnotationUtil;
@@ -27,7 +28,6 @@ import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mapstruct.Mapping;
 import org.mapstruct.intellij.util.MapStructVersion;
 import org.mapstruct.intellij.util.MapstructUtil;
 import org.mapstruct.intellij.util.TargetType;
@@ -203,21 +203,28 @@ class MapstructTargetReference extends BaseMappingReference {
     @Override
     PsiType resolvedType() {
         PsiElement element = resolve();
+        PsiType elementType = switch ( element ) {
+            case PsiMethod psiMethod -> firstParameterPsiType( psiMethod );
+            case PsiParameter psiParameter -> psiParameter.getType();
+            case PsiRecordComponent psiRecordComponent -> psiRecordComponent.getType();
+            case PsiField psiField -> psiField.getType();
+            case null, default -> null;
+        };
 
-        if ( element instanceof PsiMethod psiMethod ) {
-            return firstParameterPsiType( psiMethod );
-        }
-        else if ( element instanceof PsiParameter psiParameter ) {
-            return psiParameter.getType();
-        }
-        else if ( element instanceof PsiRecordComponent psiRecordComponent ) {
-            return psiRecordComponent.getType();
-        }
-        else if ( element instanceof PsiField psiField ) {
-            return psiField.getType();
+        if ( elementType == null ) {
+            return null;
         }
 
-        return null;
+        PsiType contextType = Optional.ofNullable( getPrevious() )
+                .map( MapstructBaseReference::resolvedType )
+                .or( () -> Optional.ofNullable( getMappingMethod() )
+                        .map( TargetUtils::getRelevantType )
+                )
+                .orElse( null );
+
+        return PsiUtil.resolveGenericsClassInType( contextType )
+                .getSubstitutor()
+                .substitute( elementType );
     }
 
     /**
