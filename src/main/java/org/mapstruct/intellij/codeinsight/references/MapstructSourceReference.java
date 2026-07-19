@@ -135,16 +135,16 @@ class MapstructSourceReference extends BaseMappingReference {
         PsiElement element = resolve();
 
         if ( element instanceof PsiMethod psiMethod ) {
-            return psiMethod.getReturnType();
+            return substituteMemberType( psiMethod.getReturnType() );
         }
         else if ( element instanceof PsiParameter psiParameter ) {
             return psiParameter.getType();
         }
         else if ( element instanceof PsiRecordComponent psiRecordComponent ) {
-            return psiRecordComponent.getType();
+            return substituteMemberType( psiRecordComponent.getType() );
         }
         else if ( element instanceof PsiField psiField ) {
-            return psiField.getType();
+            return substituteMemberType( psiField.getType() );
         }
 
         return null;
