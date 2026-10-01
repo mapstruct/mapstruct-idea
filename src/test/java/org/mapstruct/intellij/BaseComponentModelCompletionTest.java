@@ -24,10 +24,9 @@ public abstract class BaseComponentModelCompletionTest extends MapstructBaseComp
 
     public void testCompletionInsideQuotesStartsWithC() {
         configureByTestName();
-        List<String> strings = myFixture.getLookupElementStrings();
-        assertThat( strings ).as( "Inside quotes" )
-            .contains( "cdi" )
-            .doesNotContain( "default", "spring", "jsr330" );
+        assertThat( myFixture.getFile().getText() )
+            .as( "Single matching component model is inserted automatically" )
+            .contains( "componentModel = \"cdi\"" );
     }
 
     public void testCompletionNoQuotes() {

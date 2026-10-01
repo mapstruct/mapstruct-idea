@@ -60,6 +60,7 @@ public class ComponentModelCompletionContributor extends CompletionContributor {
                     result.addElement( LookupElementBuilder.create( type ) );
                 }
             }
+            result.stopHere();
         }
 
     }
