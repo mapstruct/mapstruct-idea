@@ -9,7 +9,6 @@ import java.io.File;
 
 import com.intellij.codeInsight.completion.LightFixtureCompletionTestCase;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.util.PathUtil;
@@ -29,7 +28,13 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
         super.setUp();
         final String mapstructLibPath = PathUtil.toSystemIndependentName( new File( BUILD_LIBS_DIRECTORY )
             .getAbsolutePath() );
-        VfsRootAccess.allowRootAccess( getTestRootDisposable(), mapstructLibPath );
+
+        allowAccessToDirsIfExists(
+                BUILD_LIBS_DIRECTORY,
+                "testData",
+                "build/test-libs"
+        );
+
         PsiTestUtil.addLibrary(
             myFixture.getProjectDisposable(),
             myFixture.getModule(),

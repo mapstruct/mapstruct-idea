@@ -61,6 +61,11 @@ abstract class MapstructBaseReference extends BaseReference {
     }
 
     @Nullable
+    public MapstructBaseReference getPrevious() {
+        return this.previous;
+    }
+
+    @Nullable
     @Override
     public final PsiElement resolve() {
         String value = getValue();

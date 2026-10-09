@@ -6,6 +6,7 @@
 package org.mapstruct.intellij.codeinsight.references;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -23,6 +24,7 @@ import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
+import org.mapstruct.intellij.util.SourceUtils;
 
 import static org.mapstruct.intellij.util.MapstructUtil.asLookup;
 import static org.mapstruct.intellij.util.MapstructUtil.findRecordComponent;
@@ -133,21 +135,31 @@ class MapstructSourceReference extends BaseMappingReference {
     @Override
     PsiType resolvedType() {
         PsiElement element = resolve();
+        PsiType elementType = switch ( element ) {
+            case PsiMethod psiMethod -> psiMethod.getReturnType();
+            case PsiParameter psiParameter -> psiParameter.getType();
+            case PsiRecordComponent psiRecordComponent -> psiRecordComponent.getType();
+            case PsiField psiField -> psiField.getType();
+            case null, default -> null;
+        };
 
-        if ( element instanceof PsiMethod psiMethod ) {
-            return psiMethod.getReturnType();
-        }
-        else if ( element instanceof PsiParameter psiParameter ) {
-            return psiParameter.getType();
-        }
-        else if ( element instanceof PsiRecordComponent psiRecordComponent ) {
-            return psiRecordComponent.getType();
-        }
-        else if ( element instanceof PsiField psiField ) {
-            return psiField.getType();
+        if ( elementType == null ) {
+            return null;
         }
 
-        return null;
+        PsiType contextType = Optional.ofNullable( getPrevious() )
+                .map( MapstructBaseReference::resolvedType )
+                .or( () -> Optional.ofNullable( this.getMappingMethod() )
+                        .map( MapstructUtil::getSourceParameters )
+                        .filter( params -> params.length == 1 )
+                        .map( psiParameters -> psiParameters[0] )
+                        .map( SourceUtils::getParameterType )
+                )
+                .orElse( null );
+
+        return PsiUtil.resolveGenericsClassInType( contextType )
+                .getSubstitutor()
+                .substitute( elementType );
     }
 
     /**

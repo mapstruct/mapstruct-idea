@@ -488,6 +488,114 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
             );
     }
 
+    public void testGenericCarWrapperSourceAutoCompleteAfterCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder(
+                "winCode"
+            );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder(
+                createVariable( "winCode", "String" )
+            );
+    }
+
+    public void testGenericCarWrapperTargetAutoCompleteAfterCar() {
+        configureByTestName();
+
+        assertThat( myItems )
+            .extracting( LookupElement::getLookupString )
+            .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+            .extracting( LookupElementPresentation::renderElement )
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
+    public void testGenericCarWrapperSourceAutoCompleteAfterCarWithoutParameterPrefix() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
+    public void testGenericConstructorCarMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
+    public void testGenericRecordConstructorTargetMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
+                .containsExactlyInAnyOrder( createParameter( "winCode", "String" ) );
+    }
+
+    public void testGenericConstructorMappingTargetUpdateMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
+    public void testGenericTwoTypeParamsConstructorTargetMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "serial" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder( createVariable( "serial", "String" ) );
+    }
+
+    public void testGenericNestedGenericTargetMapper() {
+        configureByTestName();
+
+        assertThat( myItems )
+                .extracting( LookupElement::getLookupString )
+                .containsExactlyInAnyOrder( "winCode" );
+
+        assertThat( myItems )
+                .extracting( LookupElementPresentation::renderElement )
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder( createVariable( "winCode", "String" ) );
+    }
+
     public void testVariantsCarMapperNoSourceClass() {
         myFixture.configureByFile( "CarMapperNoSourceClass.java" );
         complete();
