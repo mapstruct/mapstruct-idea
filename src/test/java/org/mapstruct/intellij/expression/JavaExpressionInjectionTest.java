@@ -177,6 +177,23 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
         "    CarPlainDto carToCarPlainDto(Car car);\n" +
         "}";
 
+    @Language("java")
+    private static final String CAR_MAPPER_TO_RECORD = "" +
+        "import java.util.List;\n" +
+        "\n" +
+        "import org.mapstruct.Mapper;\n" +
+        "import org.mapstruct.Mapping;\n" +
+        "import org.mapstruct.Mappings;\n" +
+        "import org.example.dto.CarDtoRecord;\n" +
+        "import org.example.dto.Car;\n" +
+        "\n" +
+        "@Mapper(" + MAPPER + ")\n" +
+        "public interface CarMapper {\n" +
+        "\n" +
+        "    " + MAPPING + "\n" +
+        "    CarDtoRecord carToCarDtoRecord(Car car);\n" +
+        "}";
+
     @Override
     protected String getTestDataPath() {
         return "testData/expression";
@@ -704,6 +721,35 @@ public class JavaExpressionInjectionTest extends MapstructBaseCompletionTestCase
                 "getNumberOfSeats",
                 "setNumberOfSeats"
             );
+
+        assertThat( myFixture.complete( CompletionType.SMART ) )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .containsExactlyInAnyOrder( "getMake", "toString" );
+
+        PsiElement elementAt = file.findElementAt( myFixture.getCaretOffset() );
+        assertThat( elementAt )
+            .isNotNull()
+            .isInstanceOf( PsiJavaToken.class );
+        assertThat( elementAt.getText() ).isEqualTo( ";" );
+    }
+
+    public void testExpressionWithRecordTarget() {
+        withRecordTarget( "expression" );
+        withRecordTarget( "defaultExpression" );
+        withRecordTarget( "conditionExpression" );
+    }
+
+    protected void withRecordTarget(String attribute) {
+        String mapping = "@Mapping(target = \"manufacturingYear\", " + attribute + " = \"java(car.<caret>)\")\n";
+        @Language("java")
+        String mapper = formatMapper( CAR_MAPPER_TO_RECORD, mapping );
+        PsiFile file = configureMapperByText( mapper );
+
+        assertThat( myFixture.completeBasic() )
+            .extracting( LookupElementPresentation::renderElement )
+            .extracting( LookupElementPresentation::getItemText )
+            .contains( "getMake", "getNumberOfSeats", "getManufacturingDate" );
 
         assertThat( myFixture.complete( CompletionType.SMART ) )
             .extracting( LookupElementPresentation::renderElement )
