@@ -106,7 +106,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             );
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .containsExactlyInAnyOrder(
                 createField( "OPEN", "RoofType" ),
                 createField( "BOX", "RoofType" ),
@@ -135,7 +135,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             );
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .containsExactlyInAnyOrder(
                 createField( "OPEN", "RoofType" ),
                 createField( "BOX", "RoofType" ),
@@ -163,7 +163,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             );
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .containsExactlyInAnyOrder(
                 createField( "OPEN", "RoofType" ),
                 createField( "BOX", "RoofType" ),
@@ -190,7 +190,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             .isEmpty();
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .isEmpty();
     }
 
@@ -213,7 +213,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
             .isEmpty();
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .isEmpty();
     }
 
@@ -275,7 +275,7 @@ public class ValueMappingCompletionTestCase extends MapstructBaseCompletionTestC
 
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
-            .usingElementComparatorIgnoringFields( "myIcon" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon" )
             .containsExactlyInAnyOrder(
                 createField( "OPEN", "ExternalRoofType" ),
                 createField( "BOX", "ExternalRoofType" ),
