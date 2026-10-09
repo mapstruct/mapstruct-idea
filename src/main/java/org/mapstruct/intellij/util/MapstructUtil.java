@@ -61,6 +61,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
+import org.mapstruct.SubclassMapping;
+import org.mapstruct.SubclassMappings;
 import org.mapstruct.ValueMapping;
 import org.mapstruct.ValueMappings;
 import org.mapstruct.factory.Mappers;
@@ -98,8 +100,11 @@ public class MapstructUtil {
 
     public static final String MAPPINGS_ANNOTATION_FQN = Mappings.class.getName();
 
-    static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
-    static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
+    public static final String SUBCLASS_MAPPING_ANNOTATION_FQN = SubclassMapping.class.getName();
+    public static final String SUBCLASS_MAPPINGS_ANNOTATION_FQN = SubclassMappings.class.getName();
+
+    public static final String VALUE_MAPPING_ANNOTATION_FQN = ValueMapping.class.getName();
+    public static final String VALUE_MAPPINGS_ANNOTATION_FQN = ValueMappings.class.getName();
     private static final String MAPPING_TARGET_ANNOTATION_FQN = MappingTarget.class.getName();
     private static final String CONTEXT_ANNOTATION_FQN = Context.class.getName();
     private static final String BUILDER_ANNOTATION_FQN = Builder.class.getName();

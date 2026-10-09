@@ -155,6 +155,22 @@
             key="inspection.mapstruct.references"
             shortName="MapstructReferenceInspection"
             implementationClass="org.mapstruct.intellij.inspection.MapstructReferenceInspection"/>
+    <localInspection
+            language="JAVA"
+            enabledByDefault="true"
+            level="ERROR"
+            bundle="org.mapstruct.intellij.messages.MapStructBundle"
+            key="inspection.subclass.mapping.source.subclass.already.defined.title"
+            shortName="SubclassMappingSourceSubclassMappedMoreThanOnceInspection"
+            implementationClass="org.mapstruct.intellij.inspection.SubclassMappingSourceSubclassMappedMoreThanOnceInspection"/>
+      <localInspection
+              language="JAVA"
+              enabledByDefault="true"
+              level="ERROR"
+              bundle="org.mapstruct.intellij.messages.MapStructBundle"
+              key="inspection.value.mapping.source.mapped.more.than.once.title"
+              shortName="ValueMappingSourceMappedMoreThanOnceInspection"
+              implementationClass="org.mapstruct.intellij.inspection.ValueMappingSourceMappedMoreThanOnceInspection"/>
   </extensions>
 
   <actions>
