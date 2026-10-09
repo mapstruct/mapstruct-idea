@@ -553,8 +553,7 @@ public class MapstructCompletionTestCase extends MapstructBaseCompletionTestCase
 
         assertThat( myItems )
                 .extracting( LookupElementPresentation::renderElement )
-                .usingRecursiveFieldByFieldElementComparator()
-                .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
                 .containsExactlyInAnyOrder( createParameter( "winCode", "String" ) );
     }
 
