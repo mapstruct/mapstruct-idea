@@ -6,9 +6,10 @@
 package org.mapstruct.intellij.util.patterns;
 
 import com.intellij.patterns.ElementPattern;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes;
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression;
 
 import static org.mapstruct.intellij.util.patterns.MapStructKotlinPatterns.ktAnnotation;
 import static org.mapstruct.intellij.util.patterns.MapStructKotlinPatterns.ktValueArgument;
@@ -36,7 +37,7 @@ public class KotlinElementPattern<T extends PsiElement, Self extends KotlinEleme
         // @Mapping(target = "name")
 
         KtValueArgumentPattern ktValueArgumentPattern = ktValueArgument().withName( parameterName );
-        return withElementType( KtStubElementTypes.STRING_TEMPLATE ).andOr(
+        return and( PlatformPatterns.psiElement( KtStringTemplateExpression.class ) ).andOr(
             withParent(
                 ktValueArgumentPattern
                     .withAncestor( 5, ktAnnotation().qName( annotationHolderQualifiedName ) )
@@ -54,7 +55,7 @@ public class KotlinElementPattern<T extends PsiElement, Self extends KotlinEleme
         String parameterName) {
 
         KtValueArgumentPattern ktValueArgumentPattern = ktValueArgument().withName( parameterName );
-        return withElementType( KtStubElementTypes.STRING_TEMPLATE ).andOr(
+        return and( PlatformPatterns.psiElement( KtStringTemplateExpression.class ) ).andOr(
             withAncestor(
                 2,
                 ktValueArgumentPattern
