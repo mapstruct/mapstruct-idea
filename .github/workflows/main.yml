@@ -8,10 +8,9 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - { jdk: 21, idea: 2025.1 }
-          - { jdk: 21, idea: 2025.2 }
-          - { jdk: 21, idea: 2025.3 }
           - { jdk: 21, idea: 2026.1 }
+          - { jdk: 25, idea: 2026.2 }
+          - { jdk: 25, idea: 2026.3 }
           - { jdk: 25, idea: LATEST-EAP-SNAPSHOT }
     name: 'IDEA ${{ matrix.version.idea }}'
     env:
@@ -32,7 +31,7 @@ jobs:
       - name: 'Generate coverage report'
         run: ./gradlew --warning-mode=all jacocoTestReport
       - name: 'Upload coverage to Codecov'
-        if: github.repository == 'mapstruct/mapstruct-idea' &&  matrix.version.idea  == '2025.1'
+        if: github.repository == 'mapstruct/mapstruct-idea' &&  matrix.version.idea  == '2026.1'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           fail_ci_if_error: true
