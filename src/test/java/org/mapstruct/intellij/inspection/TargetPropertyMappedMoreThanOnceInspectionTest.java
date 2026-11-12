@@ -65,4 +65,8 @@ public class TargetPropertyMappedMoreThanOnceInspectionTest extends BaseInspecti
         Caret currentCaret = myFixture.getEditor().getCaretModel().getCurrentCaret();
         assertThat( currentCaret.getSelectedText( ) ).isEqualTo( "testName" );
     }
+
+    public void testTargetPropertyNotMappedMoreThanOnceFromAnnotation() {
+        doTest();
+    }
 }

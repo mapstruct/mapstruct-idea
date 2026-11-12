@@ -5,6 +5,7 @@
  */
 package org.mapstruct.intellij.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -297,9 +298,12 @@ public class MapstructAnnotationUtils {
     private static Stream<PsiAnnotation> findAllDefinedMappingAnnotations(@NotNull PsiModifierListOwner owner,
                                                                           boolean includeMetaAnnotations) {
         //TODO cache
+        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
+        if ( includeMetaAnnotations ) {
+            return mappingAnnotations;
+        }
         PsiAnnotation mappings = findAnnotation( owner, true, MapstructUtil.MAPPINGS_ANNOTATION_FQN );
         Stream<PsiAnnotation> mappingsAnnotations = extractMappingAnnotationsFromMappings( mappings );
-        Stream<PsiAnnotation> mappingAnnotations = findMappingAnnotations( owner, includeMetaAnnotations );
 
         return Stream.concat( mappingAnnotations, mappingsAnnotations );
     }
@@ -330,10 +334,10 @@ public class MapstructAnnotationUtils {
     }
 
     @NotNull
-    private static Set<PsiAnnotation> findDirectAndMetaAnnotations(@NotNull PsiModifierListOwner owner,
+    private static List<PsiAnnotation> findDirectAndMetaAnnotations(@NotNull PsiModifierListOwner owner,
                                                                    Set<? super PsiClass> visited) {
 
-        Set<PsiAnnotation> result = new HashSet<>();
+        List<PsiAnnotation> result = new ArrayList<>();
 
         // to avoid infinite loops, do not include meta annotations at this point
         findAllDefinedMappingAnnotations( owner, false ).forEach( result::add );
