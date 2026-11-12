@@ -36,3 +36,23 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  # Runs the release build without the Gradle cache. A warm cache can skip dependency
+  # verification for metadata that a fresh cache (like the one in the release job) resolves.
+  verify_dependencies:
+    name: 'Dependency verification (no cache)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: 'Set up JDK'
+        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-disabled: true
+      - name: 'Build plugin'
+        run: ./gradlew --warning-mode=all buildPlugin
