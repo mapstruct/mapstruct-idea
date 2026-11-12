@@ -44,6 +44,14 @@ intellijPlatform {
             untilBuild = provider { null } as Provider<? extends String>
         }
     }
+    signing {
+        certificateChain = providers.environmentVariable('CERTIFICATE_CHAIN')
+        privateKey = providers.environmentVariable('PRIVATE_KEY')
+        password = providers.environmentVariable('PRIVATE_KEY_PASSWORD')
+    }
+    publishing {
+        token = providers.environmentVariable('JETBRAINS_MARKETPLACE_TOKEN')
+    }
 }
 
 // Simple function to load change-notes.html and description.html into valid text for plugin.xml
@@ -104,6 +112,8 @@ dependencies {
 
         bundledPlugin( 'com.intellij.java' )
         bundledPlugin( 'org.jetbrains.kotlin' )
+
+        zipSigner( '0.1.45' )
 
         testFramework( TestFrameworkType.Platform.INSTANCE )
         testFramework( TestFrameworkType.Plugin.Java.INSTANCE )
