@@ -28,7 +28,6 @@ java {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     intellijPlatform {
         defaultRepositories()
@@ -160,5 +159,21 @@ test {
     useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
+    }
+}
+
+// Dependency verification (gradle/verification-metadata.xml) only covers what ends up in the plugin distribution
+// and what runs while signing and publishing the plugin.
+// The Gradle plugins are always verified. Everything else (tests, checkstyle, jacoco) only runs in CI,
+// and depends on the IDEA version that is being tested against.
+def verifiedConfigurations = [
+        'runtimeClasspath',
+        'intellijPlatformRuntimeClasspath',
+        'intellijPlatformSandboxRuntimeClasspath',
+        'marketplaceZipSigner',
+]
+configurations.configureEach {
+    if (!verifiedConfigurations.contains(name)) {
+        resolutionStrategy.disableDependencyVerification()
     }
 }
