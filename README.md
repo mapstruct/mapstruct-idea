@@ -26,8 +26,10 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
   * Completion of `target` and `source` properties in `@ValueMapping` annotation
   * Completion of `componentModel` in `@Mapper` and `@MapperConfig` annotations
   * Completion of `qualifiedByName` in `@Mapping` annotation
+  * Completion of `name` in `@InheritConfiguration` and `@InheritInverseConfiguration` annotations
 * Go To Declaration for properties in `target` and `source` to setters / getters
 * Go To Declaration for `Mapping#qualifiedByName`
+* Go To Declaration for `name` in `@InheritConfiguration` and `@InheritInverseConfiguration` annotations
 * Find usages of properties in `target` and `source` and find usages of setters / getters in `@Mapping` annotations
 * Highlighting properties in `target` and `source`
 * Errors and Quick fixes:
@@ -41,6 +43,7 @@ To learn more about MapStruct have a look at the [mapstruct](https://github.com/
   * `*` used as a source in `@Mapping` annotation with quick fixes: Replace `*` with method parameter name.
   * Unknown reference inspection for `source` and `target` in `@Mapping` and `@ValueMapping` annotation. 
   * Unknown reference inspection for `qualifiedByName` in `@Mapping` annotation
+  * Unknown reference inspection for `name` in `@InheritConfiguration` and `@InheritInverseConfiguration` annotations
  
 ## Requirements
 

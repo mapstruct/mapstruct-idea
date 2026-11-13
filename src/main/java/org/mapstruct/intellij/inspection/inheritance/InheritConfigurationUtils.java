@@ -294,7 +294,7 @@ public class InheritConfigurationUtils {
      * @param mapperAnnotation the mapper annotation of the containing class
      * @return possible mapping methods to be inherited from
      */
-    private static Stream<PsiMethod> findMappingMethodsFromInheritScope(@NotNull PsiClass containingClass,
+    public static Stream<PsiMethod> findMappingMethodsFromInheritScope(@NotNull PsiClass containingClass,
                                                                         @NotNull PsiAnnotation mapperAnnotation) {
 
         Stream<PsiMethod> localAndParentMethods = Arrays.stream( containingClass.getAllMethods() );

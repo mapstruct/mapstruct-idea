@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.codeinsight.references.BaseReference;
 import org.mapstruct.intellij.codeinsight.references.BaseValueMappingReference;
+import org.mapstruct.intellij.codeinsight.references.InheritConfigurationNameReference;
 import org.mapstruct.intellij.util.MapstructUtil;
 
 /**
@@ -73,6 +74,11 @@ public class MapstructReferenceInspection extends InspectionBase {
         private boolean shouldRegisterProblem(BaseReference reference) {
             if ( reference instanceof BaseValueMappingReference valueMappingReference ) {
                 return valueMappingReference.getEnumClass() != null;
+            }
+
+            if ( reference instanceof InheritConfigurationNameReference ) {
+                // The name attribute references a method name, not a property that could be a map key.
+                return true;
             }
 
             if ( hasSingleStringKeyMapSourceParameter( reference.getMappingMethod() ) ) {

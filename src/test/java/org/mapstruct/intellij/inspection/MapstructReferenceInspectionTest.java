@@ -49,4 +49,20 @@ public class MapstructReferenceInspectionTest extends BaseInspectionTest {
     public void testUnknownQualifiedByNameReferenceReference() {
         doTest();
     }
+
+    public void testUnknownInheritConfigurationNameReference() {
+        doTest();
+    }
+
+    public void testUnknownInheritConfigurationNameReferenceWithMapSource() {
+        doTest();
+    }
+
+    public void testUnknownInheritInverseConfigurationNameReference() {
+        doTest();
+    }
+
+    public void testInheritConfigurationWithMapperConfigReference() {
+        doTest();
+    }
 }
