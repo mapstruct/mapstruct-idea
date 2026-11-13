@@ -120,7 +120,7 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
         assertThat( myItems )
             .extracting( LookupElementPresentation::renderElement )
             .usingRecursiveFieldByFieldElementComparator()
-            .usingElementComparatorIgnoringFields( "myIcon", "myTail" )
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields( "myIcon", "myTail" )
             .containsExactlyInAnyOrder(
                 createParameter( "name", "String" )
             );
